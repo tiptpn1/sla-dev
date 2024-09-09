@@ -1,0 +1,246 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Eviden;
+use App\Traits\RoleTrait;
+use Carbon\Carbon;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Session;
+use ZipArchive;
+
+class DashboardController extends Controller
+{
+    use RoleTrait;
+    public function index(Request $request)
+    {
+        $selectedUnit = $request->input('unit', Session::get('bagian_id'));
+        $tahun = $request->input('tahun', Carbon::now()->year);
+        // dd(Session::all());
+        $current_bagian = Session::get('bagian_id');
+        $bagian_id = $selectedUnit;
+        $semua_bagian = DB::table('kpi_master_bagian')
+            ->orderBy('kpi_master_bagian_id', 'desc')
+            ->get();
+        $bagian = DB::table('kpi_master_bagian')
+            ->where('kpi_master_bagian_id', $current_bagian)->first();
+        $segments = DB::table('kpi_master_data_kpi_segmen')->get();
+        $subSegments = DB::table('kpi_master_data_kpi_subsegmen')->get();
+        $type = $this->getRoleByBagianId($bagian->kpi_master_bagian_id);
+        // dd($type);
+        $years = DB::table('kpi_master_data_kpi')
+            ->select('kpi_master_data_kpi_tahun')
+            ->distinct()
+            ->orderBy('kpi_master_data_kpi_tahun', 'asc')
+            ->pluck('kpi_master_data_kpi_tahun');
+
+        $query = DB::table('kpi_master_data_kpi AS kpi')
+            ->leftJoin('kpi_master_data_kpi_segmen AS segmen', 'kpi.kpi_master_data_kpi_segmen_id', '=', 'segmen.kpi_master_data_kpi_segmen_id')
+            ->leftJoin('kpi_master_data_kpi_subsegmen AS subsegmen', 'kpi.kpi_master_data_kpi_subsegmen_id', '=', 'subsegmen.kpi_master_data_kpi_subsegmen_id')
+            ->leftJoin('kpi_distribusi_kpi AS distribusi', 'kpi.kpi_master_data_kpi_id', '=', 'distribusi.kpi_distribusi_kpi_master_data_kpi_id')
+            ->leftJoin('kpi_monitoring AS monitoring', 'distribusi.kpi_distribusi_kpi_id', '=', 'monitoring.kpi_monitoring_distribusi_id')
+            ->leftJoin('kpi_satuan AS satuan', 'kpi.kpi_master_data_kpi_satuan', '=', 'satuan.kpi_satuan_id')
+            ->leftJoin('kpi_hub_pemilik AS pemilik', 'distribusi.kpi_distribusi_kpi_id', '=', 'pemilik.kpi_hub_pemilik_distribusi_id')
+            ->where(function ($query) use ($bagian_id) {
+                $query->where('distribusi.kpi_distribusi_kpi_master_bagian_id', '=', $bagian_id)
+                    ->orWhere('pemilik.kpi_hub_pemilik_bagian_id', '=', $bagian_id);
+            })
+            ->where('kpi.kpi_master_data_kpi_tahun', '=', $tahun)
+            ->select(
+                DB::raw('DISTINCT kpi.kpi_master_data_kpi_id'),
+                'kpi.kpi_master_data_kpi_tahun',
+                'segmen.kpi_master_data_kpi_segmen_global AS segmen_global',
+                'subsegmen.kpi_master_data_kpi_subsegmen_judul AS subsegmen_judul',
+                'kpi.kpi_master_data_kpi_nama',
+                'kpi.kpi_master_data_kpi_formula',
+                'kpi.kpi_master_data_kpi_esg',
+                'kpi.kpi_master_data_kpi_ps',
+                'kpi.kpi_master_data_kpi_satuan',
+                'kpi.kpi_master_data_kpi_polaritas',
+                'kpi.kpi_master_data_kpi_created',
+                'kpi.kpi_master_data_kpi_updated',
+                'distribusi.kpi_distribusi_kpi_bobot',
+                'distribusi.kpi_distribusi_kpi_target',
+                'distribusi.kpi_distribusi_kpi_master_bagian_id',
+                'satuan.kpi_satuan_id',
+                'satuan.kpi_satuan_nama',
+                // 'monitoring.kpi_monitoring_realisasi',
+                // 'monitoring.kpi_monitoring_rkap_bulan_ini',
+                // 'monitoring.kpi_monitoring_realisasi_target_bulanan',
+                // 'monitoring.kpi_monitoring_realiasai_target_tahun'
+            )
+            ->orderBy('segmen.kpi_master_data_kpi_segmen_global')
+            ->orderBy('subsegmen.kpi_master_data_kpi_subsegmen_judul')
+            ->get();
+        // Mengelompokkan data berdasarkan segmen dan subsegmen
+        $grouped_data = $query->groupBy('segmen_global')->map(function ($items) {
+            return $items->groupBy('subsegmen_judul')->map(function ($subsegmen) {
+                return [
+                    'data' => $subsegmen,
+                    'subtotal_bobot' => $subsegmen->sum('kpi_distribusi_kpi_bobot'),
+                    'subtotal_skor_bulan' => $subsegmen->sum('kpi_monitoring_realisasi_target_bulanan'),
+                    'subtotal_skor_tahun' => $subsegmen->sum('kpi_monitoring_realiasai_target_tahun')
+                ];
+            });
+        });
+
+        // dd($grouped_data);
+
+        return view('pages/dashboard', compact(
+            'semua_bagian',
+            'bagian',
+            'type',
+            'current_bagian',
+            'bagian_id',
+            'years',
+            'segments',
+            'subSegments',
+            'grouped_data',
+            'selectedUnit',
+            'tahun',
+        ));
+
+        // dd($bagian);
+        // Mengambil data dari database menggunakan query yang diberikan
+        // $kpi_ekonomi_finansial = DB::table('kpi_master_data_kpi AS kpi')
+        //     ->leftJoin('kpi_master_data_kpi_segmen AS segmen', 'kpi.kpi_master_data_kpi_segmen_id', '=', 'segmen.kpi_master_data_kpi_segmen_id')
+        //     ->leftJoin('kpi_master_data_kpi_subsegmen AS subsegmen', 'kpi.kpi_master_data_kpi_subsegmen_id', '=', 'subsegmen.kpi_master_data_kpi_subsegmen_id')
+        //     ->leftJoin('kpi_distribusi_kpi AS distribusi', function ($join) {
+        //         $join->on('kpi.kpi_master_data_kpi_id', '=', 'distribusi.kpi_distribusi_kpi_master_data_kpi_id');
+        //     })
+        //     // ->leftJoin('kpi_hub_pemilik AS pemilik', 'distribusi.kpi_distribusi_kpi_master_bagian_id', '=', 'pemilik.kpi_hub_pemilik_distribusi_id')
+        //     ->where('segmen.kpi_master_data_kpi_segmen_id', '=', 1)
+        //     ->where('subsegmen.kpi_master_data_kpi_subsegmen_id', '=', 1)
+        //     ->where(function ($query) use ($bagian_id) {
+        //         if ($bagian_id != 0) {
+        //             $query->where('distribusi.kpi_distribusi_kpi_master_bagian_id', '=', $bagian_id);
+        //         } else {
+        //             $query->where('distribusi.kpi_distribusi_kpi_master_bagian_id', '!=', 0);
+        //         }
+        //     })
+
+        //     ->select(
+        //         'kpi.kpi_master_data_kpi_id',
+        //         'kpi.kpi_master_data_kpi_tahun',
+        //         'segmen.kpi_master_data_kpi_segmen_global AS segmen_global',
+        //         'subsegmen.kpi_master_data_kpi_subsegmen_judul AS subsegmen_judul',
+        //         'kpi.kpi_master_data_kpi_nama',
+        //         'kpi.kpi_master_data_kpi_formula',
+        //         'kpi.kpi_master_data_kpi_esg',
+        //         'kpi.kpi_master_data_kpi_ps',
+        //         'kpi.kpi_master_data_kpi_satuan',
+        //         'kpi.kpi_master_data_kpi_polaritas',
+        //         'kpi.kpi_master_data_kpi_created',
+        //         'kpi.kpi_master_data_kpi_updated',
+        //         'distribusi.kpi_distribusi_kpi_bobot',
+        //         'distribusi.kpi_distribusi_kpi_target',
+        //         'distribusi.kpi_distribusi_kpi_master_bagian_id'
+        //     )
+        //     ->get();
+        // // dd($kpi_ekonomi_finansial);
+
+        // // Hitung subtotal jika diperlukan
+        // $subtotal_bobot_ekonomi_finansial = $kpi_ekonomi_finansial->sum('kpi_distribusi_kpi_bobot');
+        // $subtotal_skor_bulan_ekonomi_finansial = $kpi_ekonomi_finansial->sum('kpi_monitoring_realisasi_target_bulanan');
+        // $subtotal_skor_tahun_ekonomi_finansial = $kpi_ekonomi_finansial->sum('kpi_monitoring_realiasai_target_tahun');
+    }
+
+    public function dashdata(Request $request)
+    {
+        $unit = $request->input('unit');
+        $tahun = $request->input('tahun');
+        dd([$unit, $tahun]);
+
+
+        // if ($unit == "1") {
+        //     return view('pages/dashboard');
+        // } else if ($unit == "2") {
+        //     return view('pages/dashboard-dirkeu');
+        // } else if ($unit == "3") {
+        //     return view('pages/dashboard-dirops');
+        // } else if ($unit == "4") {
+        //     return view('pages/dashboard-dirsdm');
+        // } else if ($unit == "5") {
+        //     return view('pages/dashboard-dirpma');
+        // } else if ($unit == "6") {
+        //     return view('pages/dashboard-dirhk');
+        // } else if ($unit == "7") {
+        //     return view('pages/dashboard-reg1');
+        // } else if ($unit == "8") {
+        //     return view('pages/dashboard-reg2');
+        // } else if ($unit == "9") {
+        //     return view('pages/dashboard-reg3');
+        // } else if ($unit == "10") {
+        //     return view('pages/dashboard-reg4');
+        // } else if ($unit == "11") {
+        //     return view('pages/dashboard-reg5');
+        // } else if ($unit == "12") {
+        //     return view('pages/dashboard-reg6');
+        // } else if ($unit == "13") {
+        //     return view('pages/dashboard-reg7');
+        // } else if ($unit == "14") {
+        //     return view('pages/dashboard-reg8');
+        // } else {
+        //     return view('pages/dashboard');
+        // }
+    }
+
+    public function processForm(Request $request)
+    {
+        // Validasi input jika diperlukan
+        $request->validate([
+            'bulan' => 'required', // Sesuaikan dengan aturan validasi yang sesuai
+            'angka' => 'nullable|numeric', // Contoh validasi angka
+            'unit' => 'required',
+        ]);
+
+        // Ambil nilai bulan dari form
+        $selectedMonth = $request->input('bulan');
+
+        // Jika bulan yang dipilih adalah Mei 2024, set nilai angka menjadi 0
+        if ($selectedMonth == "1") {
+            $angka = 0;
+        } elseif ($selectedMonth == "2") {
+            $angka = 0;
+        } else if ($selectedMonth == "3") {
+            $angka = 0;
+        } else if ($selectedMonth == "4") {
+            $angka = 0;
+        } else if ($selectedMonth == "5") {
+            $angka = 0;
+        } else if ($selectedMonth == "6") {
+            $angka = 0;
+        } else if ($selectedMonth == "7") {
+            $angka = 0;
+        } else if ($selectedMonth == "8") {
+            $angka = 0;
+        } else if ($selectedMonth == "9") {
+            $angka = 0;
+        } else if ($selectedMonth == "10") {
+            $angka = 0;
+        } else if ($selectedMonth == "11") {
+            $angka = 0;
+        } else if ($selectedMonth == "12") {
+            $angka = 0;
+        } else {
+            // Jika bukan Mei 2024, gunakan nilai yang diinputkan
+            $angka = $request->input('angka');
+        }
+
+        // Lakukan apa yang perlu dilakukan dengan nilai angka, misalnya menyimpan ke database
+        // atau menampilkan kembali ke view dengan nilai angka yang sudah diubah
+
+        //return view('pages/mondash')->with('angka', $angka); // Menampilkan kembali form dengan nilai angka
+        return redirect('/mon_data')->with(['message' => 'Form submitted successfully', 'angka' => $angka]);
+    }
+
+    public function search(Request $request)
+    {
+        $Unit = $request->input('unit') ?? null;
+        $Tahun = $request->input('tahun') ?? null;
+    }
+}
