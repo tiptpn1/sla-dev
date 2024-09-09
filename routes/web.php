@@ -1,12 +1,13 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BagianController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DivisiController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\SummaryIndicatorController;
-use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,14 +31,25 @@ Route::post('logout', 'App\Http\Controllers\AuthController@logout')->name('logou
 // Master Divisi
 Route::group(['prefix' => 'master-bagian', 'as' => 'master-bagian.'], function () {
     Route::get('/', [BagianController::class, 'index'])->name('index');
+    Route::get('get-data', [BagianController::class, 'getData'])->name('get-data');
+    Route::get('get-data/{id}', [BagianController::class, 'getDataById'])->name('get-data-id');
+    Route::post('store', [BagianController::class, 'store'])->name('store');
+    Route::post('status/{id}', [BagianController::class, 'updateStatus'])->name('update-status');
+    Route::post('form/{id}', [BagianController::class, 'updateForm'])->name('update-form');
+    Route::delete('delete/{id}', [BagianController::class, 'delete'])->name('delete');
+});
+
+// Master Project
+Route::group(['prefix' => 'master-proyek', 'as' => 'master-proyek.'], function () {
+    Route::get('/', [ProjectController::class, 'index'])->name('index');
+    Route::get('get-data', [ProjectController::class, 'getData'])->name('get-data');
+    Route::get('get-data/{id}', [ProjectController::class, 'getDataById'])->name('get-data-id');
+    Route::post('store', [ProjectController::class, 'store'])->name('store');
+    Route::post('status/{id}', [ProjectController::class, 'updateStatus'])->name('update-status');
+    Route::post('form/{id}', [ProjectController::class, 'updateForm'])->name('update-form');
+    Route::delete('delete/{id}', [ProjectController::class, 'delete'])->name('delete');
 });
 
 
-Route::get('/master-bagian/get-data', [BagianController::class, 'getData'])->name('master-bagian.get-data');
-Route::get('/master-bagian/get-data/{id}', [BagianController::class, 'getDataById'])->name('master-bagian.get-data-id');
-Route::post('/master-bagian/store', [BagianController::class, 'store'])->name('master-bagian.store');
-Route::post('/master-bagian/status/{id}', [BagianController::class, 'updateStatus'])->name('master-bagian.update-status');
-Route::post('/master-bagian/form/{id}', [BagianController::class, 'updateForm'])->name('master-bagian.update-form');
-Route::delete('/master-bagian/delete/{id}', [BagianController::class, 'delete'])->name('master-bagian.delete');
 
 Route::get('admin', [AdminController::class, 'index'])->name('index');
