@@ -133,7 +133,7 @@
                     <table id="masterBagianTable" class="table table-bordered table-striped">
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th>NO</th>
                                 <th>Nama Bagian</th>
                                 <th>Status Aktif</th>
                                 <th>Action</th>
@@ -307,27 +307,31 @@ $(document).ready(function() {
     });
 
     $('#editForm').on('submit', function(e) {
-        e.preventDefault();
-        $.ajax({
-            url: '{{ route("master-bagian.update-status", ":id") }}'.replace(':id', $('#editId').val()),
-            method: 'POST',
-            data: {
-                status: $('#editIsActive').val()
-            },
-            success: function(response) {
-                if (response.status === 'success') {
-                    $('#editModal').modal('hide');
-                    fetchData();
-                    Swal.fire({
+    e.preventDefault();
+    var id = $('#editId').val();
+    
+    $.ajax({
+        url: '{{ route("master-bagian.update-status", ":id") }}'.replace(':id', id),
+        method: 'POST',
+        data: {
+            namaBagian: $('#editNamaBagian').val(),
+            status: $('#editIsActive').val()
+        },
+        success: function(response) {
+            if (response.status === 'success') {
+                $('#editModal').modal('hide');
+                fetchData();
+                Swal.fire({
                     icon: 'success',
                     title: 'Data berhasil diperbarui',
                     showConfirmButton: false,
                     timer: 1500
                 });
-                }
             }
-        });
+        }
     });
+});
+
 
     // Hapus data
     $('#masterBagianTable').on('click', '.delete-btn', function() {
@@ -381,6 +385,8 @@ $(document).ready(function() {
 });
 
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 @endpush
 
 

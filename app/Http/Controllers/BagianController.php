@@ -46,20 +46,20 @@ class BagianController extends Controller
 
         return response()->json(['status' => 'success']);
     }
-
     public function updateStatus($id, Request $request)
     {
         $validated = $request->validate([
+            'namaBagian' => 'required|string|max:255',
             'status' => 'required|boolean',
         ]);
 
         $bagian = Bagian::find($id);
+        $bagian->master_bagian_nama = $validated['namaBagian'];
         $bagian->is_active = $validated['status'];
         $bagian->save();
 
         return response()->json(['status' => 'success']);
     }
-
     public function delete($id)
     {
         Bagian::destroy($id);
