@@ -260,9 +260,9 @@ $(document).ready(function() {
                 table.clear();
                 $.each(data, function(index, item) {
                     table.row.add([
-                        item.master_bagian_id,
+                        index + 1,
                         item.master_bagian_nama,
-                        item.is_active ? 'Aktif' : 'Nonaktif',
+                        '<span class="badge ' + (item.is_active ? 'badge-success' : 'badge-danger') + '">' + (item.is_active ? 'Aktif' : 'Nonaktif') + '</span>',
                         '<button class="btn btn-warning btn-sm edit-btn" data-id="'+ item.master_bagian_id +'">Edit</button> ' +
                         '<button class="btn btn-danger btn-sm delete-btn" data-id="'+ item.master_bagian_id +'">Hapus</button> ' +
                         '<button class="btn btn-info btn-sm status-btn" data-id="'+ item.master_bagian_id +'" data-status="'+ (item.is_active ? 0 : 1) +'">' + (item.is_active ? 'Nonaktifkan' : 'Aktifkan') + '</button>'
@@ -318,6 +318,12 @@ $(document).ready(function() {
                 if (response.status === 'success') {
                     $('#editModal').modal('hide');
                     fetchData();
+                    Swal.fire({
+                    icon: 'success',
+                    title: 'Data berhasil diperbarui',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
                 }
             }
         });
@@ -339,6 +345,12 @@ $(document).ready(function() {
                 if (response.status === 'success') {
                     $('#deleteModal').modal('hide');
                     fetchData();
+                    Swal.fire({
+                            icon: 'success',
+                            title: 'Data berhasil dihapus',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
                 }
             }
         });
@@ -355,6 +367,13 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.status === 'success') {
                     fetchData();
+                    Swal.fire({
+                    icon: 'success',
+                    title: 'Data berhasil diperbarui',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+
                 }
             }
         });
