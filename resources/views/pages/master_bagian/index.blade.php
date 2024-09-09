@@ -311,7 +311,7 @@ $(document).ready(function() {
     var id = $('#editId').val();
     
     $.ajax({
-        url: '{{ route("master-bagian.update-status", ":id") }}'.replace(':id', id),
+        url: '{{ route("master-bagian.update-form", ":id") }}'.replace(':id', id),
         method: 'POST',
         data: {
             namaBagian: $('#editNamaBagian').val(),

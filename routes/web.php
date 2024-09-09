@@ -37,6 +37,7 @@ Route::get('/master-bagian/get-data', [BagianController::class, 'getData'])->nam
 Route::get('/master-bagian/get-data/{id}', [BagianController::class, 'getDataById'])->name('master-bagian.get-data-id');
 Route::post('/master-bagian/store', [BagianController::class, 'store'])->name('master-bagian.store');
 Route::post('/master-bagian/status/{id}', [BagianController::class, 'updateStatus'])->name('master-bagian.update-status');
+Route::post('/master-bagian/form/{id}', [BagianController::class, 'updateForm'])->name('master-bagian.update-form');
 Route::delete('/master-bagian/delete/{id}', [BagianController::class, 'delete'])->name('master-bagian.delete');
 
 Route::get('admin', [AdminController::class, 'index'])->name('index');
