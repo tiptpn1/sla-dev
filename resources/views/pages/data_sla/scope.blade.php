@@ -1,6 +1,6 @@
 @extends('master/master')
 
-@section('title', 'Data Master Scope')
+@section('title', 'Data Master Ruang Lingkup')
 
 @section('master-scope', 'active')
 
@@ -126,7 +126,7 @@
         <!-- Table -->
         <div class="card">
             <div class="card-header">
-                <button class="btn btn-primary" data-toggle="modal" data-target="#addModal">Tambah Master Project</button>
+                <button class="btn btn-primary" data-toggle="modal" data-target="#addModal">Tambah Ruang Lingkup</button>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -134,7 +134,7 @@
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <th>Nama Scope</th>
+                                <th>Ruang Lingkup</th>
                                 <th>Nama Project</th>
                                 <th>Status</th>
                                 <th>Action</th>
@@ -155,7 +155,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addModalLabel">Tambah Master Project</h5>
+                <h5 class="modal-title" id="addModalLabel">Tambah Ruang Lingkup</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -163,7 +163,7 @@
             <form id="addForm">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="namaScope">Nama Scope</label>
+                        <label for="namaScope">Nama Ruang Lingkup</label>
                         <input type="text" class="form-control" id="namaScope" name="namaScope" required>
                     </div>
                     <div class="form-group">
@@ -195,7 +195,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Edit Master Project</h5>
+                <h5 class="modal-title" id="editModalLabel">Edit Ruang Lingkup</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -204,7 +204,7 @@
                 <div class="modal-body">
                     <input type="hidden" id="editId" name="editId">
                     <div class="form-group">
-                        <label for="editScope">Nama Scope</label>
+                        <label for="editScope">Nama Ruang Lingkup</label>
                         <input type="text" class="form-control" id="editScope" name="editScope" required>
                     </div>
                     <div class="form-group">
@@ -277,7 +277,7 @@ $(document).ready(function() {
                     table.row.add([
                         index + 1,
                         item.nama,
-                        item.proyek.project_nama, 
+                        item.project_nama, 
                         '<span class="badge ' + (item.isActive ? 'badge-success' : 'badge-danger') + '">' + (item.isActive ? 'Aktif' : 'Nonaktif') + '</span>',
                         '<button class="btn btn-warning btn-sm edit-btn" data-id="'+ item.id +'">Edit</button> ' +
                         '<button class="btn btn-danger btn-sm delete-btn" data-id="'+ item.id +'">Hapus</button> ' +
