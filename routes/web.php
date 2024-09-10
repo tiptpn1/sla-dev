@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MasterBagianController;
 use App\Http\Controllers\UsernameController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\SummaryIndicatorController;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +37,18 @@ Route::group(['prefix' => 'master-username', 'as' => 'master-username.'], functi
     Route::get('{id}/data', [UsernameController::class, 'getDataById'])->name('get-data-by-id');
     Route::put('update', [UsernameController::class, 'update'])->name('update');
     Route::delete('destroy/{id}', [UsernameController::class, 'destroy'])->name('destroy');
+});
+
+Route::group(['prefix' => 'master-role', 'as' => 'master-role.'], function () {
+    Route::get('/', [RoleController::class, 'index'])->name('index');
+    Route::get('/get-data', [RoleController::class, 'getData'])->name('data');
+    Route::get('create', [RoleController::class, 'create'])->name('create');
+    Route::post('/store', [RoleController::class, 'store'])->name('store');
+    Route::get('{id}/show', [RoleController::class, 'show'])->name('show');
+    Route::get('{id}/edit', [RoleController::class, 'edit'])->name('edit');
+    Route::get('{id}/data', [RoleController::class, 'getDataById'])->name('get-data-by-id');
+    Route::put('update', [RoleController::class, 'update'])->name('update');
+    Route::delete('destroy/{id}', [RoleController::class, 'destroy'])->name('destroy');
 });
 
 //Dashboard KPI

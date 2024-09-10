@@ -156,6 +156,12 @@
                                         <p>User</p>
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('master-role.index') }}" class="nav-link @yield('master-role')">
+                                        <i class="nav-icon fas fa-user"></i>
+                                        <p>Hak Akses</p>
+                                    </a>
+                                </li>
                             </ul>
                         </li>
 
