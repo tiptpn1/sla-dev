@@ -168,8 +168,11 @@
                     </div>
                     <div class="form-group">
                         <label for="namaProyek">Nama Project</label>
-                        <input type="text" class="form-control" id="namaProyek" name="namaProyek" required>
+                        <select class="form-control" id="namaProyek" name="namaProyek" required>
+                            <!-- Options will be loaded dynamically with JavaScript -->
+                        </select>
                     </div>
+                    
                     <div class="form-group">
                         <label for="isActive">Status Aktif</label>
                         <select class="form-control" id="isActive" name="isActive" required>
@@ -205,9 +208,12 @@
                         <input type="text" class="form-control" id="editScope" name="editScope" required>
                     </div>
                     <div class="form-group">
-                        <label for="editProyek">Nama Proyek</label>
-                        <input type="text" class="form-control" id="editProyek" name="editProyek" required>
+                        <label for="editProyek">Nama Project</label>
+                        <select class="form-control" id="editProyek" name="editProyek" required>
+                            <!-- Options will be loaded dynamically with JavaScript -->
+                        </select>
                     </div>
+                    
                     <div class="form-group">
                         <label for="editIsActive">Status Aktif</label>
                         <select class="form-control" id="editIsActive" name="editIsActive" required>
@@ -271,7 +277,7 @@ $(document).ready(function() {
                     table.row.add([
                         index + 1,
                         item.nama,
-                        item.project_id,
+                        item.proyek.project_nama, 
                         '<span class="badge ' + (item.isActive ? 'badge-success' : 'badge-danger') + '">' + (item.isActive ? 'Aktif' : 'Nonaktif') + '</span>',
                         '<button class="btn btn-warning btn-sm edit-btn" data-id="'+ item.id +'">Edit</button> ' +
                         '<button class="btn btn-danger btn-sm delete-btn" data-id="'+ item.id +'">Hapus</button> ' +
@@ -400,6 +406,44 @@ $(document).ready(function() {
                 }
             }
         });
+    });
+});
+
+</script>
+
+<script>
+$(document).ready(function() {
+    function loadProjects() {
+        $.ajax({
+            url: '{{ route("master-scope.get-project-list") }}',  // URL untuk mengambil data project
+            method: 'GET',
+            success: function(response) {
+                $('#namaProyek').empty(); // Kosongkan dulu opsi sebelumnya
+                $('#editProyek').empty();
+
+                // Append option untuk Tambah
+                $.each(response, function(index, project) {
+                    $('#namaProyek').append('<option value="' + project.id_project + '">' + project.project_nama + '</option>');
+                });
+
+                // Append option untuk Edit
+                $.each(response, function(index, project) {
+                    $('#editProyek').append('<option value="' + project.id_project + '">' + project.project_nama + '</option>');
+                });
+            }
+        });
+    }
+
+    // Panggil fungsi untuk load data project
+    loadProjects();
+
+    // Panggil loadProjects() ketika membuka modal tambah atau edit
+    $('#addModal').on('shown.bs.modal', function() {
+        loadProjects();
+    });
+
+    $('#editModal').on('shown.bs.modal', function() {
+        loadProjects();
     });
 });
 
