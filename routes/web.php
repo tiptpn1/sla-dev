@@ -6,7 +6,10 @@ use App\Http\Controllers\BagianController;
 use App\Http\Controllers\DivisiController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UsernameController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\MonitoringController;
+use App\Http\Controllers\ScopeController;
 use App\Http\Controllers\SummaryIndicatorController;
 
 /*
@@ -50,6 +53,18 @@ Route::group(['prefix' => 'master-proyek', 'as' => 'master-proyek.'], function (
     Route::delete('delete/{id}', [ProjectController::class, 'delete'])->name('delete');
 });
 
+// Master Scope
+Route::group(['prefix' => 'master-scope', 'as' => 'master-scope.'], function () {
+    Route::get('/', [ScopeController::class, 'index'])->name('index');
+    Route::get('get-data', [ScopeController::class, 'getData'])->name('get-data');
+    Route::get('get-project-list', [ScopeController::class, 'getData'])->name('get-project-list');
+    Route::get('get-data/{id}', [ScopeController::class, 'getDataById'])->name('get-data-id');
+    Route::post('store', [ScopeController::class, 'store'])->name('store');
+    Route::post('status/{id}', [ScopeController::class, 'updateStatus'])->name('update-status');
+    Route::post('form/{id}', [ScopeController::class, 'updateForm'])->name('update-form');
+    Route::delete('delete/{id}', [ScopeController::class, 'delete'])->name('delete');
+});
 
 
-Route::get('admin', [AdminController::class, 'index'])->name('index');
+
+// Route::get('admin', [AdminController::class, 'index'])->name('index');
