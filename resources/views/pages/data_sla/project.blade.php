@@ -1,6 +1,6 @@
 @extends('master/master')
 
-@section('title', 'Data Master Proyek')
+@section('title', 'Data Master Project')
 
 @section('master-proyek', 'active')
 
@@ -126,7 +126,7 @@
         <!-- Table -->
         <div class="card">
             <div class="card-header">
-                <button class="btn btn-primary" data-toggle="modal" data-target="#addModal">Tambah Master Proyek</button>
+                <button class="btn btn-primary" data-toggle="modal" data-target="#addModal">Tambah Master Project</button>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -154,7 +154,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addModalLabel">Tambah Master Proyek</h5>
+                <h5 class="modal-title" id="addModalLabel">Tambah Master Project</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -187,7 +187,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Edit Master Proyek</h5>
+                <h5 class="modal-title" id="editModalLabel">Edit Master Project</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
