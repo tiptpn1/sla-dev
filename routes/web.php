@@ -57,7 +57,7 @@ Route::group(['prefix' => 'master-proyek', 'as' => 'master-proyek.'], function (
 Route::group(['prefix' => 'master-scope', 'as' => 'master-scope.'], function () {
     Route::get('/', [ScopeController::class, 'index'])->name('index');
     Route::get('get-data', [ScopeController::class, 'getData'])->name('get-data');
-    Route::get('get-project-list', [ScopeController::class, 'getData'])->name('get-project-list');
+    Route::get('get-project-list', [ScopeController::class, 'getProjectList'])->name('get-project-list');
     Route::get('get-data/{id}', [ScopeController::class, 'getDataById'])->name('get-data-id');
     Route::post('store', [ScopeController::class, 'store'])->name('store');
     Route::post('status/{id}', [ScopeController::class, 'updateStatus'])->name('update-status');
