@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use SebastianBergmann\CodeCoverage\Report\Xml\Project;
 
 class Scope extends Model
 {
@@ -18,4 +19,9 @@ class Scope extends Model
     const UPDATED_AT = 'updated_at';
 
     protected $guarded = ['id'];
+
+    // public function proyek()
+    // {
+    //     return $this->belongsTo(Proyek::class, 'project_id');  // Sesuaikan 'project_id' jika nama kolom berbeda
+    // }
 }
