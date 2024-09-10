@@ -418,6 +418,9 @@ $(document).ready(function() {
             url: '{{ route("master-scope.get-project-list") }}',  // URL untuk mengambil data project
             method: 'GET',
             success: function(response) {
+                var currentNamaProyekValue = $('#namaProyek').val(); // Simpan nilai yang sudah terpilih
+                var currentEditProyekValue = $('#editProyek').val(); // Simpan nilai yang sudah terpilih
+                
                 $('#namaProyek').empty(); // Kosongkan dulu opsi sebelumnya
                 $('#editProyek').empty();
 
@@ -430,6 +433,10 @@ $(document).ready(function() {
                 $.each(response, function(index, project) {
                     $('#editProyek').append('<option value="' + project.id_project + '">' + project.project_nama + '</option>');
                 });
+
+                // Set nilai yang sudah terpilih sebelumnya
+                $('#namaProyek').val(currentNamaProyekValue);
+                $('#editProyek').val(currentEditProyekValue);
             }
         });
     }
@@ -446,6 +453,7 @@ $(document).ready(function() {
         loadProjects();
     });
 });
+
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
