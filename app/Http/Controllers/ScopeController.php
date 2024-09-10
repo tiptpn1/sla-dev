@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Scope;
-use Illuminate\Http\Request;
+use App\Models\Proyek;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StoreScopeRequest;
 use App\Http\Requests\UpdateScopeRequest;
-use App\Models\Proyek;
 
 class ScopeController extends Controller
 {
@@ -19,7 +20,12 @@ class ScopeController extends Controller
     // Menyimpan data scope baru
     public function getData()
     {
-        return response()->json(Scope::all());
+        $scopes = DB::table('scopes')
+            ->join('master_project', 'scopes.project_id', '=', 'master_project.id_project')
+            ->select('scopes.*', 'master_project.project_nama') // Menentukan kolom yang ingin diambil
+            ->get();
+
+        return response()->json($scopes);
     }
 
     /**
