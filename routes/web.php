@@ -88,10 +88,10 @@ Route::prefix('evidence')->name('evidence.')->group(function () {
 });
 
 
-Route::get('admin', [AdminController::class, 'index'])->name('index');
 
 
 Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('ganchart', [DashboardController::class, 'ganchart'])->name('ganchart');
 
 Route::get('activities/data', [ServerSideActivityController::class, 'data'])->name('activities.data');
 Route::resource('activities', ActivityController::class);
