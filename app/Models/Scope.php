@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use SebastianBergmann\CodeCoverage\Report\Xml\Project;
+use Illuminate\Database\Eloquent\Model;
 
 class Scope extends Model
 {
@@ -15,13 +14,26 @@ class Scope extends Model
     protected $keyType = 'int';
     public $incrementing = true;
     public $timestamps = true;
-    const CREATED_AT = 'created_at';
-    const UPDATED_AT = 'updated_at';
+
+    protected $fillable = [
+        'nama',
+        'isActive',
+        'project_id'
+    ];
 
     protected $guarded = ['id'];
 
-    // public function proyek()
-    // {
-    //     return $this->belongsTo(Proyek::class, 'project_id');  // Sesuaikan 'project_id' jika nama kolom berbeda
-    // }
+
+
+
+    public function activities()
+    {
+        return $this->hasMany(Activity::class, 'scope_id', 'id');
+    }
+
+
+    public function project()
+    {
+        return $this->belongsTo(Proyek::class, 'project_id', 'id_project');
+    }
 }

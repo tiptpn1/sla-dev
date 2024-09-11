@@ -262,10 +262,10 @@ $(document).ready(function() {
                     table.row.add([
                         index + 1,
                         item.project_nama,
-                        '<span class="badge ' + (item.is_active ? 'badge-success' : 'badge-danger') + '">' + (item.is_active ? 'Aktif' : 'Nonaktif') + '</span>',
+                        '<span class="badge ' + (item.isActive ? 'badge-success' : 'badge-danger') + '">' + (item.isActive ? 'Aktif' : 'Nonaktif') + '</span>',
                         '<button class="btn btn-warning btn-sm edit-btn" data-id="'+ item.id_project +'">Edit</button> ' +
                         '<button class="btn btn-danger btn-sm delete-btn" data-id="'+ item.id_project +'">Hapus</button> ' +
-                        '<button class="btn btn-info btn-sm status-btn" data-id="'+ item.id_project +'" data-status="'+ (item.is_active ? 0 : 1) +'">' + (item.is_active ? 'Nonaktifkan' : 'Aktifkan') + '</button>'
+                        '<button class="btn btn-info btn-sm status-btn" data-id="'+ item.id_project +'" data-status="'+ (item.isActive ? 0 : 1) +'">' + (item.isActive ? 'Nonaktifkan' : 'Aktifkan') + '</button>'
                     ]).draw();
                 });
             }

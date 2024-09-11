@@ -1,16 +1,22 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BagianController;
-use App\Http\Controllers\DivisiController;
-use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\UsernameController;
-use App\Http\Controllers\RoleController;
+use App\Http\Controllers\DivisiController;
+use App\Http\Controllers\MasterBagianController;
 use App\Http\Controllers\MonitoringController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\RincianProgressController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ScopeController;
+use App\Http\Controllers\ServerSide\ActivityController as ServerSideActivityController;
+use App\Http\Controllers\ServerSide\ProjectScopeController;
 use App\Http\Controllers\SummaryIndicatorController;
+use App\Http\Controllers\UsernameController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,13 +29,11 @@ use App\Http\Controllers\SummaryIndicatorController;
 |
 */
 
-Route::get('/', function () {
-    return redirect('login');
-});
+Route::redirect('/', 'login');
 
-Route::get('login', 'App\Http\Controllers\AuthController@login');
-Route::post('actionLogin', 'App\Http\Controllers\AuthController@actionLogin')->name('actLogin');
-Route::post('logout', 'App\Http\Controllers\AuthController@logout')->name('logout');
+Route::get('login', [AuthController::class, 'viewLoginPage'])->name('page.login');
+Route::post('Login', [AuthController::class, 'actionLogin'])->name('login');
+Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
 // Master Divisi
 Route::group(['prefix' => 'master-bagian', 'as' => 'master-bagian.'], function () {
@@ -65,6 +69,35 @@ Route::group(['prefix' => 'master-scope', 'as' => 'master-scope.'], function () 
     Route::delete('delete/{id}', [ScopeController::class, 'delete'])->name('delete');
 });
 
+// rincian progress
+Route::prefix('activity/rincian-progress')->name('rincian.')->group(function () {
+    Route::get('/{id}', [RincianProgressController::class, 'index'])->name('show');
+    Route::post('/get-data', [RincianProgressController::class, 'getData'])->name('getData');
+    Route::post('/store', [RincianProgressController::class, 'store'])->name('store');
+    Route::put('/update', [RincianProgressController::class, 'update'])->name('update');
+    Route::delete('/delete/{id}', [RincianProgressController::class, 'delete'])->name('delete');
+});
+
+// evidence
+Route::prefix('evidence')->name('evidence.')->group(function () {
+    Route::post('/get-evidence', [RincianProgressController::class, 'getDataEvidence'])->name('show');
+    Route::post('/upload-evidence', [RincianProgressController::class, 'uploadDataEvidence'])->name('upload');
+    Route::post('/update-evidence', [RincianProgressController::class, 'updateDataEvidence'])->name('update');
+    Route::delete('/delete-evidence', [RincianProgressController::class, 'deleteEvidence'])->name('delete');
+    Route::post('/download', [RincianProgressController::class, 'downloadEvidence'])->name('download');;
+});
 
 
-// Route::get('admin', [AdminController::class, 'index'])->name('index');
+Route::get('admin', [AdminController::class, 'index'])->name('index');
+
+
+Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+Route::get('activities/data', [ServerSideActivityController::class, 'data'])->name('activities.data');
+Route::resource('activities', ActivityController::class);
+Route::post('activity/update', [ActivityController::class, 'updateActivity'])->name('activity.update');
+
+Route::get('project/data', [ProjectScopeController::class, 'getProjects'])->name('project.data');
+Route::get('project/data/{id}', [ProjectScopeController::class, 'getProjectById'])->name('project.data.detail');
+Route::get('scope/{id}/data', [ProjectScopeController::class, 'getScopes'])->name('scope.data');
+Route::get('scope/data/{id}', [ProjectScopeController::class, 'getScopeById'])->name('scope.data.detail');
