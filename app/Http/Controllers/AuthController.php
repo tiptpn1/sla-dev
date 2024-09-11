@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use App\User;
 
 class AuthController extends Controller
 {
-    public function login()
+    public function viewLoginPage()
     {
         return view('auth/login');
     }

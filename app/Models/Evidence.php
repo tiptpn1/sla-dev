@@ -9,13 +9,13 @@ class Evidence extends Model
 {
     use HasFactory;
 
-    protected $table = 'evidance';
-    protected $primaryKey = 'id_evidance';
+    protected $table = 'evidence';
+    protected $primaryKey = 'id_evidence';
     protected $keyType = 'int';
     public $incrementing = true;
     public $timestamps = false;
 
-    protected $guarded = ['id_evidance'];
+    protected $guarded = ['id_evidence'];
 
     public function progress()
     {

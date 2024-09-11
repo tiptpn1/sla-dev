@@ -17,7 +17,28 @@ class Activity extends Model
     const CREATED_AT = 'created';
     const UPDATED_AT = 'updated';
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'nama_activity',
+        'plan_start',
+        'plan_duration',
+        'actual_start',
+        'actual_duration',
+        'percent_complete',
+        'scope_id',
+        'project_id',
+        'isActive',
+    ];
+
     protected $guarded = ['id_activity'];
+
+    protected $attributes = [
+        'percent_complete' => 0,
+    ];
 
     public function pics()
     {
@@ -32,5 +53,10 @@ class Activity extends Model
     public function progress()
     {
         return $this->hasMany(Progress::class, 'activity_id', 'id_activity');
+    }
+
+    public function scope()
+    {
+        return $this->belongsTo(Scope::class, 'scope_id', 'id');
     }
 }

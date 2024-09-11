@@ -238,7 +238,8 @@
                         <div class="form-group">
                             <label for="username">Username : </label>
                             <div class="d-flex">
-                                <input type="text" class="form-control ml-2" id="ubahUsername" name="nama" required>
+                                <input type="text" class="form-control ml-2" id="ubahUsername" name="nama"
+                                    required>
                             </div>
                         </div>
                         {{-- <div class="form-group">
