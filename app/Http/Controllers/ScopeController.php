@@ -28,6 +28,7 @@ class ScopeController extends Controller
         return response()->json($scopes);
     }
 
+
     /**
      * Mendapatkan data scope berdasarkan ID
      *

@@ -96,85 +96,92 @@
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                         data-accordion="false">
-                        <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
-                        <li class="nav-item">
-                            <a href="{{ route('dashboard') }}" class="nav-link @yield('dashboard')">
-                                <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p>
-                                    Dashboard
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('master-proyek.index') }}" class="nav-link @yield('master-proyek')">
-                                <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p>
-                                    Master Project
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('master-scope.index') }}" class="nav-link @yield('master-scope')">
-                                <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p>
-                                    Master Scope
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="" class="nav-link @yield('mon')">
-                                <i class="nav-icon fas fa-chart-line"></i>
-                                <p>
-                                    Timeline
-                                </p>
-                            </a>
-                        </li>
-                        <!-- Parent Menu Item for Master Data -->
-                        <li class="nav-item has-treeview">
-                            <a href="#" class="nav-link @yield('mast')">
-                                <i class="nav-icon fas fa-database"></i>
-                                <p>
-                                    Master Data
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <!-- Child Menu Item for Segment -->
-                                <li class="nav-item">
-                                    <a href="" class="nav-link @yield('segment')">
-                                        <i class="nav-icon fas fa-list"></i>
-                                        <p>Proyek</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ route('activities.index') }}" class="nav-link @yield('activity')">
-                                        <i class="nav-icon fas fa-th"></i>
-                                        <p>Activity</p>
-                                    </a>
-                                </li>
-                                <!-- Child Menu Item for Sub Segment -->
-                                <li class="nav-item">
-                                    <a href="" class="nav-link @yield('subSegment')">
-                                        <i class="nav-icon fas fa-sitemap"></i>
-                                        <p>Bagian</p>
-                                    </a>
-                                </li>
-                                <!-- Child Menu Item for KPI -->
-                                <li class="nav-item">
-                                    <a href="" class="nav-link @yield('master-username')">
-                                        <i class="nav-icon fas fa-user"></i>
-                                        <p>User</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="" class="nav-link @yield('master-role')">
-                                        <i class="nav-icon fas fa-user"></i>
-                                        <p>Hak Akses</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                        @if (session('hak_akses_id') == 2 || session('hak_akses_id') == 3)
+                            <li class="nav-item">
+                                <a href="{{ route('ganchart') }}" class="nav-link @yield('ganchart')">
+                                    <i class="nav-icon fas fa-calendar-alt"></i>
+                                    <p>
+                                        Dashboard
+                                    </p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('activities.index') }}" class="nav-link @yield('activity')">
+                                    <i class="nav-icon fas fa-tachometer-alt"></i>
+                                    <p>
+                                        Aktivitas
+                                    </p>
+                                </a>
+                            </li>
+                        @endif
+
+                        @if (session('hak_akses_id') == 2)
+                            <!-- Parent Menu Item for Pembentuk SLA Data -->
+                            <li class="nav-item has-treeview">
+                                <a href="#" class="nav-link @yield('mast')">
+                                    <i class="nav-icon fas fa-database"></i>
+                                    <p>
+                                        Pembentuk SLA
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <!-- Child Menu Item for Segment -->
+                                    <li class="nav-item">
+                                        <a href="{{ route('master-proyek.index') }}"
+                                            class="nav-link @yield('master-proyek')">
+                                            <i class="nav-icon fas fa-project-diagram"></i>
+                                            <p>Master Project</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('master-scope.index') }}"
+                                            class="nav-link @yield('master-scope')">
+                                            <i class="nav-icon fas fa-briefcase"></i>
+                                            <p>Master Scope</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endif
+
+                        @if (session()->get('hak_akses_id') == 1)
+                            <!-- Parent Menu Item for Master Data -->
+                            <li class="nav-item has-treeview">
+                                <a href="#" class="nav-link @yield('mast')">
+                                    <i class="nav-icon fas fa-database"></i>
+                                    <p>
+                                        Master Data
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <!-- Child Menu Item for Sub Segment -->
+                                    <li class="nav-item">
+                                        <a href="{{ route('master-bagian.index') }}"
+                                            class="nav-link @yield('subSegment')">
+                                            <i class="nav-icon fas fa-sitemap"></i>
+                                            <p>Bagian</p>
+                                        </a>
+                                    </li>
+                                    <!-- Child Menu Item for KPI -->
+                                    <li class="nav-item">
+                                        <a href="{{ route('master-username.index') }}"
+                                            class="nav-link @yield('master-username')">
+                                            <i class="nav-icon fas fa-user"></i>
+                                            <p>User</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('master-role.index') }}"
+                                            class="nav-link @yield('master-role')">
+                                            <i class="nav-icon fas fa-key"></i>
+                                            <p>Hak Akses</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endif
 
                     </ul>
                 </nav>

@@ -11,7 +11,7 @@ class ProjectScopeController extends Controller
 {
     public function getProjects()
     {
-        $data = Proyek::where('isActive', true)->where('project_nama', 'like', '%' . request('q') . '%')->paginate(10);
+        $data = Proyek::where('is_active', true)->where('project_nama', 'like', '%' . request('q') . '%')->paginate(10);
 
         return response()->json([
             'total_data' => $data->total(),

@@ -23,10 +23,14 @@ class Scope extends Model
 
     protected $guarded = ['id'];
 
+
+
+
     public function activities()
     {
         return $this->hasMany(Activity::class, 'scope_id', 'id');
     }
+
 
     public function project()
     {

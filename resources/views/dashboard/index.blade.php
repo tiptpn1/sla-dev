@@ -1,8 +1,8 @@
 @extends('master/master')
 
-@section('title', 'Dashboard SLA')
+@section('title', 'activity SLA')
 
-@section('dashboard', 'active')
+@section('activity', 'active')
 
 @section('content')
     <section class="content">
@@ -19,15 +19,6 @@
                                         <i class="fas fa-plus"></i> Tambah Aktivitas
                                     </a>
                                 @endif
-
-                                <div class="card-tools">
-                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-tool" data-card-widget="maximize">
-                                        <i class="fas fa-expand"></i>
-                                    </button>
-                                </div>
                                 <!-- /.card-tools -->
                             </div>
                             <div class="card-body">
@@ -40,7 +31,6 @@
                                         @foreach ($projects as $project)
                                             @php
                                                 $segmentAlpha = numberToAlpha($segmentIndex++);
-                                                $subSegmentIndex = 1;
                                             @endphp
                                             <div class="container-fluid">
                                                 <div class="row">
@@ -71,7 +61,6 @@
                                                                                 class="card card-outline card-secondary collapsed-card">
                                                                                 <div class="card-header">
                                                                                     <h3 class="card-title">
-                                                                                        {{ $segmentAlpha }}.{{ $subSegmentIndex }}.
                                                                                         {{ $scope->nama }}
                                                                                     </h3>
 
@@ -100,6 +89,13 @@
                                                                                                     <th>Percent Complete
                                                                                                     </th>
                                                                                                     <th>PIC</th>
+                                                                                                    <th>Rincian Progress
+                                                                                                    </th>
+                                                                                                    <th>Evidence
+                                                                                                    </th>
+                                                                                                    @if (session()->get('hak_akses_id') == 2)
+                                                                                                        <th>Status</th>
+                                                                                                    @endif
                                                                                                     <th>Action
                                                                                                     </th>
                                                                                                 </tr>
@@ -188,9 +184,9 @@
                                                                                                                 @foreach ($activity->pics as $pic)
                                                                                                                     <span
                                                                                                                         class="badge badge-primary"
-                                                                                                                        style="margin: 2px; padding: 5px 10px; display: inline-block; background-color: #007bff; color: white; border-radius: 15px; cursor: pointer;"
+                                                                                                                        style="margin: 2px; padding: 5px 10px; background-color: #007bff; color: white; border-radius: 15px; cursor: pointer;"
                                                                                                                         title="{{ $pic->bagian->master_bagian_nama }}">
-                                                                                                                        {{ $pic->bagian->master_bagian_nama }}
+                                                                                                                        {{ $pic->bagian->master_bagian_kode }}
                                                                                                                     </span>
                                                                                                                 @endforeach
                                                                                                             @else
@@ -198,22 +194,92 @@
                                                                                                                     available</em>
                                                                                                             @endif
                                                                                                         </td>
+                                                                                                        <td>
+                                                                                                            @if ($activity->progress->isNotEmpty())
+                                                                                                                <div
+                                                                                                                    class="text-muted">
+                                                                                                                    <span>...,</span>
+                                                                                                                    <span
+                                                                                                                        class="font-weight-bold">
+                                                                                                                        {{ $activity->progress->first()->rincian_progress }}
+                                                                                                                    </span>
+                                                                                                                </div>
+                                                                                                            @else
+                                                                                                                <em
+                                                                                                                    class="text-danger">No
+                                                                                                                    Progress
+                                                                                                                    available</em>
+                                                                                                            @endif
+                                                                                                        </td>
+                                                                                                        <td>
+                                                                                                            @if ($activity->progress->isNotEmpty() && $activity->progress->first()->evidences->isNotEmpty())
+                                                                                                                <div
+                                                                                                                    class="text-muted">
+                                                                                                                    <span>...,</span>
+                                                                                                                    <a href="{{ $activity->progress->first()->evidences->first()->file_path }}"
+                                                                                                                        target="_blank"
+                                                                                                                        class="text-info">
+                                                                                                                        {{-- Tambahkan icon file menggunakan Font Awesome --}}
+                                                                                                                        <i
+                                                                                                                            class="fas fa-file-alt"></i>
+                                                                                                                        {{ $activity->progress->first()->evidences->first()->file_path }}
+                                                                                                                    </a>
+                                                                                                                </div>
+                                                                                                            @else
+                                                                                                                <em
+                                                                                                                    class="text-danger">No
+                                                                                                                    Evidence
+                                                                                                                    available</em>
+                                                                                                            @endif
+                                                                                                        </td>
+
+                                                                                                        @if (session()->get('hak_akses_id') == 2)
+                                                                                                            <td>
+                                                                                                                @if ($activity->isActive)
+                                                                                                                    <span
+                                                                                                                        class="badge badge-success">Active</span>
+                                                                                                                @else
+                                                                                                                    <span
+                                                                                                                        class="badge badge-danger">Inactive</span>
+                                                                                                                @endif
+                                                                                                            </td>
+                                                                                                        @endif
 
                                                                                                         <td>
-
-                                                                                                            @if ($isPic)
+                                                                                                            @if ($isPic || session()->get('hak_akses_id') == 3)
                                                                                                                 <a href="{{ route('rincian.show', ['id' => $activity->id_activity]) }}"
-                                                                                                                    class="btn btn-info btn-sm">Show</a>
+                                                                                                                    class="btn btn-info btn-sm">
+                                                                                                                    <i
+                                                                                                                        class="fas fa-eye"></i>
+                                                                                                                    Show
+                                                                                                                </a>
                                                                                                             @endif
 
                                                                                                             @if (in_array(session()->get('hak_akses_id'), [1, 2]))
                                                                                                                 <a href="{{ route('activities.edit', $activity->id_activity) }}"
-                                                                                                                    class="btn btn-warning btn-sm">Edit</a>
-                                                                                                                '<a href="javascript:void(0)"
+                                                                                                                    class="btn btn-warning btn-sm">
+                                                                                                                    <i
+                                                                                                                        class="fas fa-edit"></i>
+                                                                                                                    Edit
+                                                                                                                </a>
+                                                                                                                <a href="javascript:void(0)"
                                                                                                                     onclick="deleteActivity({{ $activity->id_activity }})"
-                                                                                                                    class="btn btn-danger btn-sm">Delete</a>'
+                                                                                                                    class="btn btn-danger btn-sm">
+                                                                                                                    <i
+                                                                                                                        class="fas fa-trash"></i>
+                                                                                                                    Delete
+                                                                                                                </a>
+                                                                                                                <button
+                                                                                                                    class="btn btn-primary btn-sm status-btn"
+                                                                                                                    data-id="{{ $activity->id_activity }}"
+                                                                                                                    data-status="{{ $activity->isActive ? 0 : 1 }}">
+                                                                                                                    <i
+                                                                                                                        class="fas fa-power-off"></i>
+                                                                                                                    {{ $activity->isActive ? 'Nonaktifkan' : 'Aktifkan' }}
+                                                                                                                </button>
                                                                                                             @endif
                                                                                                         </td>
+
                                                                                                     </tr>
                                                                                                 @endforeach
 
@@ -320,6 +386,44 @@
                         toastr.error(response.message);
                     }
                 });
+            })
+
+            $('.status-btn').on('click', function() {
+                var id = $(this).data('id');
+                var status = $(this).data('status');
+
+                // Konfirmasi sebelum melanjutkan
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: status ? 'Activate this activity?' : 'Deactivate this activity?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, change it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('activity.status', ':id') }}".replace(':id',
+                                id),
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                _method: "PATCH",
+                                id: id,
+                                status: status
+                            },
+                            success: function(response) {
+                                toastr.success(response.message);
+                                location.reload();
+                            },
+                            error: function(xhr, status, error) {
+                                console.error(xhr.responseText);
+                                toastr.error(response.message);
+                            }
+                        });
+                    }
+                })
             })
         });
 

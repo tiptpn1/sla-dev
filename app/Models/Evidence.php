@@ -13,7 +13,7 @@ class Evidence extends Model
     protected $primaryKey = 'id_evidence';
     protected $keyType = 'int';
     public $incrementing = true;
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected $guarded = ['id_evidence'];
 

@@ -15,7 +15,24 @@ class ActivityController extends Controller
      */
     public function index()
     {
-        return view('activities.index');
+        $projects = Proyek::with([
+            'scopes' => function ($query) {
+                $query->where('isActive', 1);
+            },
+            'scopes.activities',
+            'scopes.activities.pics',
+            'scopes.activities.pics.bagian',
+            'scopes.activities.progress' => function ($query) {
+                $query->latest('created_at')->first();
+            },
+            'scopes.activities.progress.evidences' => function ($query) {
+                $query->latest('created_at')->first();
+            }
+        ])->where('is_active', true)->get();
+
+        // return response()->json($projects);
+
+        return view('dashboard.index', compact('projects'));
     }
 
     /**
@@ -170,5 +187,14 @@ class ActivityController extends Controller
         }
 
         return response()->json(['message' => 'Invalid field'], 400);
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $activity = Activity::findOrFail($id);
+        $activity->isActive = $request->input('status');
+        $activity->save();
+
+        return response()->json(['success' => true]);
     }
 }

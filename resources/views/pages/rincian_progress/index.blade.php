@@ -20,7 +20,8 @@
             /* Warna oranye gelap saat hover */
         }
 
-        .btn-evidence,.btn-download {
+        .btn-evidence,
+        .btn-download {
             background-color: transparent !important;
             /* Membuat latar belakang transparan */
             border: none !important;
@@ -29,7 +30,8 @@
             /* Warna oranye untuk 'Edit' */
         }
 
-        .btn-evidence:hover,.btn-download:hover {
+        .btn-evidence:hover,
+        .btn-download:hover {
             color: #00277CFF !important;
             /* Warna oranye gelap saat hover */
         }
@@ -133,11 +135,43 @@
     <section class="content">
         <div class="col-md-12">
             <div class="container">
-                <div class="d-flex justify-content-between flex-wrap mb-2">
-                    <button type="button" class="btn btn-primary mb-2" data-toggle="modal" onclick="tambahRincianProgress()">
-                        Tambah Rincian Progress
-                    </button>
+                <div class="row-mb-4">
+                    <div class="col-md-4">
+                        @if ($hasAccess)
+                            <button type="button" class="btn btn-primary" data-toggle="modal"
+                                onclick="tambahRincianProgress()">
+                                <i class="fas fa-plus"></i> Tambah Rincian Progress
+                            </button>
+                            <a href="{{ route('activities.edit', $activity->id_activity) }}" class="btn btn-warning ">
+                                <i class="fas fa-edit"></i> Edit Activity
+                            </a>
+                        @endif
+                    </div>
                 </div>
+
+                <!-- Activity Detail Section -->
+                <div class="card mt-4 mb-4">
+                    <div class="card-header">
+                        <h4>Detail Activity</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Nama Aktivitas:</strong> {{ $activity->nama_activity }}</p>
+                                <p><strong>Plan Start:</strong> {{ $activity->plan_start }}</p>
+                                <p><strong>Plan Duration:</strong> {{ $activity->plan_duration }}</p>
+                                <p><strong>Actual Start:</strong> {{ $activity->actual_start }}</p>
+                                <p><strong>Actual Duration:</strong> {{ $activity->actual_duration }}</p>
+                                <p><strong>Percent Complete:</strong> {{ $activity->percent_complete }}%</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Nama Project:</strong> {{ $activity->scope->project->project_nama }}</p>
+                                <p><strong>Nama Scope:</strong> {{ $activity->scope->nama }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="table-responsive tbl-container bdr">
                     <table class="table table-hover bg-white table-rounded" id="table_rincian_progress">
                         <thead class="bg-green">
@@ -146,7 +180,9 @@
                                 <th scope="col">Kendala</th>
                                 <th scope="col">Tindak Lanjut</th>
                                 {{-- <th scope="col">Evidence</th> --}}
-                                <th scope="col" width="22%" style="text-align: center">Actions</th>
+                                @if ($hasAccess)
+                                    <th scope="col" width="22%" style="text-align: center">Actions</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -154,9 +190,9 @@
                 </div>
                 <div class="pagination-container">
                     <div class="pagination-left">
-                        <p class="results-info m-0">Showing <span id="result-start">1</span> to <span
-                                id="result-end">10</span>
-                            of <span id="total-results">36</span> results</p>
+                        <p class="results-info m-0">Showing <span id="result-start">0</span> to <span
+                                id="result-end">0</span>
+                            of <span id="total-results">0</span> results</p>
                     </div>
                     <div class="pagination-center">
                         <select id="per-page" class="form-control m-0">
@@ -216,7 +252,8 @@
                         <div class="form-group">
                             <label for="addEvidence">File Evidence : </label>
                             <div class="d-flex">
-                                <input type="file" class="form-control ml-2" id="addEvidence" name="file_evidence">
+                                <input type="file" class="form-control ml-2" id="addEvidence"
+                                    accept=".pdf, .jpg, .zip, .rar, .xlsx, .xls" name="file_evidence">
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary">Save</button>
@@ -286,7 +323,9 @@
                         <div class="d-flex justify-content-between flex-wrap mb-2">
                             <form method="POST" enctype="multipart/form-data">
                                 <input type="hidden" name="progress_id" id="rincianProgressIdForEvidence">
-                                <input type="file" style="display: none;" name="file_evidence" onchange="addFileEvidence(this)" id="addFileEvidenceFromDetail">
+                                <input type="file" style="display: none;" name="file_evidence"
+                                    onchange="addFileEvidence(this)" accept=".pdf, .jpg, .zip, .rar, .xlsx, .xls"
+                                    id="addFileEvidenceFromDetail">
                                 <button type="button" class="btn btn-primary mb-2" data-toggle="modal"
                                     onclick="document.getElementById('addFileEvidenceFromDetail').click()">
                                     Tambah Evidence
@@ -306,9 +345,9 @@
                         </div>
                         <div class="pagination-container">
                             <div class="pagination-left">
-                                <p class="results-info m-0">Showing <span id="result-start-evidence">1</span> to <span
-                                        id="result-end-evidence">10</span>
-                                    of <span id="total-results-evidence">36</span> results</p>
+                                <p class="results-info m-0">Showing <span id="result-start-evidence">0</span> to <span
+                                        id="result-end-evidence">0</span>
+                                    of <span id="total-results-evidence">0</span> results</p>
                             </div>
                             <div class="pagination-center">
                                 <select id="per-page-evidence" class="form-control m-0">
@@ -368,7 +407,8 @@
                     <form method="POST">
                         <input type="hidden" name="id_evidence" id="deleteFileEvidenceId">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" onclick="confirmDeleteFileEvidence()">Delete</button>
+                        <button type="button" class="btn btn-danger"
+                            onclick="confirmDeleteFileEvidence()">Delete</button>
                     </form>
                 </div>
             </div>
@@ -376,8 +416,8 @@
     </div>
 
     {{-- Update --}}
-    <div class="modal fade" id="updateEvidenceModal" tabindex="-1" role="dialog" aria-labelledby="updateEvidenceModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="updateEvidenceModal" tabindex="-1" role="dialog"
+        aria-labelledby="updateEvidenceModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -390,9 +430,11 @@
                 <div class="modal-footer">
                     <form method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="id_evidence" id="updateFileEvidenceId">
-                        <input type="file" style="display: none" name="file_evidence" id="updateFileEvidence" onchange="confirmUbahFileEvidence(this)">
+                        <input type="file" style="display: none" name="file_evidence" id="updateFileEvidence"
+                            accept=".pdf, .jpg, .zip, .rar, .xlsx, .xls" onchange="confirmUbahFileEvidence(this)">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" onclick="document.getElementById('updateFileEvidence').click()">Yes</button>
+                        <button type="button" class="btn btn-danger"
+                            onclick="document.getElementById('updateFileEvidence').click()">Yes</button>
                     </form>
                 </div>
             </div>
@@ -402,6 +444,7 @@
 
 @push('scripts')
     <script>
+        let hasAccess = {{ $hasAccess ? 'true' : 'false' }};
         let currentPageEvidence = 1;
         let perPageEvidence = 5;
 
@@ -440,16 +483,17 @@
                     },
                     success: function(data) {
                         $('#table_rincian_progress tbody').empty();
-                        $('#result-start').text((page - 1) * perPage + 1);
+                        $('#result-start').text(data.pagination.total != 0 ? (page - 1) * perPage + 1 :
+                            0);
                         $('#result-end').text(Math.min(page * perPage, data.pagination.total));
                         $('#total-results').text(data.pagination.total);
 
                         $.each(data.data, function(index, rincian) {
-                            var row = `
-                                <tr id="bagian-${rincian.id}">
-                                    <td scope="row">${rincian.rincian_progress ?? '-'}</td>
-                                    <td scope="row">${rincian.kendala ?? '-'}</td>
-                                    <td scope="row">${rincian.tindak_lanjut ?? '-'}</td>
+                            var actionButtons = '';
+
+                            // Cek apakah hasAccess bernilai true
+                            if (hasAccess) {
+                                actionButtons = `
                                     <td scope="row" width="22%">
                                         <button class="btn btn-sm btn-evidence" data-toggle="modal" onclick=showEvidence(this) data-id="${rincian.id}" data-rincian_progress="${rincian.rincian_progress}">
                                             <i class="fas fa-file"></i> Evidence
@@ -461,6 +505,15 @@
                                             <i class="fas fa-trash"></i> Delete
                                         </button>
                                     </td>
+                                `;
+                            }
+
+                            var row = `
+                                <tr id="bagian-${rincian.id}">
+                                    <td scope="row">${rincian.rincian_progress ?? '-'}</td>
+                                    <td scope="row">${rincian.kendala ?? '-'}</td>
+                                    <td scope="row">${rincian.tindak_lanjut ?? '-'}</td>
+                                    ${actionButtons}
                                 </tr>
                             `;
                             $('#table_rincian_progress tbody').append(row);
@@ -482,6 +535,7 @@
                         });
                     },
                     error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
                         toastr.error('Failed to load data.');
                     }
                 })
@@ -615,8 +669,10 @@
                     rincian_progress_id: rincianProgressId,
                 },
                 success: function(data) {
-                    $('#result-start-evidence').text((currentPageEvidence - 1) * perPageEvidence + 1);
-                    $('#result-end-evidence').text(Math.min(currentPageEvidence * perPageEvidence, data.pagination.total));
+                    $('#result-start-evidence').text(data.pagination.total != 0 ? (currentPageEvidence - 1) *
+                        perPageEvidence + 1 : 0);
+                    $('#result-end-evidence').text(Math.min(currentPageEvidence * perPageEvidence, data
+                        .pagination.total));
                     $('#total-results-evidence').text(data.pagination.total);
 
                     $.each(data.data, function(index, evidence) {
@@ -694,7 +750,7 @@
                         toastr.success('Evidence upload successfully.');
                     },
                     error: function(xhr, status, error) {
-                        toastr.error('Failed to upload evidence.');
+                        toastr.error(xhr.responseJSON.message);
                     }
                 });
             }
@@ -717,7 +773,7 @@
                         toastr.success('Evidence updated successfully.');
                     },
                     error: function(xhr, status, error) {
-                        toastr.error('Failed to updated evidence.');
+                        toastr.error(xhr.responseJSON.message);
                     }
                 });
             }
@@ -767,39 +823,41 @@
             id_evidence = $(button).data('id');
             filename = $(button).data('filename');
 
-            const data = { id_evidence: id_evidence };
+            const data = {
+                id_evidence: id_evidence
+            };
 
             fetch(`{{ route('evidence.download') }}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
 
-                return response.blob();
-            })
-            .then(blob => {
-                toastr.success('Evidence download successfully.');
+                    return response.blob();
+                })
+                .then(blob => {
+                    toastr.success('Evidence download successfully.');
 
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-            })
-            .catch(error => {
-                toastr.error('Failed to download file.');
-            });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                })
+                .catch(error => {
+                    toastr.error('Failed to download file.');
+                });
         }
     </script>
 @endpush

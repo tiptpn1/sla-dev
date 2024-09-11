@@ -7,30 +7,45 @@ use App\Models\Evidence;
 use App\Models\Progress;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
 class RincianProgressController extends Controller
 {
-    public function index($id) {
-        $activity = Activity::where('id_activity', $id)->first();
-        return view('pages.rincian_progress.index' , [
+    public function index($id)
+    {
+        $activity = Activity::where('isActive', true)->where('id_activity', $id)->with(['scope', 'scope.project', 'pics'])->first();
+
+        if (!$activity) {
+            return redirect()->back()->with('error', 'Activity not found');
+        }
+
+        $bagianId = Session::get('bagian_id');
+
+        $hasAccess = $activity->pics->contains(function ($pic) use ($bagianId) {
+            return $pic->bagian_id == $bagianId;
+        });
+
+        return view('pages.rincian_progress.index', [
             'id' => $id,
             'activity' => $activity,
+            'hasAccess' => $hasAccess
         ]);
     }
 
-    public function getData(Request $request) {
+    public function getData(Request $request)
+    {
         $currentPage = $request->input('page', 1);
         $perPage = $request->input('per_page', 5);
 
         $rincianProgress = DB::table('detail_progress as dp')
-        // ->leftJoin('evidence as e', 'dp.id', '=', 'e.progress_id')
-        // ->select('dp.*', DB::raw('GROUP_CONCAT(e.`file_path` SEPARATOR \', \') as bukti')) // Memilih kolom dari master_user dan master_bagian
-        ->select('dp.*') // Memilih kolom dari master_user dan master_bagian
-        ->where('activity_id', '=', $request->activity_id)
-        ->where('isActive', 1)
-        // ->groupBy('dp.id')
-        ->paginate($perPage, ['*'], 'page', $currentPage);
+            // ->leftJoin('evidence as e', 'dp.id', '=', 'e.progress_id')
+            // ->select('dp.*', DB::raw('GROUP_CONCAT(e.`file_path` SEPARATOR \', \') as bukti')) // Memilih kolom dari master_user dan master_bagian
+            ->select('dp.*') // Memilih kolom dari master_user dan master_bagian
+            ->where('activity_id', '=', $request->activity_id)
+            ->where('isActive', 1)
+            // ->groupBy('dp.id')
+            ->paginate($perPage, ['*'], 'page', $currentPage);
 
         return response()->json([
             'data' => $rincianProgress->items(),
@@ -43,11 +58,13 @@ class RincianProgressController extends Controller
         ], 200);
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $validated = Validator::make($request->all(), [
             'activity_id' => 'required|exists:activity,id_activity',
             'rincian_progress' => 'required|string',
             'tindak_lanjut' => 'required|string',
+            'file_evidence' => 'nullable|mimes:pdf,jpg,zip,rar,xlsx,xls|max:10240',
         ]);
 
         if ($validated->fails()) {
@@ -104,7 +121,8 @@ class RincianProgressController extends Controller
         }
     }
 
-    public function update(Request $request) {
+    public function update(Request $request)
+    {
         $validatedData = Validator::make($request->all(), [
             'id' => 'required|exists:detail_progress,id',
             'rincian_progress' => 'required|string',
@@ -143,7 +161,8 @@ class RincianProgressController extends Controller
         }
     }
 
-    public function delete($id) {
+    public function delete($id)
+    {
         try {
             DB::beginTransaction();
 
@@ -167,14 +186,15 @@ class RincianProgressController extends Controller
         }
     }
 
-    public function getDataEvidence(Request $request) {
+    public function getDataEvidence(Request $request)
+    {
         $currentPage = $request->input('page', 1);
         $perPage = $request->input('per_page', 5);
 
         $rincianProgress = DB::table('evidence')
-        ->select('*') // Memilih kolom dari master_user dan master_bagian
-        ->where('progress_id', '=', $request->rincian_progress_id)
-        ->paginate($perPage, ['*'], 'page', $currentPage);
+            ->select('*') // Memilih kolom dari master_user dan master_bagian
+            ->where('progress_id', '=', $request->rincian_progress_id)
+            ->paginate($perPage, ['*'], 'page', $currentPage);
 
         return response()->json([
             'data' => $rincianProgress->items(),
@@ -187,8 +207,20 @@ class RincianProgressController extends Controller
         ], 200);
     }
 
-    public function uploadDataEvidence(Request $request) {
+    public function uploadDataEvidence(Request $request)
+    {
         try {
+            $validatedData = Validator::make($request->all(), [
+                'file_evidence' => 'nullable|mimes:pdf,jpg,zip,rar,xlsx,xls|max:10240',
+            ]);
+
+            if ($validatedData->fails()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $validatedData->errors()->first(),
+                ], 400);
+            }
+
             $file_evidence = $request->file('file_evidence');
             $filename = time() . '_' . $file_evidence->getClientOriginalName();
             $file_evidence->move(public_path() . '/evidence', $filename);
@@ -203,7 +235,7 @@ class RincianProgressController extends Controller
             return response()->json([
                 'status' => 'success',
             ], 200);
-        } catch(\Throwable $th) {
+        } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',
                 'message' => $th->getMessage(),
@@ -213,8 +245,21 @@ class RincianProgressController extends Controller
         }
     }
 
-    public function updateDataEvidence(Request $request) {
+    public function updateDataEvidence(Request $request)
+    {
         try {
+            $validatedData = Validator::make($request->all(), [
+                'id_evidence' => 'required',
+                'file_evidence' => 'nullable|mimes:pdf,jpg,zip,rar,xlsx,xls|max:10240',
+            ]);
+
+            if ($validatedData->fails()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $validatedData->errors()->first(),
+                ], 400);
+            }
+
             $evidence = Evidence::where('id_evidence', $request->id_evidence)->first();
 
             if (!$evidence) {
@@ -242,7 +287,7 @@ class RincianProgressController extends Controller
             return response()->json([
                 'status' => 'success',
             ], 200);
-        } catch(\Throwable $th) {
+        } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',
                 'message' => $th->getMessage(),
@@ -252,7 +297,8 @@ class RincianProgressController extends Controller
         }
     }
 
-    public function deleteEvidence(Request $request) {
+    public function deleteEvidence(Request $request)
+    {
         try {
             DB::beginTransaction();
 
@@ -278,7 +324,7 @@ class RincianProgressController extends Controller
             return response()->json([
                 'status' => 'success',
             ], 200);
-        } catch(\Throwable $th) {
+        } catch (\Throwable $th) {
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
@@ -289,7 +335,8 @@ class RincianProgressController extends Controller
         }
     }
 
-    public function downloadEvidence(Request $request) {
+    public function downloadEvidence(Request $request)
+    {
         try {
             $evidence = DB::table('evidence')->where('id_evidence', $request->id_evidence)->select('*')->get();
 
