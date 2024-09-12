@@ -17,3 +17,7 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+<<<<<<< HEAD
+/.svn
+=======
+>>>>>>> 28164a9d5f8d90fb6349e9f8740e599413e7bcf5

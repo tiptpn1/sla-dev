@@ -25,20 +25,24 @@ class DashboardController extends Controller
 
     public function ganchart()
     {
-        // Data aktivitas dengan start, durasi dalam minggu, dan perhitungan tanggal akhir
         $activities = [
-            ['id' => 1, 'text' => 'Activity 1', 'start_date' => '2024-02-08', 'duration_weeks' => 8],
-            ['id' => 2, 'text' => 'Activity 2', 'start_date' => '2024-01-15', 'duration_weeks' => 4],
+            ['id' => 1, 'text' => 'Activity 1', 'plan_start' => '2024-02-08', 'plan_duration_weeks' => 8, 'actual_start' => '2024-02-15', 'actual_duration_weeks' => 7],
+            ['id' => 2, 'text' => 'Activity 2', 'plan_start' => '2024-01-15', 'plan_duration_weeks' => 4, 'actual_start' => '2024-01-20', 'actual_duration_weeks' => 5],
             // Tambahkan aktivitas lain sesuai kebutuhan
         ];
 
-        // Hitung end_date berdasarkan start_date dan duration_weeks
         foreach ($activities as &$activity) {
-            $startDate = new \DateTime($activity['start_date']);
-            $endDate = $startDate->modify("+{$activity['duration_weeks']} weeks");
-            $activity['end_date'] = $endDate->format('Y-m-d');
+            $startDate = new \DateTime($activity['plan_start']);
+            $endDate = $startDate->modify("+{$activity['plan_duration_weeks']} weeks");
+            $activity['plan_end_date'] = $endDate->format('Y-m-d');
+
+            $startDate = new \DateTime($activity['actual_start']);
+            $endDate = $startDate->modify("+{$activity['actual_duration_weeks']} weeks");
+            $activity['actual_end_date'] = $endDate->format('Y-m-d');
         }
 
-        return view('pages.ganchart.dashboard', compact('activities'));
+        $currentYear = date('Y');
+
+        return view('pages.ganchart.dashboard', compact('activities', 'currentYear'));
     }
 }

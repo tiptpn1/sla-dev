@@ -17,7 +17,11 @@ class Proyek extends Model
 
     protected $fillable = [
         'project_nama',
+<<<<<<< HEAD
+        'isActive'
+=======
         'is_active'
+>>>>>>> 28164a9d5f8d90fb6349e9f8740e599413e7bcf5
     ];
 
     protected $guarded = ['id_project'];
