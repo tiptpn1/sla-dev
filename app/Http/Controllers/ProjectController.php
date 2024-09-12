@@ -39,7 +39,7 @@ class ProjectController extends Controller
 
         Proyek::create([
             'project_nama' => $validated['namaProyek'],
-            'is_active' => $validated['isActive'],
+            'isActive' => $validated['isActive'],
         ]);
 
         return response()->json(['status' => 'success']);
@@ -51,7 +51,7 @@ class ProjectController extends Controller
         ]);
 
         $bagian = Proyek::find($id);
-        $bagian->is_active = $validated['status'];
+        $bagian->isActive = $validated['status'];
         $bagian->save();
 
         return response()->json(['status' => 'success']);
@@ -66,7 +66,7 @@ class ProjectController extends Controller
 
         $bagian = Proyek::find($id);
         $bagian->project_nama = $validated['namaProyek'];
-        $bagian->is_active = $validated['status'];
+        $bagian->isActive = $validated['status'];
         $bagian->save();
 
         return response()->json(['status' => 'success']);

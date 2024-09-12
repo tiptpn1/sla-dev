@@ -317,6 +317,7 @@ $(document).ready(function() {
             namaBagian: $('#editNamaBagian').val(),
             status: $('#editIsActive').val()
         },
+        
         success: function(response) {
             if (response.status === 'success') {
                 $('#editModal').modal('hide');

@@ -1,8 +1,8 @@
 @extends('master/master')
 
-@section('title', 'Data Master Bagian')
+@section('title', 'Data Master Ruang Lingkup')
 
-@section('master-bagian', 'active')
+@section('master-scope', 'active')
 
 @push('css')
     <style>
@@ -126,16 +126,17 @@
         <!-- Table -->
         <div class="card">
             <div class="card-header">
-                <button class="btn btn-primary" data-toggle="modal" data-target="#addModal">Tambah Master Bagian</button>
+                <button class="btn btn-primary" data-toggle="modal" data-target="#addModal">Tambah Ruang Lingkup</button>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table id="masterBagianTable" class="table table-bordered table-striped">
+                    <table id="masterBagianScope" class="table table-bordered table-striped">
                         <thead>
                             <tr>
-                                <th>NO</th>
-                                <th>Nama Bagian</th>
-                                <th>Status Aktif</th>
+                                <th>No</th>
+                                <th>Ruang Lingkup</th>
+                                <th>Nama Project</th>
+                                <th>Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -154,7 +155,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addModalLabel">Tambah Master Bagian</h5>
+                <h5 class="modal-title" id="addModalLabel">Tambah Ruang Lingkup</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -162,9 +163,16 @@
             <form id="addForm">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="namaBagian">Nama Bagian</label>
-                        <input type="text" class="form-control" id="namaBagian" name="namaBagian" required>
+                        <label for="namaScope">Nama Ruang Lingkup</label>
+                        <input type="text" class="form-control" id="namaScope" name="namaScope" required>
                     </div>
+                    <div class="form-group">
+                        <label for="namaProyek">Nama Project</label>
+                        <select class="form-control" id="namaProyek" name="namaProyek" required>
+                            <!-- Options will be loaded dynamically with JavaScript -->
+                        </select>
+                    </div>
+                    
                     <div class="form-group">
                         <label for="isActive">Status Aktif</label>
                         <select class="form-control" id="isActive" name="isActive" required>
@@ -187,7 +195,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Edit Master Bagian</h5>
+                <h5 class="modal-title" id="editModalLabel">Edit Ruang Lingkup</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -196,9 +204,16 @@
                 <div class="modal-body">
                     <input type="hidden" id="editId" name="editId">
                     <div class="form-group">
-                        <label for="editNamaBagian">Nama Bagian</label>
-                        <input type="text" class="form-control" id="editNamaBagian" name="editNamaBagian" required>
+                        <label for="editScope">Nama Ruang Lingkup</label>
+                        <input type="text" class="form-control" id="editScope" name="editScope" required>
                     </div>
+                    <div class="form-group">
+                        <label for="editProyek">Nama Project</label>
+                        <select class="form-control" id="editProyek" name="editProyek" required>
+                            <!-- Options will be loaded dynamically with JavaScript -->
+                        </select>
+                    </div>
+                    
                     <div class="form-group">
                         <label for="editIsActive">Status Aktif</label>
                         <select class="form-control" id="editIsActive" name="editIsActive" required>
@@ -252,20 +267,21 @@ $(document).ready(function() {
     // Ambil data dan isi tabel
     function fetchData() {
         $.ajax({
-            url: '{{ route("master-bagian.get-data") }}',
+            url: '{{ route("master-scope.get-data") }}',
             method: 'GET',
             dataType: 'json',
             success: function(data) {
-                var table = $('#masterBagianTable').DataTable();
+                var table = $('#masterBagianScope').DataTable();
                 table.clear();
                 $.each(data, function(index, item) {
                     table.row.add([
                         index + 1,
-                        item.master_bagian_nama,
-                        '<span class="badge ' + (item.is_active ? 'badge-success' : 'badge-danger') + '">' + (item.is_active ? 'Aktif' : 'Nonaktif') + '</span>',
-                        '<button class="btn btn-warning btn-sm edit-btn" data-id="'+ item.master_bagian_id +'">Edit</button> ' +
-                        '<button class="btn btn-danger btn-sm delete-btn" data-id="'+ item.master_bagian_id +'">Hapus</button> ' +
-                        '<button class="btn btn-info btn-sm status-btn" data-id="'+ item.master_bagian_id +'" data-status="'+ (item.is_active ? 0 : 1) +'">' + (item.is_active ? 'Nonaktifkan' : 'Aktifkan') + '</button>'
+                        item.nama,
+                        item.project_nama, 
+                        '<span class="badge ' + (item.isActive ? 'badge-success' : 'badge-danger') + '">' + (item.isActive ? 'Aktif' : 'Nonaktif') + '</span>',
+                        '<button class="btn btn-warning btn-sm edit-btn" data-id="'+ item.id +'">Edit</button> ' +
+                        '<button class="btn btn-danger btn-sm delete-btn" data-id="'+ item.id +'">Hapus</button> ' +
+                        '<button class="btn btn-info btn-sm status-btn" data-id="'+ item.id +'" data-status="'+ (item.isActive ? 0 : 1) +'">' + (item.isActive ? 'Nonaktifkan' : 'Aktifkan') + '</button>'
                     ]).draw();
                 });
             }
@@ -278,29 +294,37 @@ $(document).ready(function() {
     $('#addForm').on('submit', function(e) {
         e.preventDefault();
         $.ajax({
-            url: '{{ route("master-bagian.store") }}',
+            url: '{{ route("master-scope.store") }}',
             method: 'POST',
             data: $(this).serialize(),
             success: function(response) {
                 if (response.status === 'success') {
                     $('#addModal').modal('hide');
                     fetchData();
+                    Swal.fire({
+                    icon: 'success',
+                    title: 'Data berhasil ditambah',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                    
                 }
             }
         });
     });
 
     // Edit data
-    $('#masterBagianTable').on('click', '.edit-btn', function() {
+    $('#masterBagianScope').on('click', '.edit-btn', function() {
         var id = $(this).data('id');
         $.ajax({
-            url: '{{ route("master-bagian.get-data-id", ":id") }}'.replace(':id', id),
+            url: '{{ route("master-scope.get-data-id", ":id") }}'.replace(':id', id),
             method: 'GET',
             dataType: 'json',
             success: function(data) {
-                $('#editId').val(data.master_bagian_id);
-                $('#editNamaBagian').val(data.master_bagian_nama);
-                $('#editIsActive').val(data.is_active ? 1 : 0);
+                $('#editId').val(data.id);
+                $('#editScope').val(data.nama);
+                $('#editProyek').val(data.project_id);
+                $('#editIsActive').val(data.isActive ? 1 : 0);
                 $('#editModal').modal('show');
             }
         });
@@ -311,10 +335,11 @@ $(document).ready(function() {
     var id = $('#editId').val();
     
     $.ajax({
-        url: '{{ route("master-bagian.update-form", ":id") }}'.replace(':id', id),
+        url: '{{ route("master-scope.update-form", ":id") }}'.replace(':id', id),
         method: 'POST',
         data: {
-            namaBagian: $('#editNamaBagian').val(),
+            namaScope: $('#editScope').val(),
+            namaProyek: $('#editProyek').val(),
             status: $('#editIsActive').val()
         },
         success: function(response) {
@@ -334,7 +359,7 @@ $(document).ready(function() {
 
 
     // Hapus data
-    $('#masterBagianTable').on('click', '.delete-btn', function() {
+    $('#masterBagianScope').on('click', '.delete-btn', function() {
         var id = $(this).data('id');
         $('#deleteModal').modal('show');
         $('#confirmDelete').data('id', id);
@@ -343,7 +368,7 @@ $(document).ready(function() {
     $('#confirmDelete').on('click', function() {
         var id = $(this).data('id');
         $.ajax({
-            url: '{{ route("master-bagian.delete", ":id") }}'.replace(':id', id),
+            url: '{{ route("master-scope.delete", ":id") }}'.replace(':id', id),
             method: 'DELETE',
             success: function(response) {
                 if (response.status === 'success') {
@@ -361,11 +386,11 @@ $(document).ready(function() {
     });
 
     // Update status aktif/nonaktif
-    $('#masterBagianTable').on('click', '.status-btn', function() {
+    $('#masterBagianScope').on('click', '.status-btn', function() {
         var id = $(this).data('id');
         var status = $(this).data('status');
         $.ajax({
-            url: '{{ route("master-bagian.update-status", ":id") }}'.replace(':id', id),
+            url: '{{ route("master-scope.update-status", ":id") }}'.replace(':id', id),
             method: 'POST',
             data: { status: status },
             success: function(response) {
@@ -383,6 +408,52 @@ $(document).ready(function() {
         });
     });
 });
+
+</script>
+
+<script>
+$(document).ready(function() {
+    function loadProjects() {
+        $.ajax({
+            url: '{{ route("master-scope.get-project-list") }}',  // URL untuk mengambil data project
+            method: 'GET',
+            success: function(response) {
+                var currentNamaProyekValue = $('#namaProyek').val(); // Simpan nilai yang sudah terpilih
+                var currentEditProyekValue = $('#editProyek').val(); // Simpan nilai yang sudah terpilih
+                
+                $('#namaProyek').empty(); // Kosongkan dulu opsi sebelumnya
+                $('#editProyek').empty();
+
+                // Append option untuk Tambah
+                $.each(response, function(index, project) {
+                    $('#namaProyek').append('<option value="' + project.id_project + '">' + project.project_nama + '</option>');
+                });
+
+                // Append option untuk Edit
+                $.each(response, function(index, project) {
+                    $('#editProyek').append('<option value="' + project.id_project + '">' + project.project_nama + '</option>');
+                });
+
+                // Set nilai yang sudah terpilih sebelumnya
+                $('#namaProyek').val(currentNamaProyekValue);
+                $('#editProyek').val(currentEditProyekValue);
+            }
+        });
+    }
+
+    // Panggil fungsi untuk load data project
+    loadProjects();
+
+    // Panggil loadProjects() ketika membuka modal tambah atau edit
+    $('#addModal').on('shown.bs.modal', function() {
+        loadProjects();
+    });
+
+    $('#editModal').on('shown.bs.modal', function() {
+        loadProjects();
+    });
+});
+
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
