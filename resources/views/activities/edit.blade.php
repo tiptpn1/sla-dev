@@ -39,9 +39,10 @@
 
                             <!-- Project Dropdown -->
                             <div class="form-group">
+                                {{-- @dd(session()->get('hak_akses_id')) --}}
                                 <label for="project_id">Project</label>
                                 <select name="project_id" class="form-control @error('project_id') is-invalid @enderror"
-                                    id="project_id" required>
+                                    id="project_id" {{ session()->get('hak_akses_id') == 2 ? 'required' : 'disabled' }}>
                                     <option value="{{ $activity->project_id }}" selected>
                                         {{ $activity->proyek->project_nama }}
                                     </option>
@@ -57,7 +58,7 @@
                             <div class="form-group">
                                 <label for="scope_id">Scope</label>
                                 <select name="scope_id" class="form-control @error('scope_id') is-invalid @enderror"
-                                    id="scope_id" required>
+                                    id="scope_id" {{ session()->get('hak_akses_id') == 2 ? 'required' : 'disabled' }}>
                                     <option value="{{ $activity->scope_id }}" selected>
                                         {{ $activity->scope->nama }}
                                     </option>
@@ -74,7 +75,8 @@
                                 <label for="nama_activity">Nama Activity</label>
                                 <input type="text" name="nama_activity"
                                     class="form-control @error('nama_activity') is-invalid @enderror" id="nama_activity"
-                                    value="{{ old('nama_activity', $activity->nama_activity) }}" required>
+                                    value="{{ old('nama_activity', $activity->nama_activity) }}"
+                                    {{ session()->get('hak_akses_id') == 2 ? 'required' : 'disabled' }}>
                                 @error('nama_activity')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -83,12 +85,12 @@
                             </div>
 
                             <!-- Plan Start Date -->
-                            <div class="form-group" {{ session()->get('hak_akses_id') == 2 ? 'hidden' : '' }}>
+                            <div class="form-group" {{ $hasAccess ? '' : 'hidden' }}>
                                 <label for="plan_start">Plan Start Date</label>
                                 <input type="date" name="plan_start"
                                     class="form-control @error('plan_start') is-invalid @enderror" id="plan_start"
                                     value="{{ old('plan_start', $activity->plan_start) }}"
-                                    {{ session()->get('hak_akses_id') == 2 ? 'readonly' : 'required' }}>
+                                    {{ $hasAccess ? 'required' : 'readonly' }}>
                                 @error('plan_start')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -97,12 +99,12 @@
                             </div>
 
                             <!-- Plan Duration -->
-                            <div class="form-group" {{ session()->get('hak_akses_id') == 2 ? 'hidden' : '' }}>
+                            <div class="form-group" {{ $hasAccess ? '' : 'hidden' }}>
                                 <label for="plan_duration">Plan Duration (days)</label>
                                 <input type="number" name="plan_duration"
                                     class="form-control @error('plan_duration') is-invalid @enderror" id="plan_duration"
                                     value="{{ old('plan_duration', $activity->plan_duration) }}"
-                                    {{ session()->get('hak_akses_id') == 2 ? 'readonly' : 'required' }}>
+                                    {{ $hasAccess ? 'required' : 'readonly' }}>
                                 @error('plan_duration')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -111,12 +113,12 @@
                             </div>
 
                             <!-- Actual Start Date (Optional) -->
-                            <div class="form-group" {{ session()->get('hak_akses_id') == 2 ? 'hidden' : '' }}>
+                            <div class="form-group" {{ $hasAccess ? '' : 'hidden' }}>
                                 <label for="actual_start">Actual Start Date (optional)</label>
                                 <input type="date" name="actual_start"
                                     class="form-control @error('actual_start') is-invalid @enderror" id="actual_start"
                                     value="{{ old('actual_start', $activity->actual_start) }}"
-                                    {{ session()->get('hak_akses_id') == 2 ? 'readonly' : 'required' }}>
+                                    {{ $hasAccess ? 'required' : 'readonly' }}>
                                 @error('actual_start')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -125,12 +127,12 @@
                             </div>
 
                             <!-- Actual Duration (Optional) -->
-                            <div class="form-group" {{ session()->get('hak_akses_id') == 2 ? 'hidden' : '' }}>
+                            <div class="form-group" {{ $hasAccess ? '' : 'hidden' }}>
                                 <label for="actual_duration">Actual Duration (days, optional)</label>
                                 <input type="number" name="actual_duration"
                                     class="form-control @error('actual_duration') is-invalid @enderror" id="actual_duration"
                                     value="{{ old('actual_duration', $activity->actual_duration) }}"
-                                    {{ session()->get('hak_akses_id') == 2 ? 'readonly' : 'required' }}>
+                                    {{ $hasAccess ? 'required' : 'readonly' }}>
                                 @error('actual_duration')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -139,13 +141,13 @@
                             </div>
 
                             <!-- Percent Complete (Optional) -->
-                            <div class="form-group" {{ session()->get('hak_akses_id') == 2 ? 'hidden' : '' }}>
+                            <div class="form-group" {{ $hasAccess ? '' : 'hidden' }}>
                                 <label for="percent_complete">Percent Complete (%)</label>
                                 <input type="number" name="percent_complete"
                                     class="form-control @error('percent_complete') is-invalid @enderror"
                                     id="percent_complete"
                                     value="{{ old('percent_complete', $activity->percent_complete) }}"
-                                    {{ session()->get('hak_akses_id') == 2 ? 'readonly' : 'required' }}>
+                                    {{ $hasAccess ? 'required' : 'readonly' }}>
                                 @error('percent_complete')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -158,7 +160,7 @@
                                 <label for="bagian_id">Select PIC(s)</label>
                                 <select name="bagian_id[]"
                                     class="form-control select2 @error('bagian_id') is-invalid @enderror" id="bagian_id"
-                                    multiple required>
+                                    multiple {{ session()->get('hak_akses_id') == 2 ? 'required' : 'disabled' }}>
                                     @foreach ($bagians as $bagian)
                                         <option value="{{ $bagian->master_bagian_id }}"
                                             {{ in_array($bagian->master_bagian_id, old('bagian_id', $activity->pics->pluck('bagian_id')->toArray())) ? 'selected' : '' }}>

@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Scope;
-use App\Models\Proyek;
-
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StoreScopeRequest;
 use App\Http\Requests\UpdateScopeRequest;
+use App\Models\Proyek;
+use App\Models\Scope;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ScopeController extends Controller
 {
@@ -104,5 +103,15 @@ class ScopeController extends Controller
     {
         $projects = Proyek::select('id_project', 'project_nama')->get();
         return response()->json($projects);
+    }
+
+    public function getProcess($id)
+    {
+        $scope = Scope::with('activities')->findOrFail($id);
+
+        // Hitung rata-rata percent_complete dari semua activities
+        $totalPercentComplete = $scope->activities->avg('percent_complete');
+
+        return response()->json(['percent_complete' => $totalPercentComplete]);
     }
 }

@@ -7,6 +7,7 @@ use App\Models\Bagian;
 use App\Models\Pic;
 use App\Models\Proyek;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class ActivityController extends Controller
 {
@@ -28,11 +29,11 @@ class ActivityController extends Controller
             'scopes.activities.progress.evidences' => function ($query) {
                 $query->latest('created_at')->first();
             }
-        ])->where('is_active', true)->get();
+        ])->where('isActive', true)->get();
 
         // return response()->json($projects);
 
-        return view('dashboard.index', compact('projects'));
+        return view('activities.index', compact('projects'));
     }
 
     /**
@@ -42,6 +43,8 @@ class ActivityController extends Controller
     {
         $projects = Proyek::select('id_project', 'project_nama')->get();
         $bagians = Bagian::select('master_bagian_id', 'master_bagian_nama')->get();
+
+        $bagianId = Session::get('bagian_id');
 
         return view('activities.create', compact('projects', 'bagians'));
     }
@@ -104,9 +107,16 @@ class ActivityController extends Controller
      */
     public function edit(string $id)
     {
-        $activity = Activity::findOrFail($id);
+        $activity = Activity::where('id_activity', $id)->with(['pics'])->first();
+
+        $bagianId = Session::get('bagian_id');
+
+        $hasAccess = $activity->pics->contains(function ($pic) use ($bagianId) {
+            return $pic->bagian_id == $bagianId;
+        });
+
         $bagians = Bagian::all();
-        return view('activities.edit', compact('activity', 'bagians'));
+        return view('activities.edit', compact('activity', 'bagians', 'hasAccess'));
     }
 
     /**

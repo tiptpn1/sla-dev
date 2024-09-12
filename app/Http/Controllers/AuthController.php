@@ -29,10 +29,10 @@ class AuthController extends Controller
         $credentials = $request->only('username', 'password');
         //$user = db::table('kpi_master_user')->where('kpi_master_user_nama', $credentials['username'])->first();
         $user = db::table('master_user')
-                ->leftJoin('master_bagian', 'master_user.master_nama_bagian_id', '=', 'master_bagian.master_bagian_id')
-                ->where('master_user.master_user_nama', $credentials['username'])
-                ->select('master_user.*', 'master_bagian.*')  // Anda bisa menentukan kolom spesifik jika diperlukan
-                ->first();
+            ->leftJoin('master_bagian', 'master_user.master_nama_bagian_id', '=', 'master_bagian.master_bagian_id')
+            ->where('master_user.master_user_nama', $credentials['username'])
+            ->select('master_user.*', 'master_bagian.*')  // Anda bisa menentukan kolom spesifik jika diperlukan
+            ->first();
         if ($user && password_verify($credentials['password'], $user->master_user_password)) {
             $request->session()->regenerate();
             $request->session()->put('id', $user->master_user_id);
@@ -52,9 +52,10 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $request->session()->flush();
-        $request->session()->regenerate();
+        session()->flush();
+        session()->invalidate();
+        session()->regenerate();
 
-        return redirect('/login');
+        return redirect('/login')->with('alert', 'Anda berhasil logout');
     }
 }

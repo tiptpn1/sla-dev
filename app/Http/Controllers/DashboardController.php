@@ -19,24 +19,24 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         // dd(session()->all());
-        $projects = Proyek::with([
-            'scopes' => function ($query) {
-                $query->where('isActive', 1);
-            },
-            'scopes.activities',
-            'scopes.activities.pics',
-            'scopes.activities.pics.bagian',
-            'scopes.activities.progress' => function ($query) {
-                $query->latest('created_at')->first();
-            },
-            'scopes.activities.progress.evidences' => function ($query) {
-                $query->latest('created_at')->first();
-            }
-        ])->where('is_active', true)->get();
+        // $projects = Proyek::with([
+        //     'scopes' => function ($query) {
+        //         $query->where('isActive', 1);
+        //     },
+        //     'scopes.activities',
+        //     'scopes.activities.pics',
+        //     'scopes.activities.pics.bagian',
+        //     'scopes.activities.progress' => function ($query) {
+        //         $query->latest('created_at')->first();
+        //     },
+        //     'scopes.activities.progress.evidences' => function ($query) {
+        //         $query->latest('created_at')->first();
+        //     }
+        // ])->where('is_active', true)->get();
 
         // return response()->json($projects);
 
-        return view('dashboard.index', compact('projects'));
+        return view('dashboard.index',);
     }
 
     public function ganchart()
@@ -55,6 +55,6 @@ class DashboardController extends Controller
             $activity['end_date'] = $endDate->format('Y-m-d');
         }
 
-        return view('dashboard', compact('activities'));
+        return view('pages.ganchart.dashboard', compact('activities'));
     }
 }

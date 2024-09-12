@@ -63,7 +63,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-widget="sign-out" href="/login" role="button">
+                    <a class="nav-link" data-widget="sign-out" href="{{ route('logout') }}" role="button">
                         <i class="fas fa-sign-out-alt"></i>
                     </a>
                 </li>
@@ -98,7 +98,7 @@
                         data-accordion="false">
                         @if (session('hak_akses_id') == 2 || session('hak_akses_id') == 3)
                             <li class="nav-item">
-                                <a href="{{ route('ganchart') }}" class="nav-link @yield('ganchart')">
+                                <a href="{{ route('dashboard') }}" class="nav-link @yield('dashboard')">
                                     <i class="nav-icon fas fa-calendar-alt"></i>
                                     <p>
                                         Dashboard
@@ -109,7 +109,7 @@
                                 <a href="{{ route('activities.index') }}" class="nav-link @yield('activity')">
                                     <i class="nav-icon fas fa-tachometer-alt"></i>
                                     <p>
-                                        Aktivitas
+                                        Activity
                                     </p>
                                 </a>
                             </li>
@@ -121,7 +121,7 @@
                                 <a href="#" class="nav-link @yield('mast')">
                                     <i class="nav-icon fas fa-database"></i>
                                     <p>
-                                        Pembentuk SLA
+                                        Data SLA
                                         <i class="right fas fa-angle-left"></i>
                                     </p>
                                 </a>

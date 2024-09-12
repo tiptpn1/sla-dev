@@ -33,7 +33,7 @@ Route::redirect('/', 'login');
 
 Route::get('login', [AuthController::class, 'viewLoginPage'])->name('page.login');
 Route::post('Login', [AuthController::class, 'actionLogin'])->name('login');
-Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::group(['prefix' => 'master-username', 'as' => 'master-username.'], function () {
     Route::get('/', [UsernameController::class, 'index'])->name('index');
@@ -91,6 +91,7 @@ Route::group(['prefix' => 'master-scope', 'as' => 'master-scope.'], function () 
     Route::post('status/{id}', [ScopeController::class, 'updateStatus'])->name('update-status');
     Route::post('form/{id}', [ScopeController::class, 'updateForm'])->name('update-form');
     Route::delete('delete/{id}', [ScopeController::class, 'delete'])->name('delete');
+    Route::get('/get-process/{id}', [ScopeController::class, 'getProcess'])->name('get-process');
 });
 
 // rincian progress
