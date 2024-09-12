@@ -6,16 +6,16 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class ProjectScope extends Component
+class ScopeActivity extends Component
 {
-    public $scope;
+    public $activity;
     public $color;
     /**
      * Create a new component instance.
      */
-    public function __construct($scope, $color)
+    public function __construct($activity, $color)
     {
-        $this->scope = $scope;
+        $this->activity = $activity;
         $this->color = $color;
     }
 
@@ -24,7 +24,6 @@ class ProjectScope extends Component
      */
     public function render()
     {
-        $progressColors = ['bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-primary'];
-        return view('components.sla.project-scope', compact('progressColors'));
+        return view('components.sla.scope-activity');
     }
 }

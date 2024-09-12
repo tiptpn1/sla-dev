@@ -142,9 +142,7 @@
                                 onclick="tambahRincianProgress()">
                                 <i class="fas fa-plus"></i> Tambah Rincian Progress
                             </button>
-                            <a href="{{ route('activities.edit', $activity->id_activity) }}" class="btn btn-warning ">
-                                <i class="fas fa-edit"></i> Edit Activity
-                            </a>
+                            
                         @endif
                     </div>
                 </div>

@@ -307,7 +307,7 @@ $(document).ready(function() {
             success: function(data) {
                 $('#editId').val(data.id_project);
                 $('#editProyek').val(data.project_nama);
-                $('#editIsActive').val(data.is_active ? 1 : 0);
+                $('#editIsActive').val(data.isActive ? 1 : 0);
                 $('#editModal').modal('show');
             }
         });

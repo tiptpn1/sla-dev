@@ -25,7 +25,10 @@ class ProgressActivity extends Component
         $projects = Proyek::with([
             'scopes' => function ($query) {
                 $query->where('isActive', true);
-            }
+            },
+            'scopes.activities' => function ($query) {
+                $query->where('isActive', true);
+            },
         ])->where('isActive', true)->get();
 
         $progressColors = ['bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-primary'];
