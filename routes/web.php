@@ -31,99 +31,99 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', 'login');
 
-Route::get('login', [AuthController::class, 'viewLoginPage'])->name('page.login');
+Route::get('login', [AuthController::class, 'viewLoginPage'])->name('page.login')->middleware('checkLogin');
 Route::post('Login', [AuthController::class, 'actionLogin'])->name('login');
-Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::group(['prefix' => 'master-username', 'as' => 'master-username.'], function () {
-    Route::get('/', [UsernameController::class, 'index'])->name('index');
-    Route::get('/get-data', [UsernameController::class, 'getData'])->name('data');
-    Route::get('create', [UsernameController::class, 'create'])->name('create');
-    Route::post('/store', [UsernameController::class, 'store'])->name('store');
-    Route::get('{id}/show', [UsernameController::class, 'show'])->name('show');
-    Route::get('{id}/edit', [UsernameController::class, 'edit'])->name('edit');
-    Route::get('{id}/data', [UsernameController::class, 'getDataById'])->name('get-data-by-id');
-    Route::put('update', [UsernameController::class, 'update'])->name('update');
-    Route::delete('destroy/{id}', [UsernameController::class, 'destroy'])->name('destroy');
+Route::middleware(['checkLogin'])->group(function () {
+    Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+
+    Route::group(['prefix' => 'master-username', 'as' => 'master-username.'], function () {
+        Route::get('/', [UsernameController::class, 'index'])->name('index');
+        Route::get('/get-data', [UsernameController::class, 'getData'])->name('data');
+        Route::get('create', [UsernameController::class, 'create'])->name('create');
+        Route::post('/store', [UsernameController::class, 'store'])->name('store');
+        Route::get('{id}/show', [UsernameController::class, 'show'])->name('show');
+        Route::get('{id}/edit', [UsernameController::class, 'edit'])->name('edit');
+        Route::get('{id}/data', [UsernameController::class, 'getDataById'])->name('get-data-by-id');
+        Route::put('update', [UsernameController::class, 'update'])->name('update');
+        Route::delete('destroy/{id}', [UsernameController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['prefix' => 'master-role', 'as' => 'master-role.'], function () {
+        Route::get('/', [RoleController::class, 'index'])->name('index');
+        Route::get('/get-data', [RoleController::class, 'getData'])->name('data');
+        Route::get('create', [RoleController::class, 'create'])->name('create');
+        Route::post('/store', [RoleController::class, 'store'])->name('store');
+        Route::get('{id}/show', [RoleController::class, 'show'])->name('show');
+        Route::get('{id}/edit', [RoleController::class, 'edit'])->name('edit');
+        Route::get('{id}/data', [RoleController::class, 'getDataById'])->name('get-data-by-id');
+        Route::put('update', [RoleController::class, 'update'])->name('update');
+        Route::delete('destroy/{id}', [RoleController::class, 'destroy'])->name('destroy');
+    });
+
+    // Master Divisi
+    Route::group(['prefix' => 'master-bagian', 'as' => 'master-bagian.'], function () {
+        Route::get('/', [BagianController::class, 'index'])->name('index');
+        Route::get('get-data', [BagianController::class, 'getData'])->name('get-data');
+        Route::get('get-data/{id}', [BagianController::class, 'getDataById'])->name('get-data-id');
+        Route::post('store', [BagianController::class, 'store'])->name('store');
+        Route::post('status/{id}', [BagianController::class, 'updateStatus'])->name('update-status');
+        Route::post('form/{id}', [BagianController::class, 'updateForm'])->name('update-form');
+        Route::delete('delete/{id}', [BagianController::class, 'delete'])->name('delete');
+    });
+
+    // Master Project
+    Route::group(['prefix' => 'master-proyek', 'as' => 'master-proyek.'], function () {
+        Route::get('/', [ProjectController::class, 'index'])->name('index');
+        Route::get('get-data', [ProjectController::class, 'getData'])->name('get-data');
+        Route::get('get-data/{id}', [ProjectController::class, 'getDataById'])->name('get-data-id');
+        Route::post('store', [ProjectController::class, 'store'])->name('store');
+        Route::post('status/{id}', [ProjectController::class, 'updateStatus'])->name('update-status');
+        Route::post('form/{id}', [ProjectController::class, 'updateForm'])->name('update-form');
+        Route::delete('delete/{id}', [ProjectController::class, 'delete'])->name('delete');
+    });
+
+    // Master Scope
+    Route::group(['prefix' => 'master-scope', 'as' => 'master-scope.'], function () {
+        Route::get('/', [ScopeController::class, 'index'])->name('index');
+        Route::get('get-data', [ScopeController::class, 'getData'])->name('get-data');
+        Route::get('get-project-list', [ScopeController::class, 'getProjectList'])->name('get-project-list');
+        Route::get('get-data/{id}', [ScopeController::class, 'getDataById'])->name('get-data-id');
+        Route::post('store', [ScopeController::class, 'store'])->name('store');
+        Route::post('status/{id}', [ScopeController::class, 'updateStatus'])->name('update-status');
+        Route::post('form/{id}', [ScopeController::class, 'updateForm'])->name('update-form');
+        Route::delete('delete/{id}', [ScopeController::class, 'delete'])->name('delete');
+        Route::get('/get-process/{id}', [ScopeController::class, 'getProcess'])->name('get-process');
+    });
+
+    // rincian progress
+    Route::prefix('activity/rincian-progress')->name('rincian.')->group(function () {
+        Route::get('/{id}', [RincianProgressController::class, 'index'])->name('show');
+        Route::post('/get-data', [RincianProgressController::class, 'getData'])->name('getData');
+        Route::post('/store', [RincianProgressController::class, 'store'])->name('store');
+        Route::put('/update', [RincianProgressController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [RincianProgressController::class, 'delete'])->name('delete');
+    });
+
+    // evidence
+    Route::prefix('evidence')->name('evidence.')->group(function () {
+        Route::post('/get-evidence', [RincianProgressController::class, 'getDataEvidence'])->name('show');
+        Route::post('/upload-evidence', [RincianProgressController::class, 'uploadDataEvidence'])->name('upload');
+        Route::post('/update-evidence', [RincianProgressController::class, 'updateDataEvidence'])->name('update');
+        Route::delete('/delete-evidence', [RincianProgressController::class, 'deleteEvidence'])->name('delete');
+        Route::post('/download', [RincianProgressController::class, 'downloadEvidence'])->name('download');;
+    });
+
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('ganchart', [DashboardController::class, 'ganchart'])->name('ganchart');
+
+    Route::get('activities/data', [ServerSideActivityController::class, 'data'])->name('activities.data');
+    Route::resource('activities', ActivityController::class);
+    Route::post('activity/update', [ActivityController::class, 'updateActivity'])->name('activity.update');
+    Route::patch('activity/status/{id}', [ActivityController::class, 'updateStatus'])->name('activity.status');
+
+    Route::get('project/data', [ProjectScopeController::class, 'getProjects'])->name('project.data');
+    Route::get('project/data/{id}', [ProjectScopeController::class, 'getProjectById'])->name('project.data.detail');
+    Route::get('scope/{id}/data', [ProjectScopeController::class, 'getScopes'])->name('scope.data');
+    Route::get('scope/data/{id}', [ProjectScopeController::class, 'getScopeById'])->name('scope.data.detail');
 });
-
-Route::group(['prefix' => 'master-role', 'as' => 'master-role.'], function () {
-    Route::get('/', [RoleController::class, 'index'])->name('index');
-    Route::get('/get-data', [RoleController::class, 'getData'])->name('data');
-    Route::get('create', [RoleController::class, 'create'])->name('create');
-    Route::post('/store', [RoleController::class, 'store'])->name('store');
-    Route::get('{id}/show', [RoleController::class, 'show'])->name('show');
-    Route::get('{id}/edit', [RoleController::class, 'edit'])->name('edit');
-    Route::get('{id}/data', [RoleController::class, 'getDataById'])->name('get-data-by-id');
-    Route::put('update', [RoleController::class, 'update'])->name('update');
-    Route::delete('destroy/{id}', [RoleController::class, 'destroy'])->name('destroy');
-});
-
-// Master Divisi
-Route::group(['prefix' => 'master-bagian', 'as' => 'master-bagian.'], function () {
-    Route::get('/', [BagianController::class, 'index'])->name('index');
-    Route::get('get-data', [BagianController::class, 'getData'])->name('get-data');
-    Route::get('get-data/{id}', [BagianController::class, 'getDataById'])->name('get-data-id');
-    Route::post('store', [BagianController::class, 'store'])->name('store');
-    Route::post('status/{id}', [BagianController::class, 'updateStatus'])->name('update-status');
-    Route::post('form/{id}', [BagianController::class, 'updateForm'])->name('update-form');
-    Route::delete('delete/{id}', [BagianController::class, 'delete'])->name('delete');
-});
-
-// Master Project
-Route::group(['prefix' => 'master-proyek', 'as' => 'master-proyek.'], function () {
-    Route::get('/', [ProjectController::class, 'index'])->name('index');
-    Route::get('get-data', [ProjectController::class, 'getData'])->name('get-data');
-    Route::get('get-data/{id}', [ProjectController::class, 'getDataById'])->name('get-data-id');
-    Route::post('store', [ProjectController::class, 'store'])->name('store');
-    Route::post('status/{id}', [ProjectController::class, 'updateStatus'])->name('update-status');
-    Route::post('form/{id}', [ProjectController::class, 'updateForm'])->name('update-form');
-    Route::delete('delete/{id}', [ProjectController::class, 'delete'])->name('delete');
-});
-
-// Master Scope
-Route::group(['prefix' => 'master-scope', 'as' => 'master-scope.'], function () {
-    Route::get('/', [ScopeController::class, 'index'])->name('index');
-    Route::get('get-data', [ScopeController::class, 'getData'])->name('get-data');
-    Route::get('get-project-list', [ScopeController::class, 'getProjectList'])->name('get-project-list');
-    Route::get('get-data/{id}', [ScopeController::class, 'getDataById'])->name('get-data-id');
-    Route::post('store', [ScopeController::class, 'store'])->name('store');
-    Route::post('status/{id}', [ScopeController::class, 'updateStatus'])->name('update-status');
-    Route::post('form/{id}', [ScopeController::class, 'updateForm'])->name('update-form');
-    Route::delete('delete/{id}', [ScopeController::class, 'delete'])->name('delete');
-    Route::get('/get-process/{id}', [ScopeController::class, 'getProcess'])->name('get-process');
-});
-
-// rincian progress
-Route::prefix('activity/rincian-progress')->name('rincian.')->group(function () {
-    Route::get('/{id}', [RincianProgressController::class, 'index'])->name('show');
-    Route::post('/get-data', [RincianProgressController::class, 'getData'])->name('getData');
-    Route::post('/store', [RincianProgressController::class, 'store'])->name('store');
-    Route::put('/update', [RincianProgressController::class, 'update'])->name('update');
-    Route::delete('/delete/{id}', [RincianProgressController::class, 'delete'])->name('delete');
-});
-
-// evidence
-Route::prefix('evidence')->name('evidence.')->group(function () {
-    Route::post('/get-evidence', [RincianProgressController::class, 'getDataEvidence'])->name('show');
-    Route::post('/upload-evidence', [RincianProgressController::class, 'uploadDataEvidence'])->name('upload');
-    Route::post('/update-evidence', [RincianProgressController::class, 'updateDataEvidence'])->name('update');
-    Route::delete('/delete-evidence', [RincianProgressController::class, 'deleteEvidence'])->name('delete');
-    Route::post('/download', [RincianProgressController::class, 'downloadEvidence'])->name('download');;
-});
-
-
-
-
-Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-Route::get('ganchart', [DashboardController::class, 'ganchart'])->name('ganchart');
-
-Route::get('activities/data', [ServerSideActivityController::class, 'data'])->name('activities.data');
-Route::resource('activities', ActivityController::class);
-Route::post('activity/update', [ActivityController::class, 'updateActivity'])->name('activity.update');
-Route::patch('activity/status/{id}', [ActivityController::class, 'updateStatus'])->name('activity.status');
-
-Route::get('project/data', [ProjectScopeController::class, 'getProjects'])->name('project.data');
-Route::get('project/data/{id}', [ProjectScopeController::class, 'getProjectById'])->name('project.data.detail');
-Route::get('scope/{id}/data', [ProjectScopeController::class, 'getScopes'])->name('scope.data');
-Route::get('scope/data/{id}', [ProjectScopeController::class, 'getScopeById'])->name('scope.data.detail');

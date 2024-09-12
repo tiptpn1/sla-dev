@@ -172,7 +172,7 @@
                                 @enderror
                             </div>
 
-                            <!-- Select PICcccccccccccc (Multiple Selection with Select2) -->
+                            <!-- Select PIC (Multiple Selection with Select2) -->
                             <div class="form-group">
                                 <label for="bagian_id">Select PIC(s)</label>
                                 <select name="bagian_id[]"
