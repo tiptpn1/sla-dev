@@ -59,7 +59,7 @@ Route::group(['prefix' => 'master-role', 'as' => 'master-role.'], function () {
     Route::delete('destroy/{id}', [RoleController::class, 'destroy'])->name('destroy');
 });
 
-// Master Divisi
+// Master Divisiiiiiiiiiiiiiii
 Route::group(['prefix' => 'master-bagian', 'as' => 'master-bagian.'], function () {
     Route::get('/', [BagianController::class, 'index'])->name('index');
     Route::get('get-data', [BagianController::class, 'getData'])->name('get-data');
