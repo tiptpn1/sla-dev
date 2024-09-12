@@ -33,7 +33,31 @@ Route::redirect('/', 'login');
 
 Route::get('login', [AuthController::class, 'viewLoginPage'])->name('page.login');
 Route::post('Login', [AuthController::class, 'actionLogin'])->name('login');
-Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::group(['prefix' => 'master-username', 'as' => 'master-username.'], function () {
+    Route::get('/', [UsernameController::class, 'index'])->name('index');
+    Route::get('/get-data', [UsernameController::class, 'getData'])->name('data');
+    Route::get('create', [UsernameController::class, 'create'])->name('create');
+    Route::post('/store', [UsernameController::class, 'store'])->name('store');
+    Route::get('{id}/show', [UsernameController::class, 'show'])->name('show');
+    Route::get('{id}/edit', [UsernameController::class, 'edit'])->name('edit');
+    Route::get('{id}/data', [UsernameController::class, 'getDataById'])->name('get-data-by-id');
+    Route::put('update', [UsernameController::class, 'update'])->name('update');
+    Route::delete('destroy/{id}', [UsernameController::class, 'destroy'])->name('destroy');
+});
+
+Route::group(['prefix' => 'master-role', 'as' => 'master-role.'], function () {
+    Route::get('/', [RoleController::class, 'index'])->name('index');
+    Route::get('/get-data', [RoleController::class, 'getData'])->name('data');
+    Route::get('create', [RoleController::class, 'create'])->name('create');
+    Route::post('/store', [RoleController::class, 'store'])->name('store');
+    Route::get('{id}/show', [RoleController::class, 'show'])->name('show');
+    Route::get('{id}/edit', [RoleController::class, 'edit'])->name('edit');
+    Route::get('{id}/data', [RoleController::class, 'getDataById'])->name('get-data-by-id');
+    Route::put('update', [RoleController::class, 'update'])->name('update');
+    Route::delete('destroy/{id}', [RoleController::class, 'destroy'])->name('destroy');
+});
 
 // Master Divisi
 Route::group(['prefix' => 'master-bagian', 'as' => 'master-bagian.'], function () {
@@ -67,6 +91,7 @@ Route::group(['prefix' => 'master-scope', 'as' => 'master-scope.'], function () 
     Route::post('status/{id}', [ScopeController::class, 'updateStatus'])->name('update-status');
     Route::post('form/{id}', [ScopeController::class, 'updateForm'])->name('update-form');
     Route::delete('delete/{id}', [ScopeController::class, 'delete'])->name('delete');
+    Route::get('/get-process/{id}', [ScopeController::class, 'getProcess'])->name('get-process');
 });
 
 // rincian progress
@@ -96,6 +121,7 @@ Route::get('ganchart', [DashboardController::class, 'ganchart'])->name('ganchart
 Route::get('activities/data', [ServerSideActivityController::class, 'data'])->name('activities.data');
 Route::resource('activities', ActivityController::class);
 Route::post('activity/update', [ActivityController::class, 'updateActivity'])->name('activity.update');
+Route::patch('activity/status/{id}', [ActivityController::class, 'updateStatus'])->name('activity.status');
 
 Route::get('project/data', [ProjectScopeController::class, 'getProjects'])->name('project.data');
 Route::get('project/data/{id}', [ProjectScopeController::class, 'getProjectById'])->name('project.data.detail');
