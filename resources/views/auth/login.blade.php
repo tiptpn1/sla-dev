@@ -33,7 +33,7 @@
                         {{ $errors->first() }}
                     </div>
                 @endif
-                <form action="{{ route('actLogin') }}" method="POST">
+                <form action="{{ route('login') }}" method="POST">
                     @csrf
                     <div class="input-group mb-3">
                         <input type="text" class="form-control" name="username" placeholder="username" required>

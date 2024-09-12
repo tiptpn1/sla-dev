@@ -1,8 +1,8 @@
 @extends('master/master')
 
-@section('title', 'Data Master Proyek')
+@section('title', 'Data Master Ruang Lingkup')
 
-@section('master-proyek', 'active')
+@section('master-scope', 'active')
 
 @push('css')
     <style>
@@ -126,14 +126,15 @@
         <!-- Table -->
         <div class="card">
             <div class="card-header">
-                <button class="btn btn-primary" data-toggle="modal" data-target="#addModal">Tambah Master Proyek</button>
+                <button class="btn btn-primary" data-toggle="modal" data-target="#addModal">Tambah Ruang Lingkup</button>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table id="masterBagianProyek" class="table table-bordered table-striped">
+                    <table id="masterBagianScope" class="table table-bordered table-striped">
                         <thead>
                             <tr>
                                 <th>No</th>
+                                <th>Ruang Lingkup</th>
                                 <th>Nama Project</th>
                                 <th>Status</th>
                                 <th>Action</th>
@@ -149,12 +150,12 @@
     </div>
 </div>
 
-<!-- Add Modal -->
+<!-- Add Modal ----------------------------------------------->
 <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addModalLabel">Tambah Master Proyek</h5>
+                <h5 class="modal-title" id="addModalLabel">Tambah Ruang Lingkup</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -162,9 +163,16 @@
             <form id="addForm">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="namaProyek">Nama Proyek</label>
-                        <input type="text" class="form-control" id="namaProyek" name="namaProyek" required>
+                        <label for="namaScope">Nama Ruang Lingkup</label>
+                        <input type="text" class="form-control" id="namaScope" name="namaScope" required>
                     </div>
+                    <div class="form-group">
+                        <label for="namaProyek">Nama Project</label>
+                        <select class="form-control" id="namaProyek" name="namaProyek" required>
+                            <!-- Options will be loaded dynamically with JavaScript -->
+                        </select>
+                    </div>
+                    
                     <div class="form-group">
                         <label for="isActive">Status Aktif</label>
                         <select class="form-control" id="isActive" name="isActive" required>
@@ -187,7 +195,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Edit Master Proyek</h5>
+                <h5 class="modal-title" id="editModalLabel">Edit Ruang Lingkup</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -196,9 +204,16 @@
                 <div class="modal-body">
                     <input type="hidden" id="editId" name="editId">
                     <div class="form-group">
-                        <label for="editProyek">Nama Proyek</label>
-                        <input type="text" class="form-control" id="editProyek" name="editProyek" required>
+                        <label for="editScope">Nama Ruang Lingkup</label>
+                        <input type="text" class="form-control" id="editScope" name="editScope" required>
                     </div>
+                    <div class="form-group">
+                        <label for="editProyek">Nama Project</label>
+                        <select class="form-control" id="editProyek" name="editProyek" required>
+                            <!-- Options will be loaded dynamically with JavaScript -->
+                        </select>
+                    </div>
+                    
                     <div class="form-group">
                         <label for="editIsActive">Status Aktif</label>
                         <select class="form-control" id="editIsActive" name="editIsActive" required>
@@ -252,20 +267,21 @@ $(document).ready(function() {
     // Ambil data dan isi tabel
     function fetchData() {
         $.ajax({
-            url: '{{ route("master-proyek.get-data") }}',
+            url: '{{ route("master-scope.get-data") }}',
             method: 'GET',
             dataType: 'json',
             success: function(data) {
-                var table = $('#masterBagianProyek').DataTable();
+                var table = $('#masterBagianScope').DataTable();
                 table.clear();
                 $.each(data, function(index, item) {
                     table.row.add([
                         index + 1,
-                        item.project_nama,
+                        item.nama,
+                        item.project_nama, 
                         '<span class="badge ' + (item.isActive ? 'badge-success' : 'badge-danger') + '">' + (item.isActive ? 'Aktif' : 'Nonaktif') + '</span>',
-                        '<button class="btn btn-warning btn-sm edit-btn" data-id="'+ item.id_project +'">Edit</button> ' +
-                        '<button class="btn btn-danger btn-sm delete-btn" data-id="'+ item.id_project +'">Hapus</button> ' +
-                        '<button class="btn btn-info btn-sm status-btn" data-id="'+ item.id_project +'" data-status="'+ (item.isActive ? 0 : 1) +'">' + (item.isActive ? 'Nonaktifkan' : 'Aktifkan') + '</button>'
+                        '<button class="btn btn-warning btn-sm edit-btn" data-id="'+ item.id +'">Edit</button> ' +
+                        '<button class="btn btn-danger btn-sm delete-btn" data-id="'+ item.id +'">Hapus</button> ' +
+                        '<button class="btn btn-info btn-sm status-btn" data-id="'+ item.id +'" data-status="'+ (item.isActive ? 0 : 1) +'">' + (item.isActive ? 'Nonaktifkan' : 'Aktifkan') + '</button>'
                     ]).draw();
                 });
             }
@@ -278,7 +294,7 @@ $(document).ready(function() {
     $('#addForm').on('submit', function(e) {
         e.preventDefault();
         $.ajax({
-            url: '{{ route("master-proyek.store") }}',
+            url: '{{ route("master-scope.store") }}',
             method: 'POST',
             data: $(this).serialize(),
             success: function(response) {
@@ -298,15 +314,16 @@ $(document).ready(function() {
     });
 
     // Edit data
-    $('#masterBagianProyek').on('click', '.edit-btn', function() {
+    $('#masterBagianScope').on('click', '.edit-btn', function() {
         var id = $(this).data('id');
         $.ajax({
-            url: '{{ route("master-proyek.get-data-id", ":id") }}'.replace(':id', id),
+            url: '{{ route("master-scope.get-data-id", ":id") }}'.replace(':id', id),
             method: 'GET',
             dataType: 'json',
             success: function(data) {
-                $('#editId').val(data.id_project);
-                $('#editProyek').val(data.project_nama);
+                $('#editId').val(data.id);
+                $('#editScope').val(data.nama);
+                $('#editProyek').val(data.project_id);
                 $('#editIsActive').val(data.isActive ? 1 : 0);
                 $('#editModal').modal('show');
             }
@@ -318,9 +335,10 @@ $(document).ready(function() {
     var id = $('#editId').val();
     
     $.ajax({
-        url: '{{ route("master-proyek.update-form", ":id") }}'.replace(':id', id),
+        url: '{{ route("master-scope.update-form", ":id") }}'.replace(':id', id),
         method: 'POST',
         data: {
+            namaScope: $('#editScope').val(),
             namaProyek: $('#editProyek').val(),
             status: $('#editIsActive').val()
         },
@@ -341,7 +359,7 @@ $(document).ready(function() {
 
 
     // Hapus data
-    $('#masterBagianProyek').on('click', '.delete-btn', function() {
+    $('#masterBagianScope').on('click', '.delete-btn', function() {
         var id = $(this).data('id');
         $('#deleteModal').modal('show');
         $('#confirmDelete').data('id', id);
@@ -350,7 +368,7 @@ $(document).ready(function() {
     $('#confirmDelete').on('click', function() {
         var id = $(this).data('id');
         $.ajax({
-            url: '{{ route("master-proyek.delete", ":id") }}'.replace(':id', id),
+            url: '{{ route("master-scope.delete", ":id") }}'.replace(':id', id),
             method: 'DELETE',
             success: function(response) {
                 if (response.status === 'success') {
@@ -368,11 +386,11 @@ $(document).ready(function() {
     });
 
     // Update status aktif/nonaktif
-    $('#masterBagianProyek').on('click', '.status-btn', function() {
+    $('#masterBagianScope').on('click', '.status-btn', function() {
         var id = $(this).data('id');
         var status = $(this).data('status');
         $.ajax({
-            url: '{{ route("master-proyek.update-status", ":id") }}'.replace(':id', id),
+            url: '{{ route("master-scope.update-status", ":id") }}'.replace(':id', id),
             method: 'POST',
             data: { status: status },
             success: function(response) {
@@ -390,6 +408,52 @@ $(document).ready(function() {
         });
     });
 });
+
+</script>
+
+<script>
+$(document).ready(function() {
+    function loadProjects() {
+        $.ajax({
+            url: '{{ route("master-scope.get-project-list") }}',  // URL untuk mengambil data project
+            method: 'GET',
+            success: function(response) {
+                var currentNamaProyekValue = $('#namaProyek').val(); // Simpan nilai yang sudah terpilih
+                var currentEditProyekValue = $('#editProyek').val(); // Simpan nilai yang sudah terpilih
+                
+                $('#namaProyek').empty(); // Kosongkan dulu opsi sebelumnya
+                $('#editProyek').empty();
+
+                // Append option untuk Tambah
+                $.each(response, function(index, project) {
+                    $('#namaProyek').append('<option value="' + project.id_project + '">' + project.project_nama + '</option>');
+                });
+
+                // Append option untuk Edit
+                $.each(response, function(index, project) {
+                    $('#editProyek').append('<option value="' + project.id_project + '">' + project.project_nama + '</option>');
+                });
+
+                // Set nilai yang sudah terpilih sebelumnya
+                $('#namaProyek').val(currentNamaProyekValue);
+                $('#editProyek').val(currentEditProyekValue);
+            }
+        });
+    }
+
+    // Panggil fungsi untuk load data project
+    loadProjects();
+
+    // Panggil loadProjects() ketika membuka modal tambah atau edit
+    $('#addModal').on('shown.bs.modal', function() {
+        loadProjects();
+    });
+
+    $('#editModal').on('shown.bs.modal', function() {
+        loadProjects();
+    });
+});
+
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
