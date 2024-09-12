@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Session;
 class ActivityController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resourceeeeeeeeeeeeee.
      */
     public function index()
     {
