@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Activity;
 use App\Models\Eviden;
 use App\Models\Proyek;
 use App\Traits\RoleTrait;
@@ -18,25 +19,8 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        // dd(session()->all());
-        // $projects = Proyek::with([
-        //     'scopes' => function ($query) {
-        //         $query->where('isActive', 1);
-        //     },
-        //     'scopes.activities',
-        //     'scopes.activities.pics',
-        //     'scopes.activities.pics.bagian',
-        //     'scopes.activities.progress' => function ($query) {
-        //         $query->latest('created_at')->first();
-        //     },
-        //     'scopes.activities.progress.evidences' => function ($query) {
-        //         $query->latest('created_at')->first();
-        //     }
-        // ])->where('is_active', true)->get();
-
-        // return response()->json($projects);
-
-        return view('dashboard.index',);
+        $activities = Activity::all();
+        return view('dashboard.index', compact('activities'));
     }
 
     public function ganchart()

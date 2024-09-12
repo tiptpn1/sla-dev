@@ -68,27 +68,8 @@
                                                                             <div
                                                                                 class="card card-outline card-secondary collapsed-card">
                                                                                 <div class="card-header">
-                                                                                    <h3
-                                                                                        class="card-title d-flex align-items-center w-50">
-                                                                                        <span>{{ $scope->nama }}</span>
-
-                                                                                        <!-- Progress Bar Container -->
-                                                                                        @if ($scope->activities->count() > 0)
-                                                                                            <span class="ml-3 progress"
-                                                                                                style="width: 100%; max-width: 200px;">
-                                                                                                <!-- Adjust max-width as needed -->
-                                                                                                <div id="progress-bar-{{ $scope->id }}"
-                                                                                                    class="progress-bar bg-success"
-                                                                                                    data-scope-id="{{ $scope->id }}"
-                                                                                                    role="progressbar"
-                                                                                                    style="width: 50%"
-                                                                                                    aria-valuenow="50"
-                                                                                                    aria-valuemin="0"
-                                                                                                    aria-valuemax="100">
-                                                                                                    50%
-                                                                                                </div>
-                                                                                            </span>
-                                                                                        @endif
+                                                                                    <h3 class="card-title">
+                                                                                        {{ $scope->nama }}
 
                                                                                     </h3>
                                                                                     <div class="card-tools">
@@ -402,7 +383,10 @@
                     scopeId = $(this).data('scope-id');
                     console.log(scopeId);
 
-                    // updateProgressBar();
+                    if (value.startsWith('0')) {
+                        value = value.replace(/^0+/, ''); // Remove leading zeros
+                        $(this).val(value); // Update the input with the new value
+                    }
                 }
 
                 $.ajax({
@@ -464,30 +448,6 @@
                     }
                 })
             })
-
-            function updateProgressBar(scopeId) {
-                $.ajax({
-                    url: "{{ route('master-scope.get-process', ':id') }}".replace(':id', scopeId),
-                    method: 'GET',
-                    success: function(response) {
-                        const percentComplete = response.percent_complete;
-
-                        // Update the corresponding progress bar width and text
-                        $('#progress-bar-' + scopeId)
-                            .css('width', percentComplete + '%')
-                            .attr('aria-valuenow', percentComplete)
-                            .text(percentComplete + '%');
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error fetching progress:', error);
-                    }
-                });
-            }
-
-            $('.progress-bar').each(function() {
-                const scopeId = $(this).data('scope-id');
-                updateProgressBar(scopeId); // Update progress for each scope
-            });
         });
 
         function deleteActivity(id) {

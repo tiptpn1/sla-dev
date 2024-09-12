@@ -8,8 +8,8 @@
     <div class="col-md-3">
         <h6 class="text-secondary">{{ $scope->nama }}</h6>
     </div>
-    <div class="col-md-9">
-        <div class="progress" style="height: 25px;">
+    <div class="col-md-9 d-flex align-items-center">
+        <div class="progress" style="height: 25px; flex-grow: 1;">
             <div id="progress-bar-{{ $scope->id }}"
                 class="progress-bar {{ $color }} progress-bar-striped progress-bar-animated" role="progressbar"
                 style="width: 0%;" data-scope-id="{{ $scope->id }}" aria-valuenow="0" aria-valuemin="0"
@@ -17,6 +17,7 @@
                 0%
             </div>
         </div>
+        <span class="ml-2 font-weight-bold">100%</span>
     </div>
 </div>
 
