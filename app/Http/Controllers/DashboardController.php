@@ -6,6 +6,7 @@ use App\Models\Activity;
 use App\Models\Eviden;
 use App\Models\Proyek;
 use App\Traits\RoleTrait;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use DateTime;
 use Exception;
@@ -47,5 +48,27 @@ class DashboardController extends Controller
         $projects = Proyek::with(['scopes', 'scopes.activities', 'scopes.activities.pics', 'scopes.activities.progress', 'scopes.activities.progress.evidences'])->where('isActive', 1)->get();
 
         return view('pages.ganchart.dashboard', compact('projects'));
+    }
+
+    public function downloadPdf()
+    {
+        $projects = Proyek::with([
+            'scopes' => function ($query) {
+                $query->where('isActive', 1);
+            },
+            'scopes.activities' => function ($query) {
+                $query->where('isActive', 1);
+            },
+            'scopes.activities.pics',
+            'scopes.activities.pics.bagian',
+            'scopes.activities.progress' => function ($query) {
+                $query->latest('created_at')->first();
+            },
+        ])->where('isActive', 1)->get();
+
+        // $pdf = Pdf::loadView('pdf.dashboard-sla', array('projects' =>  $projects))->setPaper('a4', 'landscape');
+
+        // return $pdf->stream('dashboard-sla.pdf');
+        return view('pdf.dashboard-sla', compact('projects'));
     }
 }

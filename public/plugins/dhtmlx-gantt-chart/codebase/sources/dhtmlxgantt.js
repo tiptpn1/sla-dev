@@ -36522,6 +36522,8 @@ function createTaskRenderer(gantt) {
 
     if (task.start_date_data_actual == '' || task.duration_data_actual == '') {
         styles.push("opacity: 0");
+    } else {
+        styles.push('opacity: 0.6');
     }
 
     div.style.cssText = styles.join(";");
@@ -36600,21 +36602,19 @@ function createTaskRenderer(gantt) {
     div_plan.className = css;
     var styles = ["left:" + pos.leftPlan + "px", "top:" + (padd + pos.top) + 'px', "height:" + (taskType == cfg.types.milestone ? pos.height : height) + 'px', "line-height:" + Math.max(height < 30 ? height - 2 : height, 0) + 'px', "width:" + widthPlan + 'px'];
 
-    if (task.color) {
-      styles.push("background-color:" + task.color);
-    }
+    // if (task.color) {
+      styles.push("background-color: #007BFF");
+    // }
 
     if (task.textColor) {
       styles.push("color:" + task.textColor);
     }
 
-    styles.push('opacity: 0.3');
-
     div_plan.style.cssText = styles.join(";");
 
     // add actual and plan bar
-    parent.appendChild(div);
     if (task.start_date_data_plan != '' && task.duration_data_plan != '') parent.appendChild(div_plan);
+    parent.appendChild(div);
 
     return parent;
   }

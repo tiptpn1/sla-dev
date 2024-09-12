@@ -11,22 +11,53 @@
     <script src="{{ asset('plugins/dhtmlx-gantt-chart/codebase/sources/dhtmlxgantt.js') }}"></script>
 
     <style>
-        .gantt_task_line.gantt_bar_task>.gantt_task_content {
+        /* Menyembunyikan konten bar tugas */
+        .gantt_task_line.gantt_bar_task > .gantt_task_content {
             display: none !important;
         }
 
-        /* .gantt_grid_head_cell {
-            font-size: 8px;
-            /* Mengatur ukuran font header kolom */
-            font-weight: bold;
-            /* Menebalkan teks header jika diinginkan */
+
+        .gantt_grid_head_cell {
+            white-space: normal; /* Membungkus teks panjang ke baris berikutnya */
+            word-wrap: break-word; /* Memecah kata yang panjang */
+            overflow-wrap: break-word; /* Memastikan kata panjang tidak melampaui batas */
+            word-break: break-word; /* Memecah kata panjang untuk pembungkusan */
+            font-size: 12px; /* Ukuran font header kolom */
+            font-weight: bold; /* Menebalkan teks header */
+            padding: 4px; /* Padding di dalam sel header */
+            box-sizing: border-box; /* Menyertakan padding dalam lebar elemen */
         }
 
+        /* Mengatur gaya untuk isi sel Gantt */
         .gantt_tree_content {
-            font-size: 6px;
-            /* Mengatur ukuran font isi sel */
-        } */
+            white-space: normal; /* Membungkus teks panjang ke baris berikutnya */
+            word-wrap: break-word; /* Memecah kata yang panjang */
+            overflow-wrap: break-word; /* Memastikan kata panjang tidak melampaui batas */
+            word-break: break-word; /* Memecah kata panjang untuk pembungkusan */
+            font-size: 12px; /* Ukuran font isi sel */
+            padding: 4px; /* Padding di dalam sel */
+            box-sizing: border-box; /* Menyertakan padding dalam lebar elemen */
+            line-height: 1.2; /* Menyesuaikan tinggi baris untuk membuat teks lebih mudah dibaca */
+        }
+
+        /* Menyesuaikan tinggi baris secara otomatis */
+        .gantt_grid_body .gantt_grid_row {
+            height: auto; /* Mengatur tinggi baris otomatis */
+        }
+
+        .gantt_container {
+        display: flex;
+        width: 100%;
+        }
+
+        .gantt_column_wrap {
+            white-space: normal;
+            word-wrap: break-word;
+        }
+
     </style>
+
+
 </head>
 
 <body>
@@ -49,95 +80,135 @@
                 var weekInMonth = weekNum - monthStartWeek + 1;
 
                 // Batasi hanya hingga minggu 4
-                if (weekInMonth < 1 || weekInMonth > 4) {
-                    return "";
+                if (weekInMonth < 1 || weekInMonth > 5) {
+                    return "Week 1";
                 }
                 return "Week " + weekInMonth;
             }
         }];
 
         gantt.config.scale_height = 60; // Tinggi skala (header)
-        gantt.config.row_height = 25; // Tinggi setiap baris aktivitas
+        gantt.config.row_height = 60; // Tinggi setiap baris aktivitas
         gantt.config.bar_height = 20; // Tinggi bar Gantt untuk setiap aktivitas
 
         // Batasi tampilan Gantt Chart hingga Desember
-        gantt.config.start_date = new Date(1800, 0, 1); // 1 Januari 2024
-        gantt.config.end_date = new Date(3024, 11, 31); // 31 Desember 2024
+        gantt.config.start_date = new Date(2024, 0, 1); // 1 Januari 2024
+        gantt.config.end_date = new Date(2024, 11, 31); // 31 Desember 2024
 
         gantt.config.readonly = true; // Nonaktifkan mode hanya baca
+        // gantt.config.resizable = true;
+
+        // gantt.attachEvent("onBeforeTaskDrag", function(id, mode) {
+        //     return true; // Mengizinkan drag
+        // });
+
+        gantt.config.layout = {
+        css: "gantt_container",
+        cols: [
+            {
+                width: 500, // lebar tabel (sidebar)
+                min_width: 300,
+                rows: [
+                    { view: "grid", scrollX: "gridScroll", scrollable: true, scrollY: "scrollVer" },
+                    { view: "scrollbar", id: "gridScroll", group: "horizontal" }
+                ]
+            },
+            { resizer: true, width: 1 },
+            {
+                rows: [
+                    { view: "timeline", scrollX: "scrollHor", scrollY: "scrollVer" },
+                    { view: "scrollbar", id: "scrollHor", group: "horizontal" }
+                ]
+            },
+            { view: "scrollbar", id: "scrollVer" }
+        ]
+        };
 
         gantt.init("gantt_here");
 
-        gantt.config.columns = [{
+        gantt.config.columns = [
+            {
                 name: "proyek",
                 label: "Proyek",
                 tree: false,
-                width: '*'
+                width: 150,
+                css: "wrap-text gantt_column_wrap"
             },
             {
                 name: "scope",
                 label: "Ruang Lingkup",
                 tree: false,
-                width: '*',
+                width: 150,
+                css: "wrap-text gantt_column_wrap"
             },
             {
                 name: "activity",
                 label: "Nama Aktivitas",
                 tree: false,
-                width: '*'
+                width: 180,
+                css: "wrap-text gantt_column_wrap"
             },
             {
                 name: "start_date_data_plan",
                 label: "Start Plan",
                 tree: false,
-                width: '*',
+                width: 100,
+                css: "wrap-text gantt_column_wrap"
             },
             {
                 name: "duration_data_plan",
                 label: "Duration Plan",
                 tree: false,
-                width: '*'
+                width: 100,
+                css: "wrap-text gantt_column_wrap"
             },
             {
                 name: "start_date_data_actual",
                 label: "Start Actual",
                 tree: false,
-                width: '*'
+                width: 100,
+                css: "wrap-text gantt_column_wrap"
             },
             {
                 name: "duration_data_actual",
                 label: "Duration Actual",
                 tree: false,
-                width: '*'
+                width: 100,
+                css: "wrap-text gantt_column_wrap"
             },
             {
-                name: "progress",
+                name: "percent",
                 label: "Percent Complete",
-                width: '*',
+                width: 100,
                 align: "center",
                 template: function(item) {
                     return item.progress + "%";
-                }
+                },
+                css: "wrap-text gantt_column_wrap"
             },
             {
                 name: "pic",
                 label: "PIC",
                 align: "center",
-                width: '*'
+                width: 80,
+                css: "wrap-text gantt_column_wrap"
             },
             {
                 name: "rincian",
                 label: "Rincian Progress",
                 align: "center",
-                width: '*'
+                width: 120,
+                css: "wrap-text gantt_column_wrap"
             },
             {
                 name: "evidence",
                 label: "Evidence",
                 align: "center",
-                width: '*'
+                width: 120,
+                css: "wrap-text gantt_column_wrap"
             },
         ];
+
 
         @php
             $arrayProyek = [];
@@ -224,7 +295,7 @@
                                         start_date_data_actual: '{{ $activity->actual_start }}', // untuk kolom data
                                         end_date: '{{ $activity->end_date_actual_bar != '' ? $activity->end_date_actual_bar : ($activity->end_date_plan_bar != '' ? $activity->end_date_plan_bar : now()) }}', // untuk bar
                                         duration_data_actual: '{{ $activity->actual_duration }}',
-                                        progress: '{{ $activity->percent_complete }}',
+                                        percent: '{{ $activity->percent_complete }}',
                                         pic: '{{ implode(', ', $pics) }}',
                                         rincian: '{{ $rincian_progress != '' ? $rincian_progress->rincian_progress : '' }}',
                                         evidence: '{{ $evidence }}',
@@ -250,7 +321,7 @@
                                     start_date_data_actual: '', // untuk kolom data
                                     end_date: '{{ now() }}', // untuk bar
                                     duration_data_actual: '',
-                                    progress: '0',
+                                    percent: '0',
                                     pic: '',
                                     rincian: '',
                                     evidence: '',
@@ -271,7 +342,7 @@
                             start_date_data_actual: '', // untuk kolom data
                             end_date: '{{ now() }}', // untuk bar
                             duration_data_actual: '',
-                            progress: '0',
+                            percent: '0',
                             pic: '',
                             rincian: '',
                             evidence: '',
@@ -279,6 +350,8 @@
                     @endif
                 @endforeach
             ]
+
+
         });
     </script>
 
