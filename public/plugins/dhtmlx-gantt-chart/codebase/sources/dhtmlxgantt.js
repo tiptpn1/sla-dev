@@ -36523,7 +36523,7 @@ function createTaskRenderer(gantt) {
     if (task.start_date_data_actual == '' || task.duration_data_actual == '') {
         styles.push("opacity: 0");
     } else {
-        styles.push('opacity: 0.6');
+        styles.push('opacity: 0.9');
     }
 
     div.style.cssText = styles.join(";");
@@ -36603,7 +36603,7 @@ function createTaskRenderer(gantt) {
     var styles = ["left:" + pos.leftPlan + "px", "top:" + (padd + pos.top) + 'px', "height:" + (taskType == cfg.types.milestone ? pos.height : height) + 'px', "line-height:" + Math.max(height < 30 ? height - 2 : height, 0) + 'px', "width:" + widthPlan + 'px'];
 
     // if (task.color) {
-      styles.push("background-color: #007BFF");
+      styles.push("background-color: #52BE80 ");
     // }
 
     if (task.textColor) {
