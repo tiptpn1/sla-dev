@@ -61,7 +61,23 @@
 </head>
 
 <body>
+    
+    <div class="row">
+        <div class="col-auto mr-auto"></div>
+        <div class="col-auto mb-2" style="text-align: right;" >
+            <p style="margin: 0; font-size: 14px;">
+                <span style="display: inline-block; width: 40px; height: 10px; background-color: #007bff; border-radius: 5px; margin-right: 3px;"></span>
+                Plan
+                &nbsp;
+                <span style="display: inline-block; width: 40px; height: 10px; background-color: #3db9d3; border-radius: 5px; margin-right: 3px; margin-left: 10px;"></span>
+                Actual
+            </p>
+        </div>
+      </div>
+    
     <div id="gantt_here" style="width:100%; height:500px;"></div>
+
+    
 
     <script>
         gantt.config.date_format = "%Y-%m-%d";
@@ -241,9 +257,9 @@
                                             $start_plan_raw = new \DateTime($activity->plan_start);
                                             $plan_duration = $activity->plan_duration - 1;
                                             $end_plan = $start_plan->modify("+{$plan_duration} week");
-                                            $end_plan = $end_plan->modify('This Monday');
+                                            $end_plan = $end_plan->format('N') != 1? $end_plan->modify('This Monday') : $end_plan->modify('Next Monday');
                                             $activity->end_date_plan_bar = $end_plan->format('Y-m-d');
-                                            $activity->start_date_plan_bar = $start_plan_raw->modify('Last Monday')->format('Y-m-d');
+                                            $activity->start_date_plan_bar = $start_plan_raw->format('N') != 1? $start_plan_raw->modify('Last Monday')->format('Y-m-d') : $start_plan_raw->format('Y-m-d');
                                         }
 
                                         $activity->end_date_actual_bar = '';
@@ -253,9 +269,9 @@
                                             $start_actual_raw = new \DateTime($activity->actual_start);
                                             $actual_duration = $activity->actual_duration - 1;
                                             $end_actual = $start_actual->modify("+{$actual_duration} week");
-                                            $end_actual = $end_actual->modify('This Monday');
+                                            $end_actual = $end_actual->format('N') != 1? $end_actual->modify('This Monday') : $end_actual->modify('Next Monday');
                                             $activity->end_date_actual_bar = $end_actual->format('Y-m-d');
-                                            $activity->start_date_actual_bar = $start_actual_raw->modify('Last Monday')->format('Y-m-d');
+                                            $activity->start_date_actual_bar = $start_actual_raw->format('N') != 1? $start_actual_raw->modify('Last Monday')->format('Y-m-d') : $start_actual_raw->format('Y-m-d');
                                         }
 
                                         $pics = [];

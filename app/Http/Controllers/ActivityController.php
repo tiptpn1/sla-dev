@@ -205,6 +205,9 @@ class ActivityController extends Controller
         $activity->isActive = $request->input('status');
         $activity->save();
 
-        return response()->json(['success' => true]);
+        return response()->json([
+            'success' => true,
+            'message' => 'Activity status updated successfully',
+        ]);
     }
 }

@@ -26,10 +26,10 @@ class ActivityFactory extends Factory
         }
         return [
             'nama_activity' => fake()->sentence(5),
-            'plan_start' => fake()->date(),
-            'plan_duration' => fake()->numberBetween(1, 30),
-            'actual_start' => fake()->date(),
-            'actual_duration' => fake()->numberBetween(1, 30),
+            'plan_start' => fake()->dateTimeThisYear()->format('Y-m-d'),
+            'plan_duration' => fake()->numberBetween(1, 10),
+            'actual_start' => fake()->dateTimeThisYear()->format('Y-m-d'),
+            'actual_duration' => fake()->numberBetween(1, 10),
             'percent_complete' => fake()->numberBetween(1, 100),
             'scope_id' => $scope->id,
             'project_id' => $scope->project->id_project,

@@ -2,7 +2,7 @@
 
 @section('title', 'Rincian Progress Dari Activity "' . $activity->nama_activity . '"')
 
-@section('dashboard', 'active')
+@section('activity', 'active')
 
 @push('css')
     <style>
@@ -135,18 +135,6 @@
     <section class="content">
         <div class="col-md-12">
             <div class="container">
-                <div class="row-mb-4">
-                    <div class="col-md-4">
-                        @if ($hasAccess)
-                            <button type="button" class="btn btn-primary" data-toggle="modal"
-                                onclick="tambahRincianProgress()">
-                                <i class="fas fa-plus"></i> Tambah Rincian Progress
-                            </button>
-                            
-                        @endif
-                    </div>
-                </div>
-
                 <!-- Activity Detail Section -->
                 <div class="card mt-4 mb-4">
                     <div class="card-header">
@@ -169,42 +157,32 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="table-responsive tbl-container bdr">
-                    <table class="table table-hover bg-white table-rounded" id="table_rincian_progress">
-                        <thead class="bg-green">
-                            <tr>
-                                <th scope="col">Rincian Progress</th>
-                                <th scope="col">Kendala</th>
-                                <th scope="col">Tindak Lanjut</th>
-                                {{-- <th scope="col">Evidence</th> --}}
-                                @if ($hasAccess)
-                                    <th scope="col" width="22%" style="text-align: center">Actions</th>
-                                @endif
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-                <div class="pagination-container">
-                    <div class="pagination-left">
-                        <p class="results-info m-0">Showing <span id="result-start">0</span> to <span
-                                id="result-end">0</span>
-                            of <span id="total-results">0</span> results</p>
-                    </div>
-                    <div class="pagination-center">
-                        <select id="per-page" class="form-control m-0">
-                            <option value="5">5</option>
-                            <option value="10" selected>10</option>
-                            <option value="15">15</option>
-                        </select>
-                    </div>
-                    <div class="pagination-right">
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination pagination-rincian m-0">
-                                <!-- Pagination links will be appended here -->
-                            </ul>
-                        </nav>
+                <div class="card">
+                    @if ($hasAccess)
+                    <div class="card-header">
+                            <button type="button" class="btn btn-primary" data-toggle="modal"
+                                onclick="tambahRincianProgress()">
+                                <i class="fas fa-plus"></i> Tambah Rincian Progress
+                            </button>
+                        </div>
+                        @endif
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="table_rincian_progress" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">No</th>
+                                        <th scope="col">Rincian Progress</th>
+                                        <th scope="col">Kendala</th>
+                                        <th scope="col">Tindak Lanjut</th>
+                                        {{-- <th scope="col">Evidence</th> --}}
+                                        @if ($hasAccess)
+                                            <th scope="col" width="22%" style="text-align: center">Actions</th>
+                                        @endif
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -330,37 +308,16 @@
                                 </button>
                             </form>
                         </div>
-                        <div class="table-responsive tbl-container bdr">
-                            <table class="table table-hover bg-white table-rounded" id="table_evidence">
-                                <thead class="bg-green">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped" id="table_evidence">
+                                <thead>
                                     <tr>
+                                        <th scope="col">No</th>
                                         <th scope="col">File</th>
                                         <th scope="col" width="35%" style="text-align: center">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody></tbody>
                             </table>
-                        </div>
-                        <div class="pagination-container">
-                            <div class="pagination-left">
-                                <p class="results-info m-0">Showing <span id="result-start-evidence">0</span> to <span
-                                        id="result-end-evidence">0</span>
-                                    of <span id="total-results-evidence">0</span> results</p>
-                            </div>
-                            <div class="pagination-center">
-                                <select id="per-page-evidence" class="form-control m-0">
-                                    <option value="5" selected>5</option>
-                                    <option value="10">10</option>
-                                    <option value="15">15</option>
-                                </select>
-                            </div>
-                            <div class="pagination-right">
-                                <nav aria-label="Page navigation">
-                                    <ul class="pagination pagination-evidence m-0">
-                                        <!-- Pagination links will be appended here -->
-                                    </ul>
-                                </nav>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -443,8 +400,6 @@
 @push('scripts')
     <script>
         let hasAccess = {{ $hasAccess ? 'true' : 'false' }};
-        let currentPageEvidence = 1;
-        let perPageEvidence = 5;
 
         $(document).ready(function() {
             $.ajaxSetup({
@@ -453,83 +408,36 @@
                 },
             });
 
-            let rincianProgressId = 0;
-
-            let currentPage = 1;
-            let perPage = 10;
-
-            loadData(1);
-
-            $('#per-page').change(function() {
-                perPage = $(this).val();
-                loadData(currentPage, perPage);
-            });
-
-            $('#per-page-evidence').change(function() {
-                perPageEvidence = $(this).val();
-                loadDataEvidence(currentPageEvidence, perPageEvidence);
-            });
-
-            function loadData(page) {
+            function loadData() {
                 $.ajax({
                     url: "{{ route('rincian.getData') }}",
                     method: 'POST',
                     data: {
-                        page: page,
-                        per_page: perPage,
                         activity_id: '{{ $id }}',
                     },
-                    success: function(data) {
-                        $('#table_rincian_progress tbody').empty();
-                        $('#result-start').text(data.pagination.total != 0 ? (page - 1) * perPage + 1 :
-                            0);
-                        $('#result-end').text(Math.min(page * perPage, data.pagination.total));
-                        $('#total-results').text(data.pagination.total);
-
-                        $.each(data.data, function(index, rincian) {
-                            var actionButtons = '';
-
-                            // Cek apakah hasAccess bernilai true
-                            if (hasAccess) {
-                                actionButtons = `
-                                    <td scope="row" width="22%">
-                                        <button class="btn btn-sm btn-evidence" data-toggle="modal" onclick=showEvidence(this) data-id="${rincian.id}" data-rincian_progress="${rincian.rincian_progress}">
-                                            <i class="fas fa-file"></i> Evidence
-                                        </button>
-                                        <button class="btn btn-sm btn-edit" data-toggle="modal" onclick="ubahRincianProgress(this)" data-id="${rincian.id}" data-rincian_progress="${rincian.rincian_progress}" data-kendala="${rincian.kendala}" data-tindak_lanjut="${rincian.tindak_lanjut}">
-                                            <i class="fas fa-edit"></i> Edit
-                                        </button>
-                                        <button type="submit" class="btn btn-sm btn-delete deleteButton" type="button" data-toggle="modal" data-id="${rincian.id}">
-                                            <i class="fas fa-trash"></i> Delete
-                                        </button>
-                                    </td>
-                                `;
-                            }
-
-                            var row = `
-                                <tr id="bagian-${rincian.id}">
-                                    <td scope="row">${rincian.rincian_progress ?? '-'}</td>
-                                    <td scope="row">${rincian.kendala ?? '-'}</td>
-                                    <td scope="row">${rincian.tindak_lanjut ?? '-'}</td>
-                                    ${actionButtons}
-                                </tr>
-                            `;
-                            $('#table_rincian_progress tbody').append(row);
-                        });
-
-                        let paginationLinks = '';
-                        for (let i = 1; i <= data.pagination.last_page; i++) {
-                            paginationLinks += `<li class="page-item ${i === page ? 'active' : ''}">
-                                <a class="page-link page-link-rincian" href="#" data-page="${i}">${i}</a>
-                            </li>`;
+                    success: function(response) {
+                        table = $('#table_rincian_progress').DataTable();
+                        table.clear();
+                        $.each(response.data, function(index, item) {
+                            if (hasAccess)
+                        {
+                            table.row.add([
+                                index + 1,
+                                item.rincian_progress,
+                                item.kendala,
+                                item.tindak_lanjut,
+                                `<button class="btn btn-info btn-sm status-btn"  onclick=showEvidence(this) data-id="${item.id}" data-rincian_progress="${item.rincian_progress}">Evidence</button>
+                                <button class="btn btn-warning btn-sm edit-btn" onclick="ubahRincianProgress(this)" data-id="${item.id}" data-rincian_progress="${item.rincian_progress}" data-kendala="${item.kendala}" data-tindak_lanjut="${item.tindak_lanjut}">Edit</button>
+                                <button class="btn btn-danger btn-sm delete-btn deleteButton" type="submit" type="button" data-toggle="modal" data-id="${item.id}">Hapus</button>`
+                            ]).draw();
+                        } else {
+                            table.row.add([
+                                index + 1,
+                                item.rincian_progress,
+                                item.kendala,
+                                item.tindak_lanjut,
+                            ]).draw();
                         }
-
-                        $('.pagination-rincian').html(paginationLinks);
-
-                        $('.page-link-rincian').click(function(e) {
-                            e.preventDefault();
-                            currentPage = $(this).data('page');
-                            loadData(currentPage, perPage);
                         });
                     },
                     error: function(xhr, status, error) {
@@ -539,9 +447,7 @@
                 })
             }
 
-            $('#bagian, #nama').on('change input', function() {
-                $('#outputBagian').val($('#bagian').val() + ' ' + $('#nama').val());
-            });
+            loadData();
 
             $(document).on('submit', '#createRincianProgressForm', function(e) {
                 e.preventDefault();
@@ -553,7 +459,7 @@
                     data: new FormData(this),
                     success: function(response) {
                         $('#createRincianProgressModal').modal('hide');
-                        loadData(currentPage, perPage);
+                        loadData();
                         toastr.success('Rincian progress created successfully.');
                     },
                     error: function(xhr, status, error) {
@@ -569,10 +475,6 @@
                 });
             });
 
-            $('#bagianEdit, #namaEdit').on('change input', function() {
-                $('#outputBagianEdit').val($('#bagianEdit').val() + ' ' + $('#namaEdit').val());
-            });
-
             $(document).on('submit', '#updateRincianProgressForm', function(e) {
                 e.preventDefault();
                 var formData = $(this).serialize(); // Mengumpulkan data form
@@ -583,7 +485,7 @@
                     data: formData,
                     success: function(response) {
                         $('#updateRincianProgressModal').modal('hide');
-                        loadData(currentPage, perPage);
+                        loadData();
                         toastr.success('Rincian progress updated successfully.');
                     },
                     error: function(xhr, status, error) {
@@ -614,7 +516,7 @@
                     },
                     success: function(response) {
                         $('#deleteModal').modal('hide');
-                        loadData(currentPage, perPage);
+                        loadData();
                         toastr.success('Rincian progress deleted successfully.');
                     },
                     error: function(xhr, status, error) {
@@ -655,58 +557,31 @@
             $('#updateRincianProgressModal').modal('show');
         }
 
-        function loadDataEvidence() {
-            $('#table_evidence tbody').empty();
+        function loadDataEvidence(isReset) {
+            evidenceTable = $('#table_evidence').DataTable();
+            evidenceTable.clear();
+
+            if (isReset) {
+                evidenceTable.draw();
+            }
 
             $.ajax({
                 url: "{{ route('evidence.show') }}",
                 method: 'POST',
                 data: {
-                    page: currentPageEvidence,
-                    per_page: perPageEvidence,
                     rincian_progress_id: rincianProgressId,
                 },
-                success: function(data) {
-                    $('#result-start-evidence').text(data.pagination.total != 0 ? (currentPageEvidence - 1) *
-                        perPageEvidence + 1 : 0);
-                    $('#result-end-evidence').text(Math.min(currentPageEvidence * perPageEvidence, data
-                        .pagination.total));
-                    $('#total-results-evidence').text(data.pagination.total);
+                success: function(response) {
 
-                    $.each(data.data, function(index, evidence) {
-                        var row = `
-                            <tr id="bagian-${evidence.id_evidence}">
-                                <td scope="row">${evidence.filename}</td>
-                                <td scope="row" width="35%">
-                                    <button class="btn btn-sm btn-download" data-toggle="modal" onclick=downloadEvidence(this) data-id="${evidence.id_evidence}" data-filename=${evidence.filename}>
-                                        <i class="fas fa-download"></i> Unduh
-                                    </button>
-                                    <button class="btn btn-sm btn-edit" data-toggle="modal" onclick="ubahFileEvidence(this)" data-id="${evidence.id_evidence}" data-filename="${evidence.filename}">
-                                        <i class="fas fa-edit"></i> Edit
-                                    </button>
-                                    <button type="submit" class="btn btn-sm btn-delete" type="button" data-toggle="modal" onclick="deleteFileEvidence(this)" data-id="${evidence.id_evidence}" data-filename=${evidence.filename}>
-                                        <i class="fas fa-trash"></i> Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
-                        $('#table_evidence tbody').append(row);
-                    });
-
-                    let paginationLinksEvidence = '';
-                    for (let i = 1; i <= data.pagination.last_page; i++) {
-                        paginationLinksEvidence += `<li class="page-item ${i === currentPageEvidence ? 'active' : ''}">
-                            <a class="page-link page-link-evidence" href="#" data-page="${i}">${i}</a>
-                        </li>`;
-                    }
-
-                    $('.pagination-evidence').html(paginationLinksEvidence);
-
-                    $('.page-link-evidence').click(function(e) {
-                        e.preventDefault();
-                        currentPageEvidence = $(this).data('page');
-                        loadDataEvidence()
-                    });
+                    $.each(response.data, function(index, item) {
+                        evidenceTable.row.add([
+                        index + 1,
+                        item.filename,
+                        `<button class="btn btn-info btn-sm" onclick=downloadEvidence(this) data-id="${item.id_evidence}" data-filename=${item.filename}>Unduh</button>
+                        <button class="btn btn-warning btn-sm edit-btn" onclick="ubahFileEvidence(this)" data-id="${item.id_evidence}" data-filename="${item.filename}">Edit</button>
+                        <buttontype="submit" class="btn btn-danger btn-sm" type="button" data-toggle="modal" onclick="deleteFileEvidence(this)" data-id="${item.id_evidence}" data-filename=${item.filename}>Hapus</buttontype=>`
+                    ]).draw();
+                });
                 },
                 error: function(xhr, status, error) {
                     toastr.error('Failed to load data.');
@@ -715,11 +590,6 @@
         }
 
         function showEvidence(button) {
-            currentPageEvidence = 1;
-            perPageEvidence = 5;
-
-            $('#per-page-evidence').val('5');
-
             rincian_progress = $(button).data('rincian_progress');
             rincianProgressId = $(button).data('id');
 
@@ -727,7 +597,7 @@
 
             $('#crudEvidenceModalLabel').text(`Evidence dari rincian progress "${rincian_progress}"`);
 
-            loadDataEvidence();
+            loadDataEvidence(true);
 
             $('#crudEvidenceModal').modal('show');
         }
@@ -744,7 +614,7 @@
                     data: new FormData(form[0]),
                     success: function(response) {
                         $(input).val('');
-                        loadDataEvidence(currentPageEvidence, perPageEvidence);
+                        loadDataEvidence(false);
                         toastr.success('Evidence upload successfully.');
                     },
                     error: function(xhr, status, error) {
@@ -767,7 +637,7 @@
                     success: function(response) {
                         $(input).val('');
                         $('#updateEvidenceModal').modal('hide');
-                        loadDataEvidence(currentPageEvidence, perPageEvidence);
+                        loadDataEvidence(false);
                         toastr.success('Evidence updated successfully.');
                     },
                     error: function(xhr, status, error) {
@@ -798,11 +668,11 @@
                 },
                 success: function(response) {
                     $('#deleteEvidence').modal('hide');
-                    loadDataEvidence(currentPageEvidence, perPageEvidence);
-                    toastr.success('Evidence updated successfully.');
+                    loadDataEvidence(false);
+                    toastr.success('Evidence deleted successfully.');
                 },
                 error: function(xhr, status, error) {
-                    toastr.error('Failed to upload evidence.');
+                    toastr.error('Failed to delete evidence.');
                 }
             });
         }

@@ -20,8 +20,8 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
-            ProjectSeeder::class,
-            ScopeSeeder::class,
+            // ProjectSeeder::class,
+            // ScopeSeeder::class,
             ActivitySeeder::class,
         ]);
     }

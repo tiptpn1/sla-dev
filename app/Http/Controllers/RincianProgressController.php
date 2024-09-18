@@ -35,8 +35,8 @@ class RincianProgressController extends Controller
 
     public function getData(Request $request)
     {
-        $currentPage = $request->input('page', 1);
-        $perPage = $request->input('per_page', 5);
+        // $currentPage = $request->input('page', 1);
+        // $perPage = $request->input('per_page', 5);
 
         $rincianProgress = DB::table('detail_progress as dp')
             // ->leftJoin('evidence as e', 'dp.id', '=', 'e.progress_id')
@@ -45,16 +45,18 @@ class RincianProgressController extends Controller
             ->where('activity_id', '=', $request->activity_id)
             ->where('isActive', 1)
             // ->groupBy('dp.id')
-            ->paginate($perPage, ['*'], 'page', $currentPage);
+            // ->paginate($perPage, ['*'], 'page', $currentPage);
+            ->get();
 
         return response()->json([
-            'data' => $rincianProgress->items(),
-            'pagination' => [
-                'current_page' => $rincianProgress->currentPage(),
-                'last_page' => $rincianProgress->lastPage(),
-                'total' => $rincianProgress->total(),
-                'per_page' => $rincianProgress->perPage()
-            ],
+            // 'data' => $rincianProgress->items(),
+            'data' => $rincianProgress,
+            // 'pagination' => [
+            //     'current_page' => $rincianProgress->currentPage(),
+            //     'last_page' => $rincianProgress->lastPage(),
+            //     'total' => $rincianProgress->total(),
+            //     'per_page' => $rincianProgress->perPage()
+            // ],
         ], 200);
     }
 
@@ -188,22 +190,24 @@ class RincianProgressController extends Controller
 
     public function getDataEvidence(Request $request)
     {
-        $currentPage = $request->input('page', 1);
-        $perPage = $request->input('per_page', 5);
+        // $currentPage = $request->input('page', 1);
+        // $perPage = $request->input('per_page', 5);
 
         $rincianProgress = DB::table('evidence')
             ->select('*') // Memilih kolom dari master_user dan master_bagian
             ->where('progress_id', '=', $request->rincian_progress_id)
-            ->paginate($perPage, ['*'], 'page', $currentPage);
+            // ->paginate($perPage, ['*'], 'page', $currentPage);
+            ->get();
 
         return response()->json([
-            'data' => $rincianProgress->items(),
-            'pagination' => [
-                'current_page' => $rincianProgress->currentPage(),
-                'last_page' => $rincianProgress->lastPage(),
-                'total' => $rincianProgress->total(),
-                'per_page' => $rincianProgress->perPage()
-            ],
+            // 'data' => $rincianProgress->items(),
+            'data' => $rincianProgress,
+            // 'pagination' => [
+            //     'current_page' => $rincianProgress->currentPage(),
+            //     'last_page' => $rincianProgress->lastPage(),
+            //     'total' => $rincianProgress->total(),
+            //     'per_page' => $rincianProgress->perPage()
+            // ],
         ], 200);
     }
 

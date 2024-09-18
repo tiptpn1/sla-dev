@@ -116,161 +116,128 @@
 @endpush
 
 @section('content')
-    <section class="content">
-        <div class="col-md-12">
-            <div class="container">
-                <div class="d-flex justify-content-between flex-wrap mb-2">
-                    <button type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="#createBagianModal">
-                        Create Master Username
-                    </button>
+    <div class="content">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-header">
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#createUserModal">Create Master
+                        Username</button>
                 </div>
-                <div class="table-responsive tbl-container bdr">
-                    <table class="table table-hover bg-white table-rounded" id="table_master_bagian">
-                        <thead class="bg-green">
-                            <tr>
-                                <th scope="col">Username</th>
-                                <th scope="col">Divisi</th>
-                                <th scope="col">Role</th>
-                                <th scope="col" width="15%">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-                <div class="pagination-container">
-                    <div class="pagination-left">
-                        <p class="results-info m-0">Showing <span id="result-start">1</span> to <span
-                                id="result-end">10</span>
-                            of <span id="total-results">36</span> results</p>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="masterUserTable" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Username</th>
+                                    <th>Divisi</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{-- Data akan diisi oleh DataTables  --}}
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="pagination-center">
-                        <select id="per-page" class="form-control m-0">
-                            <option value="5">5</option>
-                            <option value="10" selected>10</option>
-                            <option value="15">15</option>
-                        </select>
-                    </div>
-                    <div class="pagination-right">
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination m-0">
-                                <!-- Pagination links will be appended here -->
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    {{-- Create Segment Modal --}}
-    <div class="modal fade" id="createBagianModal" tabindex="-1" role="dialog" aria-labelledby="createBagianModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="createBagianModalLabel">Create Master Username</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="createBagianForm" method="POST">
-                        @csrf
-                        <input type="hidden" id="bagianId" name="id">
-                        <div class="alert alert-danger d-none" id="error-message"></div>
-                        <div class="form-group">
-                            <label for="username">Username : </label>
-                            <div class="d-flex">
-                                <input type="text" class="form-control ml-2" id="nama" name="nama" required>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="username">Password : </label>
-                            <div class="d-flex">
-                                <input type="password" class="form-control ml-2" id="pass" name="pass" required>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="divisi">Divisi : </label>
-                            <div class="d-flex">
-                                <select class="form-control" name="divisi">
-                                    <option selected>Pilih Divisi</option>
-                                    @foreach ($all_divisi as $ad)
-                                        <option value="{{ $ad->master_bagian_id }}">{{ $ad->master_bagian_nama }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="role">Role : </label>
-                                <div class="d-flex">
-                                    <select class="form-control" name="role">
-                                        <option selected>Pilih Role</option>
-                                        @foreach ($hak_akses as $ha)
-                                            <option value="{{ $ha->hak_akses_id }}">{{ $ha->hak_akses_nama }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Save</button>
-                    </form>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- Update Segment Modal --}}
-    <div class="modal fade" id="updateMasterUsername" tabindex="-1" role="dialog" aria-labelledby="updateBagianModalLabel"
+    {{-- Create Segment Modal --}}
+    <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-labelledby="createUserModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="updateBagianModalLabel">Update Master Username</h5>
+                    <h5 class="modal-title" id="createUserModalLabel">Create Master Username</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <form id="updateUsernameForm" method="POST">
+                <form id="createUserForm">
+                    <div class="modal-body">
                         @csrf
-                        @method('PUT')
-                        <input type="hidden" id="ubahUsernameId" name="id"> <!-- Menyimpan ID bagian -->
+                        {{-- <div class="alert alert-danger d-none" id="error-message"></div> --}}
                         <div class="form-group">
                             <label for="username">Username : </label>
-                            <div class="d-flex">
-                                <input type="text" class="form-control ml-2" id="ubahUsername" name="nama"
-                                    required>
-                            </div>
+                            <input type="text" class="form-control ml-2" id="username" name="username" required>
                         </div>
-                        {{-- <div class="form-group">
-                            <label for="username">Password : </label>
-                            <div class="d-flex">
-                                <input type="password" class="form-control ml-2" id="ubahUserPass" name="pass">
-                            </div>
-                        </div> --}}
+                        <div class="form-group">
+                            <label for="password">Password : </label>
+                            <input type="password" class="form-control ml-2" id="password" name="password" required>
+                        </div>
                         <div class="form-group">
                             <label for="divisi">Divisi : </label>
-                            <div class="d-flex">
-                                <select class="form-control" id="ubahUserDivisi" name="divisi">
-                                    @foreach ($all_divisi as $ad)
-                                        <option value="{{ $ad->master_bagian_id }}">{{ $ad->master_bagian_nama }}</option>
+                            <select class="form-control" id="divisi" name="divisi">
+                                <option selected>Pilih Divisi</option>
+                                @foreach ($all_divisi as $divisi)
+                                    <option value="{{ $divisi->master_bagian_id }}">{{ $divisi->master_bagian_nama }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div class="form-group">
+                                <label for="role">Role : </label>
+                                <select class="form-control" id="role" name="role">
+                                    <option selected>Pilih Role</option>
+                                    @foreach ($hak_akses as $ha)
+                                        <option value="{{ $ha->hak_akses_id }}">{{ $ha->hak_akses_nama }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label for="role">Role : </label>
-                                <div class="d-flex">
-                                    <select class="form-control" id="ubahUserRole" name="role">
-                                        @foreach ($hak_akses as $ha)
-                                            <option value="{{ $ha->hak_akses_id }}">{{ $ha->hak_akses_nama }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
                         </div>
-                        <button type="submit" class="btn btn-primary" id="updateBagianBtn">Update</button>
-                    </form>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                            <button type="submit" class="btn btn-primary">Simpan</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- Update Segment Modal --}}
+    <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editUserModalLabel">Edit Master User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
+                <form id="editUserForm">
+                    <div class="modal-body">
+                        <input type="hidden" id="editId" name="id"> <!-- Menyimpan ID bagian -->
+                        <div class="form-group">
+                            <label for="editUsername">Username : </label>
+                            <input type="text" class="form-control ml-2" id="editUsername" name="editUsername" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editUserDivisi">Divisi : </label>
+                            <select class="form-control" id="editUserDivisi" name="editUserDivisi">
+                                @foreach ($all_divisi as $divisi)
+                                    <option value="{{ $divisi->master_bagian_id }}">{{ $divisi->master_bagian_nama }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editRole">Role : </label>
+                            <select class="form-control" id="editRole" name="editRole">
+                                @foreach ($hak_akses as $ha)
+                                    <option value="{{ $ha->hak_akses_id }}">{{ $ha->hak_akses_nama }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -299,203 +266,144 @@
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
-            let currentPage = 1;
-            let perPage = 10;
-
-            loadData(1);
-
-            $('#per-page').change(function() {
-                perPage = $(this).val();
-                loadData(currentPage, perPage);
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
             });
 
-            function loadData(page) {
+            function fetchUserData() {
                 $.ajax({
                     url: "{{ route('master-username.data') }}",
                     method: 'GET',
-                    data: {
-                        page: page,
-                        per_page: perPage
-                    },
+                    dataType: 'json',
                     success: function(data) {
-                        $('#table_master_bagian tbody').empty();
-                        $('#result-start').text((page - 1) * perPage + 1);
-                        $('#result-end').text(Math.min(page * perPage, data.pagination.total));
-                        $('#total-results').text(data.pagination.total);
-
-                        $.each(data.data, function(index, username) {
-                            // var urlShow = "{{ route('master-username.show', ':Id') }}".replace(
-                            //   ':Id', username
-                            // .master_user_id);
-                            //var urlEdit = "{{ route('master-username.edit', ':Id') }}".replace(
-                            //  ':Id', username
-                            //.master_user_id);
-                            var row = `
-                                <tr id="bagian-${username.master_user_id}">
-                                    <td scope="row">${username.master_user_nama}</td>
-                                    <td scope="row">${username.master_bagian_nama}</td>
-                                    <td scope="row">${username.hak_akses_nama}</td>
-                                    <td scope="row">
-                                        <button class="btn btn-sm btn-edit" data-toggle="modal" onclick="ubahUserData(this)" data-id="${username.master_user_id}" data-username="${username.master_user_nama}" data-bagian="${username.master_nama_bagian_id}" data-hak="${username.master_hak_akses_id}">
-                                            <i class="fas fa-edit"></i> Edit
-                                        </button>
-                                        <button type="submit" class="btn btn-sm btn-delete deleteButton" type="button" data-toggle="modal" data-id="${username.master_user_id}">
-                                            <i class="fas fa-trash"></i> Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                            `;
-                            $('#table_master_bagian tbody').append(row);
+                        var table = $('#masterUserTable').DataTable();
+                        table.clear();
+                        $.each(data, function(index, item) {
+                            table.row.add([
+                                index + 1,
+                                item.master_user_nama,
+                                item.bagian.master_bagian_nama,
+                                item.hak_akses.hak_akses_nama,
+                                '<button class="btn btn-warning btn-sm edit-btn" data-id="' +
+                                item.master_user_id + '">Edit</button> ' +
+                                '<button class="btn btn-danger btn-sm delete-btn" data-id="' +
+                                item.master_user_id + '">Hapus</button> '
+                            ]).draw();
                         });
-
-                        let paginationLinks = '';
-                        for (let i = 1; i <= data.pagination.last_page; i++) {
-                            paginationLinks += `<li class="page-item ${i === page ? 'active' : ''}">
-                                <a class="page-link" href="#" data-page="${i}">${i}</a>
-                            </li>`;
-                        }
-
-                        $('.pagination').html(paginationLinks);
-
-                        $('.page-link').click(function(e) {
-                            e.preventDefault();
-                            currentPage = $(this).data('page');
-                            loadData(currentPage, perPage);
-                        });
-                    },
-                    error: function(xhr, status, error) {
-                        toastr.error('Failed to load data.');
                     }
                 })
             }
 
-            $('#bagian, #nama').on('change input', function() {
-                $('#outputBagian').val($('#bagian').val() + ' ' + $('#nama').val());
-            });
+            fetchUserData();
 
-            $(document).on('submit', '#createBagianForm', function(e) {
+            // Create User
+            $('#createUserForm').on('submit', function(e) {
                 e.preventDefault();
                 $.ajax({
                     url: "{{ route('master-username.store') }}",
                     method: 'POST',
                     data: $(this).serialize(),
                     success: function(response) {
-                        $('#createBagianModal').modal('hide');
-                        loadData(currentPage, perPage);
-                        toastr.success('Master username created successfully.');
-                    },
-                    error: function(xhr, status, error) {
-                        console.log(data);
-                        console.error(xhr.responseText);
-                        if (xhr.status == 400) { // Jika ada kesalahan validasi
-                            $('#error-message').text(xhr.responseJSON.message).removeClass(
-                                'd-none');
-                        } else {
-                            toastr.error('Failed to create master username.');
-                        }
-                    }
-                });
-            });
-
-            // Update Master Username
-            $(document).on('click', '.btn-edit', function() {
-                var id = $(this).data('id');
-                $.ajax({
-                    url: "{{ route('master-username.get-data-by-id', ':Id') }}".replace(':Id', id),
-                    method: 'GET',
-                    success: function(response) {
-                        if (response.data) {
-                            let fullname = response.data.master_user_nama;
-                            $('#updateBagianModal #bagianId').val(id);
-                            //$('#updateBagianModal #bagianEdit').val(fullname[0]);
-                            $('#updateBagianModal #editnama').val(fullname);
-                            //$('#updateBagianModal #outputBagianEdit').val(response.data
-                            //  .kpi_master_bagian_nama);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.log(xhr.responseText);
-                        toastr.error('Failed to load data.');
-                    }
-                });
-            });
-
-            $('#bagianEdit, #namaEdit').on('change input', function() {
-                $('#outputBagianEdit').val($('#bagianEdit').val() + ' ' + $('#namaEdit').val());
-            });
-
-            $(document).on('submit', '#updateUsernameForm', function(e) {
-                e.preventDefault();
-                var formData = $(this).serialize(); // Mengumpulkan data form
-
-                $.ajax({
-                    url: "{{ route('master-username.update') }}", // Update dengan route yang sesuai
-                    method: 'PUT',
-                    data: formData,
-                    success: function(response) {
-                        $('#updateMasterUsername').modal('hide');
-                        loadData(currentPage, perPage);
-                        toastr.success('Master username updated successfully.');
-                    },
-                    error: function(xhr, status, error) {
-                        if (xhr.status == 400) { // Jika ada kesalahan validasi
-                            $('#updateBagianModal #error-message').text(xhr.responseJSON
-                                .message).removeClass('d-none');
-                        } else {
-                            toastr.error('Failed to update master username.');
-                        }
-                    }
-                });
-            });
-
-            var deleteUrl = '';
-            $(document).on('click', '.deleteButton', function() {
-                var id = $(this).data('id');
-                deleteUrl = `{{ route('master-username.destroy', ['id' => ':Id']) }}`.replace(':Id', id);
-                console.log(deleteUrl);
-                $('#deleteModal').modal('show');
-            });
-
-            $(document).on('click', '#confirmDelete', function() {
-                $.ajax({
-                    url: deleteUrl,
-                    method: 'DELETE',
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        $('#deleteModal').modal('hide');
-                        loadData(currentPage, perPage);
-                        toastr.success('Master username deleted successfully.');
-                    },
-                    error: function(xhr, status, error) {
-                        if (xhr.status == 400) { // Jika ada kesalahan validasi
-                            toastr.error(xhr.responseJSON.message);
-                        } else {
-                            console.log(xhr.responseJSON.message);
-                            toastr.error(xhr.responseJSON.message);
+                        if (response.status === 'success') {
+                            $('#createUserModal').modal('hide');
+                            fetchUserData();
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Data berhasil ditambahkan',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
                         }
                     }
                 })
             });
+
+            // Edit User
+            $('#masterUserTable').on('click', '.edit-btn', function(e) {
+                var id = $(this).data('id');
+                $.ajax({
+                    url: "{{ route('master-username.get-data-by-id', ':id') }}".replace(':id', id),
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        $('#editUserModal').modal('show');
+                        $('#editId').val(response.master_user_id);
+                        $('#editUsername').val(response.master_user_nama);
+                        $('#editUserDivisi').val(response.master_nama_bagian_id);
+                        $('#editRole').val(response.master_hak_akses_id);
+                    }
+                })
+            })
+
+            $('#editUserForm').on('submit', function(e) {
+                e.preventDefault();
+                var id = $('#editId').val();
+                var username = $('#editUsername').val();
+                var divisi = $('#editUserDivisi').val();
+                var role = $('#editRole').val();
+                $.ajax({
+                    url: "{{ route('master-username.update') }}",
+                    method: 'PUT',
+                    data: {
+                        id: id,
+                        username: username,
+                        divisi: divisi,
+                        role: role
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            $('#editUserModal').modal('hide');
+                            fetchUserData();
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Data User berhasil diperbarui',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        var errors = xhr.responseJSON.message;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: errors
+                        });
+                    }
+                })
+            })
+
+            // Delete User
+            $('#masterUserTable').on('click', '.delete-btn', function(e) {
+                var id = $(this).data('id');
+                $('#confirmDelete').data('id', id);
+                $('#deleteModal').modal('show');
+            });
+
+            $('#confirmDelete').on('click', function() {
+                var id = $(this).data('id');
+                $.ajax({
+                    url: "{{ route('master-username.destroy', ':id') }}".replace(':id', id),
+                    method: 'DELETE',
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            $('#deleteModal').modal('hide');
+                            fetchUserData();
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Data User berhasil dihapus',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        }
+                    }
+                })
+            })
         });
-    </script>
-
-    <script>
-        function ubahUserData(button) {
-            id = $(button).data('id');
-            username = $(button).data('username');
-            bagian = $(button).data('bagian');
-            hak = $(button).data('hak');
-
-            $('#ubahUsernameId').val(id);
-            $('#ubahUsername').val(username);
-            $('#ubahUserDivisi').val(bagian);
-            $('#ubahUserRole').val(hak);
-
-            $('#updateMasterUsername').modal('show');
-        }
     </script>
 @endpush
