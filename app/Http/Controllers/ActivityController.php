@@ -164,7 +164,7 @@ class ActivityController extends Controller
             ]);
         }
 
-        return redirect()->route('dashboard')->with('success', 'Activity updated successfully!');
+        return redirect()->route('activities.index')->with('success', 'Activity updated successfully!');
     }
 
     /**
