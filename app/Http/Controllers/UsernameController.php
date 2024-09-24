@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Username;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Hash;
+use App\Models\Bagian;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class UsernameController extends Controller
 {
@@ -17,33 +18,17 @@ class UsernameController extends Controller
         return view('pages.master_username.index', compact('all_divisi', 'hak_akses'));
     }
 
-    public function getData(Request $request)
+    public function getData()
     {
-        $currentPage = $request->input('page', 1);
-        $perPage = $request->input('per_page', 5);
-
-        $username = DB::table('master_user as username')
-        ->leftJoin('master_bagian as bagian', 'username.master_nama_bagian_id', '=', 'bagian.master_bagian_id')
-        ->leftJoin('master_hak_akses as role', 'username.master_hak_akses_id', '=', 'role.hak_akses_id')
-        ->select('username.*', 'bagian.master_bagian_nama','role.hak_akses_nama') // Memilih kolom dari master_user dan master_bagian
-        ->paginate($perPage, ['*'], 'page', $currentPage);
-
-        return response()->json([
-            'data' => $username->items(),
-            'pagination' => [
-                'current_page' => $username->currentPage(),
-                'last_page' => $username->lastPage(),
-                'total' => $username->total(),
-                'per_page' => $username->perPage()
-            ],
-        ], 200);
+        $user = User::with('bagian', 'hakAkses')->get();
+        return response()->json($user);
     }
 
     public function store(Request $request)
     {
         $validated = Validator::make($request->all(), [
-            'nama' => 'required|string',
-            'pass' => 'required|string',
+            'username' => 'required|string',
+            'password' => 'required|string',
             'divisi' => 'required|string',
             'role' => 'required|string',
         ]);
@@ -57,16 +42,16 @@ class UsernameController extends Controller
         try {
             DB::beginTransaction();
             $username = DB::table('master_user')->insert([
-                'master_user_nama' => $request->nama,
+                'master_user_nama' => $request->username,
                 'master_nama_bagian_id' => $request->divisi,
-                'master_user_password' => Hash::make($request->pass),
+                'master_user_password' => Hash::make($request->password),
                 'master_hak_akses_id' => $request->role
             ]);
             //dd($username);
             DB::commit();
 
             return response()->json([
-                'message' => 'Success',
+                'status' => 'success',
                 'data' => [
                     'id' => $username,
                     'nama' => $request->nama
@@ -82,20 +67,18 @@ class UsernameController extends Controller
 
     public function getDataById($id)
     {
-        $bagian = DB::table('master_user')->where('master_user_id', $id)->first();
+        $data = User::with('bagian', 'hakAkses')->find($id);
 
-        return response()->json([
-            'data' => $bagian
-        ], 200);
+        return response()->json($data, 200);
     }
 
     public function update(Request $request)
     {
         $validated = Validator::make($request->all(), [
             'id' => 'required|exists:master_user,master_user_id',
-            'nama' => 'required|string',
-            'divisi' => 'required',
-            'role' => 'required',
+            'username' => 'required|string',
+            'divisi' => 'required|exists:master_bagian,master_bagian_id',
+            'role' => 'required|exists:master_hak_akses,hak_akses_id',
         ]);
 
         if ($validated->fails()) {
@@ -110,7 +93,7 @@ class UsernameController extends Controller
             $user = DB::table('master_user')
                 ->where('master_user_id', $request->id)
                 ->update([
-                    'master_user_nama' => $request->nama,
+                    'master_user_nama' => $request->username,
                     'master_nama_bagian_id' => $request->divisi,
                     'master_hak_akses_id' => $request->role,
                 ]);
@@ -118,7 +101,7 @@ class UsernameController extends Controller
             DB::commit();
 
             return response()->json([
-                'message' => 'Success',
+                'status' => 'success',
                 'data' => $user
             ], 200);
         } catch (\Exception $e) {
@@ -138,12 +121,12 @@ class UsernameController extends Controller
             // Pastikan $id diubah menjadi array
             // $ids = [$id];
 
-            DB::table('master_user')->where('master_user_id', $id)->delete();
+            User::destroy($id);
 
             DB::commit();
 
             return response()->json([
-                'success' => true,
+                'status' => 'success',
                 'message' => 'Master Bagian deleted successfully',
             ], 200);
         } catch (\Exception $e) {

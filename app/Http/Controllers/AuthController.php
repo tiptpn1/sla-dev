@@ -11,6 +11,7 @@ class AuthController extends Controller
 {
     public function viewLoginPage()
     {
+        // dd(session()->all());
         return view('auth/login');
     }
 

@@ -48,6 +48,18 @@ class User extends Authenticatable
         'master_user_password' => 'hashed',
     ];
 
+    // Tentukan kolom yang digunakan untuk autentikasi
+    public function getAuthPassword()
+    {
+        return $this->master_user_password;
+    }
+
+    // Tentukan kolom yang digunakan untuk autentikasi
+    public function getAuthIdentifierName()
+    {
+        return $this->master_user_nama;
+    }
+
     public function bagian()
     {
         return $this->belongsTo(Bagian::class, 'master_nama_bagian_id', 'master_bagian_id');

@@ -107,7 +107,11 @@ class ScopeController extends Controller
 
     public function getProcess($id)
     {
-        $scope = Scope::with('activities')->findOrFail($id);
+        $scope = Scope::with([
+            'activities' => function ($query) {
+                $query->where('isActive', true);
+            },
+        ])->findOrFail($id);
 
         // Hitung rata-rata percent_complete dari semua activities
         $totalPercentComplete = $scope->activities->avg('percent_complete');
