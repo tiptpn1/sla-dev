@@ -125,48 +125,49 @@
 
 <body>
     <h2>Dashboard SLA</h2>
+    <h6>Didownload: {{ now() }}</h6>
 
     <table>
         <thead>
             <tr>
                 <th rowspan="3" class="col-1"
-                    style="text-align:center; font-weight:bold; font-size:11px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF">
+                    style="text-align:center; font-weight:bold; font-size:9px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                     Project</th>
                 <th rowspan="3" class="col-1"
-                    style="text-align:center; font-weight:bold; font-size:11px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF">
+                    style="text-align:center; font-weight:bold; font-size:9px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                     Scope</th>
                 <th rowspan="3" class="col-1"
-                    style="text-align:center; font-weight:bold; font-size:11px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF">
+                    style="text-align:center; font-weight:bold; font-size:9px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                     Activity</th>
                 <th rowspan="3" class="col-2"
-                    style="text-align:center; font-weight:bold; font-size:11px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF">
+                    style="text-align:center; font-weight:bold; font-size:9px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                     Plan Start</th>
                 <th rowspan="3" class="col-3"
-                    style="text-align:center; font-weight:bold; font-size:11px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF">
+                    style="text-align:center; font-weight:bold; font-size:9px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                     Plan Duration (Weeks)</th>
                 <th rowspan="3" class="col-4"
-                    style="text-align:center; font-weight:bold; font-size:11px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF">
+                    style="text-align:center; font-weight:bold; font-size:9px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                     Actual Start</th>
                 <th rowspan="3" class="col-5"
-                    style="text-align:center; font-weight:bold; font-size:11px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF">
+                    style="text-align:center; font-weight:bold; font-size:9px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                     Actual Duration</th>
                 <th rowspan="3" class="col-6"
-                    style="text-align:center; font-weight:bold; font-size:11px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF">
+                    style="text-align:center; font-weight:bold; font-size:9px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                     % Complete</th>
                 <th rowspan="3" class="col-7"
-                    style="text-align:center; font-weight:bold; font-size:11px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF">
+                    style="text-align:center; font-weight:bold; font-size:9px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                     PIC</th>
                 <th rowspan="3" class="col-8"
-                    style="text-align:center; font-weight:bold; font-size:11px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF">
+                    style="text-align:center; font-weight:bold; font-size:9px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                     Rincian Progress</th>
                 <th colspan="{{ $countWeeks }}" class="col-9"
-                    style="text-align:center; font-weight:bold; font-size:11px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF">
+                    style="text-align:center; font-weight:bold; font-size:9px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                     {{ $year }}</th>
             </tr>
             <tr>
                 @foreach ($months as $key => $month)
                     <th colspan="{{ $month['weeks'] }}"
-                        style="text-align:center; font-weight:bold; font-size:11px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF">
+                        style="text-align:center; font-weight:bold; font-size:9px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                         {{ $month['month'] }}</th>
                 @endforeach
             </tr>
@@ -174,7 +175,7 @@
                 @foreach ($months as $key => $month)
                     @for ($i = 1; $i <= $month['weeks']; $i++)
                         <th
-                            style="width: 60px; text-align:center; font-weight:bold; font-size:11px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF">
+                            style="width: 60px; text-align:center; font-weight:bold; font-size:9px; vertical-align:middle; background-color:#007BFF; color:#FFFFFF; border:1px solid #FFFFFF; word-wrap: break-word; width: 60px; overflow-wrap: break-word; white-space: normal;">
                             Week {{ $i }}</th>
                     @endfor
                 @endforeach
@@ -210,7 +211,7 @@
                                             $headerProject = false;
                                         @endphp
                                         <td rowspan="{{ $totalProjectActivities }}" class="nowrap"
-                                            style="text-align:center; font-size:10px; vertical-align:middle;">
+                                            style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                                             {{ $project->project_nama }}
                                         </td>
                                     @endif
@@ -221,32 +222,32 @@
                                             $headerScope = false;
                                         @endphp
                                         <td rowspan="{{ $totalScopeActivities }}" class="nowrap"
-                                            style="text-align:center; font-size:10px; vertical-align:middle;">
+                                            style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                                             {{ $scope->nama }}</td>
                                     @endif
 
                                     {{-- Activity data --}}
                                     <td class="col-1"
-                                        style="text-align:center; font-size:10px; vertical-align:middle;">
+                                        style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 120px; overflow-wrap: break-word; white-space: normal;">
                                         {{ $activity->nama_activity }}</td>
                                     <td class="col-2"
-                                        style="text-align:center; font-size:10px; vertical-align:middle;">
+                                        style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                                         {{ $activity->plan_start }}</td>
                                     <td class="col-3"
-                                        style="text-align:center; font-size:10px; vertical-align:middle;">
+                                        style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                                         {{ $activity->plan_duration }}</td>
                                     <td class="col-4"
-                                        style="text-align:center; font-size:10px; vertical-align:middle;">
+                                        style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                                         {{ $activity->actual_start }}</td>
                                     <td class="col-5"
-                                        style="text-align:center; font-size:10px; vertical-align:middle;">
+                                        style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                                         {{ $activity->actual_duration }}</td>
                                     <td class="col-6"
-                                        style="text-align:center; font-size:10px; vertical-align:middle;">
+                                        style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                                         {{ $activity->percent_complete }}%</td>
 
                                     {{-- PICs --}}
-                                    <td style="text-align:center; font-size:10px; vertical-align:middle;">
+                                    <td style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                                         @php
                                             $pics = [];
                                             foreach ($activity->pics as $pic) {
@@ -256,9 +257,9 @@
                                         {{ implode(', ', $pics) }}
                                     </td>
 
-                                    <td style="text-align:center; font-size:10px; vertical-align:middle;">
+                                    <td style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                                         @if ($activity->progress->isNotEmpty())
-                                            {{ $activity->progress->first()->nama }}
+                                            {{ $activity->progress->first()->rincian_progress }}
                                         @endif
                                     </td>
 
@@ -274,19 +275,19 @@
                                                     $indexWeek >= $activity->actual_week_start &&
                                                     $indexWeek <= $activity->actual_week_end)
                                                 <td
-                                                    style="width: 50px; text-align:center; font-size:10px; vertical-align:middle; background-color:#24A0E4">
+                                                    style="width: 50px; text-align:center; font-size:9px; vertical-align:middle; background-color:#24A0E4; word-wrap: break-word; width: 60px; overflow-wrap: break-word; white-space: normal;">
                                                 </td>
                                             @elseif ($indexWeek >= $activity->plan_week_start && $indexWeek <= $activity->plan_week_end)
                                                 <td
-                                                    style="width: 50px; text-align:center; font-size:10px; vertical-align:middle; background-color:#007BFF">
+                                                    style="width: 50px; text-align:center; font-size:9px; vertical-align:middle; background-color:#007BFF; word-wrap: break-word; width: 60px; overflow-wrap: break-word; white-space: normal;">
                                                 </td>
                                             @elseif ($indexWeek >= $activity->actual_week_start && $indexWeek <= $activity->actual_week_end)
                                                 <td
-                                                    style="width: 50px; text-align:center; font-size:10px; vertical-align:middle; background-color:#8AD0BF">
+                                                    style="width: 50px; text-align:center; font-size:9px; vertical-align:middle; background-color:#8AD0BF; word-wrap: break-word; width: 60px; overflow-wrap: break-word; white-space: normal;">
                                                 </td>
                                             @else
                                                 <td
-                                                    style="width: 50px; text-align:center; font-size:10px; vertical-align:middle;">
+                                                    style="width: 50px; text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 60px; overflow-wrap: break-word; white-space: normal;">
                                                 </td>
                                             @endif
                                             @php
@@ -299,39 +300,42 @@
                         @else
                             <tr>
                                 {{-- Project rowspan --}}
-                                @if ($loop->first)
+                                @if ($headerProject)
+                                @php
+                                    $headerProject = false;
+                                @endphp
                                     <td rowspan="{{ $totalProjectActivities }}" class="nowrap"
-                                        style="text-align:center; font-size:10px; vertical-align:middle;">
+                                        style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                                         {{ $project->project_nama }}
                                     </td>
                                 @endif
 
-                                <td class="nowrap" style="text-align:center; font-size:10px; vertical-align:middle;">
+                                <td class="nowrap" style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                                     {{ $scope->nama }}</td>
 
                                 {{-- Activity data --}}
-                                <td class="col-1" style="text-align:center; font-size:10px; vertical-align:middle;">
+                                <td class="col-1" style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                                 </td>
-                                <td class="col-2" style="text-align:center; font-size:10px; vertical-align:middle;">
+                                <td class="col-2" style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                                 </td>
-                                <td class="col-3" style="text-align:center; font-size:10px; vertical-align:middle;">
+                                <td class="col-3" style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                                 </td>
-                                <td class="col-4" style="text-align:center; font-size:10px; vertical-align:middle;">
+                                <td class="col-4" style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                                 </td>
-                                <td class="col-5" style="text-align:center; font-size:10px; vertical-align:middle;">
+                                <td class="col-5" style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                                 </td>
-                                <td class="col-6" style="text-align:center; font-size:10px; vertical-align:middle;">
+                                <td class="col-6" style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                                 </td>
 
                                 {{-- PICs --}}
-                                <td style="text-align:center; font-size:10px; vertical-align:middle;"></td>
+                                <td style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;"></td>
 
-                                <td style="text-align:center; font-size:10px; vertical-align:middle;"></td>
+                                <td style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;"></td>
 
                                 @foreach ($months as $key => $month)
                                     @for ($i = 1; $i <= $month['weeks']; $i++)
                                         <td
-                                            style="width: 50px; text-align:center; font-size:10px; vertical-align:middle;">
+                                            style="width: 50px; text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                                         </td>
                                     @endfor
                                 @endforeach
@@ -341,28 +345,28 @@
                 @else
                     <tr>
                         <td rowspan="1" class="nowrap"
-                            style="text-align:center; font-size:10px; vertical-align:middle;">
+                            style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                             {{ $project->project_nama }}
                         </td>
 
-                        <td style="text-align:center; font-size:10px; vertical-align:middle;">
+                        <td style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                         </td>
                         {{-- Activity data --}}
-                        <td class="col-1" style="text-align:center; font-size:10px; vertical-align:middle;"></td>
-                        <td class="col-2" style="text-align:center; font-size:10px; vertical-align:middle;"></td>
-                        <td class="col-3" style="text-align:center; font-size:10px; vertical-align:middle;"></td>
-                        <td class="col-4" style="text-align:center; font-size:10px; vertical-align:middle;"></td>
-                        <td class="col-5" style="text-align:center; font-size:10px; vertical-align:middle;"></td>
-                        <td class="col-6" style="text-align:center; font-size:10px; vertical-align:middle;"></td>
+                        <td class="col-1" style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;"></td>
+                        <td class="col-2" style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;"></td>
+                        <td class="col-3" style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;"></td>
+                        <td class="col-4" style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;"></td>
+                        <td class="col-5" style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;"></td>
+                        <td class="col-6" style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;"></td>
 
                         {{-- PICs --}}
-                        <td style="text-align:center; font-size:10px; vertical-align:middle;"></td>
+                        <td style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;"></td>
 
-                        <td style="text-align:center; font-size:10px; vertical-align:middle;"></td>
+                        <td style="text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;"></td>
 
                         @foreach ($months as $key => $month)
                             @for ($i = 1; $i <= $month['weeks']; $i++)
-                                <td style="width: 50px; text-align:center; font-size:10px; vertical-align:middle;">
+                                <td style="width: 50px; text-align:center; font-size:9px; vertical-align:middle; word-wrap: break-word; width: 80px; overflow-wrap: break-word; white-space: normal;">
                                 </td>
                             @endfor
                         @endforeach

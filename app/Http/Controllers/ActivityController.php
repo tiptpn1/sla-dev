@@ -16,18 +16,23 @@ class ActivityController extends Controller
      */
     public function index()
     {
+        $adminAccess = Session::get('hak_akses_id');
         $projects = Proyek::with([
             'scopes' => function ($query) {
                 $query->where('isActive', 1);
             },
-            'scopes.activities',
+            'scopes.activities' => function ($query) use ($adminAccess) {
+                if ($adminAccess != 2) {
+                    $query->where('isActive', 1);
+                }
+            },
             'scopes.activities.pics',
             'scopes.activities.pics.bagian',
             'scopes.activities.progress' => function ($query) {
-                $query->latest('created_at')->first();
+                $query->latest('created_at')->get();
             },
             'scopes.activities.progress.evidences' => function ($query) {
-                $query->latest('created_at')->first();
+                $query->latest('created_at')->get();
             }
         ])->where('isActive', true)->get();
 

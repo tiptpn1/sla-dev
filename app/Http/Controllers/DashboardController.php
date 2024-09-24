@@ -176,7 +176,7 @@ class DashboardController extends Controller
     public function downloadExcel(Request $request)
     {
         $year = $request->get('year', Carbon::now()->year);
-        $projectId = $request->get('project', null);
+        $projectId = $request->get('project', 0);
 
         $projects = Proyek::with([
             'scopes' => function ($query) {
@@ -188,7 +188,7 @@ class DashboardController extends Controller
             'scopes.activities.pics',
             'scopes.activities.pics.bagian',
             'scopes.activities.progress' => function ($query) {
-                $query->latest('created_at'); // Mengambil progress terbaru
+                $query->latest('created_at')->get(); // Mengambil progress terbaru
             },
         ])->where('isActive', 1)
             ->where(function ($query) use ($projectId) {
@@ -199,6 +199,8 @@ class DashboardController extends Controller
             // ->whereYear('created_at', $this->year)
             ->get();
 
+
+        // return response()->json($projects);
         $months = [];
         $countWeeks = 0;
 
