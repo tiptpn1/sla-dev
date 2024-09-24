@@ -226,10 +226,10 @@
                     value: value
                 },
                 success: function(response) {
+                    toastr.success(response.message);
                     if (scopeId != null) {
                         updateProgressBar(scopeId);
                     }
-                    toastr.success(response.message);
                 },
                 error: function(xhr, status, error) {
                     console.error(xhr.responseText);
