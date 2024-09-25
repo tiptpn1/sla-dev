@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 
 class UsernameController extends Controller
 {
+    // COmmit ulang
     public function index()
     {
         $all_divisi = DB::table('master_bagian')->select('*')->get();
