@@ -235,13 +235,13 @@
                                     $week_no = 0;
 
                                     if ($activity->plan_start && $activity->plan_duration) {
-                                        $plan_start = countWeeksStartDays(Carbon::parse($activity->plan_start), $months);
+                                        $plan_start = (Carbon::parse($activity->plan_start))->format('N') != 1? countWeeksStartDays((Carbon::parse($activity->plan_start))->modify("Last Monday"), $months) : countWeeksStartDays(Carbon::parse($activity->plan_start), $months);
                                         $plan_duration = $activity->plan_duration - 1;
                                         $plan_end = (Carbon::parse($activity->plan_start))->format('N') != 7? countWeeksStartDays((Carbon::parse($activity->plan_start))->modify("+{$plan_duration} weeks")->modify('This Sunday'), $months) : countWeeksStartDays((Carbon::parse($activity->plan_start))->modify("+{$plan_duration} weeks"), $months);
                                     }
 
                                     if ($activity->actual_start && $activity->actual_duration) {
-                                        $actual_start = countWeeksStartDays(Carbon::parse($activity->actual_start), $months);
+                                        $actual_start = (Carbon::parse($activity->actual_start))->format('N') != 1? countWeeksStartDays((Carbon::parse($activity->actual_start))->modify("Last Monday"), $months) : countWeeksStartDays(Carbon::parse($activity->actual_start), $months);
                                         $actual_duration = $activity->actual_duration - 1;
                                         $actual_end = (Carbon::parse($activity->actual_start))->format('N') != 7? countWeeksStartDays((Carbon::parse($activity->actual_start))->modify("+{$actual_duration} weeks")->modify('Next Sunday'), $months) : countWeeksStartDays((Carbon::parse($activity->actual_start))->modify("+{$actual_duration} weeks"), $months);
                                     }
