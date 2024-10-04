@@ -116,105 +116,85 @@
 @endpush
 
 @section('content')
-    <section class="content">
-        <div class="col-md-12">
-            <div class="container">
-                <div class="d-flex justify-content-between flex-wrap mb-2">
-                    <button type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="#createBagianModal">
+    <div class="content">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-header">
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#createRoleModal">
                         Create Master Hak Akses
                     </button>
                 </div>
-                <div class="table-responsive tbl-container bdr">
-                    <table class="table table-hover bg-white table-rounded" id="table_master_bagian">
-                        <thead class="bg-green">
-                            <tr>
-                                <th scope="col">Role</th>
-                                <th scope="col" width="15%">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-                <div class="pagination-container">
-                    <div class="pagination-left">
-                        <p class="results-info m-0">Showing <span id="result-start">1</span> to <span
-                                id="result-end">10</span>
-                            of <span id="total-results">36</span> results</p>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="masterHakAksesTable" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Hak Akses</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{-- Data akan diisi oleh DataTables  --}}
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="pagination-center">
-                        <select id="per-page" class="form-control m-0">
-                            <option value="5">5</option>
-                            <option value="10" selected>10</option>
-                            <option value="15">15</option>
-                        </select>
-                    </div>
-                    <div class="pagination-right">
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination m-0">
-                                <!-- Pagination links will be appended here -->
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    {{-- Create Segment Modal --}}
-    <div class="modal fade" id="createBagianModal" tabindex="-1" role="dialog" aria-labelledby="createBagianModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="createBagianModalLabel">Create Master Hak Akses</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="createBagianForm" method="POST">
-                        @csrf
-                        <input type="hidden" id="bagianId" name="id">
-                        <div class="alert alert-danger d-none" id="error-message"></div>
-                        <div class="form-group">
-                            <label for="username">Role Nama : </label>
-                            <div class="d-flex">
-                                <input type="text" class="form-control ml-2" id="role" name="role" required>
-                            </div>
-                        </div>
-                      </div>
-                        <button type="submit" class="btn btn-primary">Save</button>
-                    </form>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- Update Segment Modal --}}
-    <div class="modal fade" id="updateBagianModal" tabindex="-1" role="dialog" aria-labelledby="updateBagianModalLabel"
+    {{-- Create Segment Modal --}}
+    <div class="modal fade" id="createRoleModal" tabindex="-1" role="dialog" aria-labelledby="createRoleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="updateBagianModalLabel">Update Master Hak Akses</h5>
+                    <h5 class="modal-title" id="createRoleModalLabel">Create Master Hak Akses</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <form id="updateBagianForm" method="POST">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" id="bagianId" name="id"> <!-- Menyimpan ID bagian -->
-                        <div class="alert alert-danger d-none" id="error-message"></div>
+                <form id="createRoleForm">
+                    <div class="modal-body">
                         <div class="form-group">
-                            <label for="bagianEdit">Role Name : </label>
-                                <input type="text" class="form-control ml-2" id="editnama" name="namaEdit" required>
-                            </div>
+                            <label for="name">Nama Hak Akses : </label>
+                            <input type="text" class="form-control ml-2" id="name" name="name" required>
                         </div>
-                        <button type="submit" class="btn btn-primary" id="updateBagianBtn">Update</button>
-                    </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- Update Segment Modal --}}
+    <div class="modal fade" id="updateRoleModal" tabindex="-1" role="dialog" aria-labelledby="updateRoleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateRoleModalLabel">Update Master Hak Akses</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
+                <form id="updateRoleForm">
+                    <div class="modal-body">
+                        <input type="hidden" id="roleId" name="id"> <!-- Menyimpan ID bagian -->
+                        <div class="form-group">
+                            <label for="editName">Nama Hak Akses : </label>
+                            <input type="text" class="form-control ml-2" id="editName" name="editName" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -231,7 +211,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    Apakah anda yakin ingin menghapus data Master Bagian ini?
+                    Apakah anda yakin ingin menghapus data Master Hak Akses ini?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -243,183 +223,159 @@
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
-            let currentPage = 1;
-            let perPage = 10;
-
-            loadData(1);
-
-            $('#per-page').change(function() {
-                perPage = $(this).val();
-                loadData(currentPage, perPage);
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
             });
 
-            function loadData(page) {
+            function fetchRoleData() {
                 $.ajax({
                     url: "{{ route('master-role.data') }}",
                     method: 'GET',
-                    data: {
-                        page: page,
-                        per_page: perPage
-                    },
+                    dataType: 'json',
                     success: function(data) {
-                        $('#table_master_bagian tbody').empty();
-                        $('#result-start').text((page - 1) * perPage + 1);
-                        $('#result-end').text(Math.min(page * perPage, data.pagination.total));
-                        $('#total-results').text(data.pagination.total);
-
-                        $.each(data.data, function(index, role) {
-                            var urlShow = "{{ route('master-role.show', ':Id') }}".replace(
-                                ':Id', role
-                                .hak_akses_id);
-                            var urlEdit = "{{ route('master-role.edit', ':Id') }}".replace(
-                                ':Id', role
-                                .hak_akses_id);
-                            var row = `
-                                <tr id="bagian-${role.hak_akses_id}">
-                                    <td scope="row">${role.hak_akses_nama}</td>
-                                    <td scope="row">
-                                        <button class="btn btn-sm btn-edit" data-toggle="modal" data-target="#updateBagianModal" data-id="${role.hak_akses_id}">
-                                            <i class="fas fa-edit"></i> Edit
-                                        </button>
-                                        <button type="submit" class="btn btn-sm btn-delete deleteButton" type="button" data-toggle="modal" data-id="${role.hak_akses_id}">
-                                            <i class="fas fa-trash"></i> Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                            `;
-                            $('#table_master_bagian tbody').append(row);
+                        var table = $('#masterHakAksesTable').DataTable();
+                        table.clear();
+                        $.each(data, function(index, item) {
+                            table.row.add([
+                                index + 1,
+                                item.hak_akses_nama,
+                                '<button class="btn btn-warning btn-sm edit-btn" data-id="' +
+                                item.hak_akses_id + '">Edit</button> ' +
+                                '<button class="btn btn-danger btn-sm delete-btn" data-id="' +
+                                item.hak_akses_id + '">Hapus</button> '
+                            ]).draw();
                         });
-
-                        let paginationLinks = '';
-                        for (let i = 1; i <= data.pagination.last_page; i++) {
-                            paginationLinks += `<li class="page-item ${i === page ? 'active' : ''}">
-                                <a class="page-link" href="#" data-page="${i}">${i}</a>
-                            </li>`;
-                        }
-
-                        $('.pagination').html(paginationLinks);
-
-                        $('.page-link').click(function(e) {
-                            e.preventDefault();
-                            currentPage = $(this).data('page');
-                            loadData(currentPage, perPage);
-                        });
-                    },
-                    error: function(xhr, status, error) {
-                        toastr.error('Failed to load data.');
                     }
                 })
             }
 
-            $('#bagian, #nama').on('change input', function() {
-                $('#outputBagian').val($('#bagian').val() + ' ' + $('#nama').val());
-            });
+            fetchRoleData();
 
-            $(document).on('submit', '#createBagianForm', function(e) {
+            // Create Role
+            $('#createRoleForm').on('submit', function(e) {
                 e.preventDefault();
                 $.ajax({
                     url: "{{ route('master-role.store') }}",
                     method: 'POST',
                     data: $(this).serialize(),
                     success: function(response) {
-                        $('#createBagianModal').modal('hide');
-                        loadData(currentPage, perPage);
-                        toastr.success('Master bagian created successfully.');
+                        if (response.status === 'success') {
+                            $('#createRoleForm')[0].reset();
+                            $('#createRoleModal').modal('hide');
+                            fetchRoleData();
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Data berhasil ditambahkan',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        }
                     },
                     error: function(xhr, status, error) {
-                      console.log(data);
-                        console.error(xhr.responseText);
-                        if (xhr.status == 400) { // Jika ada kesalahan validasi
-                            $('#error-message').text(xhr.responseJSON.message).removeClass(
-                                'd-none');
-                        } else {
-                            toastr.error('Failed to create master bagian.');
-                        }
+                        var errors = xhr.responseJSON.message;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: errors
+                        });
                     }
-                });
+                })
             });
 
-            // Update Master Bagian
-            $(document).on('click', '.btn-edit', function() {
+            // Edit User
+            $('#masterHakAksesTable').on('click', '.edit-btn', function(e) {
                 var id = $(this).data('id');
                 $.ajax({
-                    url: "{{ route('master-role.get-data-by-id', ':Id') }}".replace(':Id', id),
+                    url: "{{ route('master-role.get-data-by-id', ':id') }}".replace(':id', id),
                     method: 'GET',
+                    dataType: 'json',
                     success: function(response) {
-                        if (response.data) {
-                            let fullname = response.data.hak_akses_nama;
-
-                            $('#updateBagianModal #bagianId').val(id);
-                            //$('#updateBagianModal #bagianEdit').val(fullname[0]);
-                            $('#editnama').val(fullname);
-                            //$('#updateBagianModal #outputBagianEdit').val(response.data
-                              //  .kpi_master_bagian_nama);
-                        }
+                        $('#updateRoleModal').modal('show');
+                        $('#roleId').val(response.hak_akses_id);
+                        $('#editName').val(response.hak_akses_nama);
                     },
                     error: function(xhr, status, error) {
-                        console.log(xhr.responseText);
-                        toastr.error('Failed to load data.');
+                        var errors = xhr.responseJSON.message;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: errors
+                        });
                     }
-                });
-            });
+                })
+            })
 
-            //$('#bagianEdit, #namaEdit').on('change input', function() {
-              //  $('#outputBagianEdit').val($('#bagianEdit').val() + ' ' + $('#namaEdit').val());
-            //});
-
-            $(document).on('submit', '#updateBagianForm', function(e) {
+            $('#updateRoleForm').on('submit', function(e) {
                 e.preventDefault();
-                var formData = $(this).serialize(); // Mengumpulkan data form
 
+                var id = $('#roleId').val();
+                var name = $('#editName').val();
                 $.ajax({
-                    url: "{{ route('master-role.update') }}", // Update dengan route yang sesuai
+                    url: "{{ route('master-role.update') }}",
                     method: 'PUT',
-                    data: formData,
+                    data: {
+                        id: id,
+                        name: name,
+                    },
                     success: function(response) {
-                        $('#updateBagianModal').modal('hide');
-                        loadData(currentPage, perPage);
-                        toastr.success('Master Hak Akses updated successfully.');
+                        if (response.status === 'success') {
+                            $('#updateRoleModal').modal('hide');
+                            fetchRoleData();
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Data Hak Akses berhasil diperbarui',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        }
                     },
                     error: function(xhr, status, error) {
-                        if (xhr.status == 400) { // Jika ada kesalahan validasi
-                            $('#updateBagianModal #error-message').text(xhr.responseJSON
-                                .message).removeClass('d-none');
-                        } else {
-                            toastr.error('Failed to update master bagian.');
-                        }
+                        var errors = xhr.responseJSON.message;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: errors
+                        });
                     }
                 });
             });
 
-            var deleteUrl = '';
-            $(document).on('click', '.deleteButton', function() {
+            // Delete User
+            $('#masterHakAksesTable').on('click', '.delete-btn', function(e) {
                 var id = $(this).data('id');
-                deleteUrl = `{{ route('master-role.destroy', ['id' => ':Id']) }}`.replace(':Id', id);
-                console.log(deleteUrl);
+                $('#confirmDelete').data('id', id);
                 $('#deleteModal').modal('show');
             });
 
-            $(document).on('click', '#confirmDelete', function() {
+            $('#confirmDelete').on('click', function() {
+                var id = $(this).data('id');
                 $.ajax({
-                    url: deleteUrl,
+                    url: "{{ route('master-role.destroy', ':id') }}".replace(':id', id),
                     method: 'DELETE',
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    },
                     success: function(response) {
-                        $('#deleteModal').modal('hide');
-                        loadData(currentPage, perPage);
-                        toastr.success('Master bagian deleted successfully.');
+                        if (response.status === 'success') {
+                            $('#deleteModal').modal('hide');
+                            fetchRoleData();
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Data Role berhasil dihapus',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        }
                     },
                     error: function(xhr, status, error) {
-                        if (xhr.status == 400) { // Jika ada kesalahan validasi
-                            toastr.error(xhr.responseJSON.message);
-                        } else {
-                            console.log(xhr.responseJSON.message);
-                            toastr.error(xhr.responseJSON.message);
-                        }
+                        var errors = xhr.responseJSON.message;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: errors
+                        });
                     }
                 })
             });

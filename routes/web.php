@@ -126,4 +126,7 @@ Route::middleware(['checkLogin'])->group(function () {
     Route::get('project/data/{id}', [ProjectScopeController::class, 'getProjectById'])->name('project.data.detail');
     Route::get('scope/{id}/data', [ProjectScopeController::class, 'getScopes'])->name('scope.data');
     Route::get('scope/data/{id}', [ProjectScopeController::class, 'getScopeById'])->name('scope.data.detail');
+
+    Route::get('dashboard/download-pdf', [DashboardController::class, 'downloadPdf'])->name('dashboard.download-pdf');
+    Route::post('dashboard/download-excel', [DashboardController::class, 'downloadExcel'])->name('dashboard.download-excel');
 });

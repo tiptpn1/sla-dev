@@ -285,6 +285,12 @@ $(document).ready(function() {
                 if (response.status === 'success') {
                     $('#addModal').modal('hide');
                     fetchData();
+                        Swal.fire({
+                        icon: 'success',
+                        title: 'Data Berhasil Ditambah',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
                 }
             }
         });
