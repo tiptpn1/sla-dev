@@ -189,9 +189,49 @@ class ActivityController extends Controller
         $field = $request->input('field');
         $value = $request->input('value');
 
-        if (in_array($field, ['plan_start', 'plan_duration', 'actual_start', 'actual_duration', 'percent_complete'])) {
+        if (in_array($field, [
+            'plan_start',
+            'plan_duration',
+            'plan_end',
+            'actual_start',
+            'actual_duration',
+            'actual_end',
+            'percent_complete'
+        ])) {
+
+            // Update field yang diminta
             $update = Activity::where('id_activity', $id)->update([$field => $value]);
+
             if ($update) {
+                $activity = Activity::where('id_activity', $id)->first();
+
+                if ($activity->plan_start && $activity->plan_duration) {
+                    // Ambil plan_start sebagai tanggal dan duration sebagai minggu
+                    $planStart = \Carbon\Carbon::parse($activity->plan_start);
+                    $planDurationWeeks = intval($activity->plan_duration);
+
+                    // Hitung tanggal akhir (plan_end) berdasarkan jumlah minggu
+                    $planEnd = $planStart->copy()->addWeeks($planDurationWeeks - 1);
+
+                    $activity->plan_end = $planEnd->format('Y-m-d');
+                    $activity->save();
+                }
+
+                if ($activity->actual_start && $activity->actual_duration) {
+                    // Ambil actual_start sebagai tanggal dan duration sebagai minggu
+                    $actualStart = \Carbon\Carbon::parse($activity->actual_start);
+                    $actualDurationWeeks = intval($activity->actual_duration);
+
+                    // Hitung tanggal akhir (actual_end) berdasarkan jumlah minggu
+                    $actualEnd = $actualStart->copy()->addWeeks($actualDurationWeeks - 1);
+
+                    $activity->actual_end = $actualEnd->format('Y-m-d');
+                    $activity->save();
+                }
+
+
+
+                // Return hasil update
                 return response()->json([
                     'message' => 'Activity updated successfully',
                     'data' => Activity::where('id_activity', $id)->first(),
@@ -203,6 +243,9 @@ class ActivityController extends Controller
 
         return response()->json(['message' => 'Invalid field'], 400);
     }
+
+
+
 
     public function updateStatus(Request $request, $id)
     {
