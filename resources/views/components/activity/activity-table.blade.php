@@ -5,9 +5,11 @@
                 <th>No.</th>
                 <th>Activity</th>
                 <th>Plan Start</th>
-                <th>Plan Duration</th>
+                <th>Plan Duration (Week)</th>
+                <th>Plan End</th>
                 <th>Actual Start</th>
-                <th>Actual Duration</th>
+                <th>Actual Duration (Week)</th>
+                <th>Actual End</th>
                 <th>Percent Complete</th>
                 <th>PIC</th>
                 <th>Rincian Progress</th>
@@ -47,6 +49,7 @@
                             data-id="{{ $activity->id_activity }}" data-field="plan_duration" min="0"
                             step="1" {{ $isPic ? '' : 'disabled' }}>
                     </td>
+                    <td id="plan-end-{{ $activity->id_activity }}">{{ $activity->plan_end }}</td>
                     <td>
                         <input type="date" value="{{ $activity->actual_start }}"
                             class="edit form-control {{ $isPic ? 'bg-secondary text-white' : '' }}"
@@ -59,6 +62,8 @@
                             data-id="{{ $activity->id_activity }}" data-field="actual_duration" min="0"
                             step="1" {{ $isPic ? '' : 'disabled' }}>
                     </td>
+                    <td id="actual-end-{{ $activity->id_activity }}">{{ $activity->actual_end }}</td>
+
                     <td>
                         <input type="number" value="{{ $activity->percent_complete }}"
                             class="edit form-control {{ $isPic ? 'bg-secondary text-white' : '' }}"
@@ -226,6 +231,8 @@
                     value: value
                 },
                 success: function(response) {
+                    $('#plan-end-' + id).text(response.data.plan_end);
+                    $('#actual-end-' + id).text(response.data.actual_end);
                     toastr.success(response.message);
                     if (scopeId != null) {
                         updateProgressBar(scopeId);
