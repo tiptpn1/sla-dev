@@ -1,9 +1,0 @@
-<?php $__env->startSection('title', 'Dashboard SLA'); ?>
-
-<?php $__env->startSection('dash', 'active'); ?>
-
-<?php $__env->startSection('content'); ?>
-
-<?php $__env->stopSection(); ?>
-
-<?php echo $__env->make('master/master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\PTPNI\dashboard_sla\resources\views/pages/dashboard.blade.php ENDPATH**/ ?>
