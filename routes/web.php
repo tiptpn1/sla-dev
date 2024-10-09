@@ -31,6 +31,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', 'login');
 
+Route::get('capthca', [AuthController::class, 'reloadCaptcha'])->name('captcha');
+
 Route::get('login', [AuthController::class, 'viewLoginPage'])->name('page.login')->middleware('checkLogin');
 Route::post('Login', [AuthController::class, 'actionLogin'])->name('login');
 

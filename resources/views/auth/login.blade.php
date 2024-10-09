@@ -33,6 +33,11 @@
                         {{ $errors->first() }}
                     </div>
                 @endif
+                @error('captcha')
+                    <div class="alert alert-danger">
+                        {{ $message }}
+                    </div>
+                @enderror
                 <form action="{{ route('login') }}" method="POST">
                     @csrf
                     <div class="input-group mb-3">
@@ -48,6 +53,18 @@
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="captchaField" class="mb-2">
+                        <span id="captcha"></span>
+                        <button type="button" class="btn btn-danger" id="reloadCaptcha"><i class="fas fa-sync"></i></button>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="captcha" name="captcha" class="form-control" placeholder="Captcha" required>
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-shield-alt"></span>
                             </div>
                         </div>
                     </div>
@@ -71,6 +88,26 @@
     <script src="{{ asset('plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <!-- AdminLTE App -->
     <script src="{{ asset('dist/js/adminlte.min.js') }}"></script>
+
+    <script>
+        function reloadCaptcha() {
+            $.ajax({
+                url: '{{ route("captcha") }}',
+                type: 'GET',
+                success: function (response) {
+                    $('#captcha').html(response.captcha);
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            reloadCaptcha();
+        });
+
+        $('#reloadCaptcha').on('click', function () {
+            reloadCaptcha();
+        });
+    </script>
 </body>
 
 </html>
