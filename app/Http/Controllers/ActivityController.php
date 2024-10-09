@@ -95,8 +95,9 @@ class ActivityController extends Controller
                 'bagian_id' => $bagianId,
             ]);
         }
+        session()->flash('success', 'Activity insert successfully!');
 
-        return redirect()->route('activities.index')->with('success', 'Activity created successfully!');
+        return redirect()->route('activities.index');
     }
 
     /**
@@ -163,8 +164,8 @@ class ActivityController extends Controller
                 'bagian_id' => $bagianId,
             ]);
         }
-
-        return redirect()->route('activities.index')->with('success', 'Activity updated successfully!');
+        session()->flash('success', 'Activity updated successfully!');
+        return redirect()->route('activities.index');
     }
 
     /**

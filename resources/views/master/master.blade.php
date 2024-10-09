@@ -1,4 +1,4 @@
-d<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -38,6 +38,11 @@ d<!DOCTYPE html>
     <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
     {{-- toastr --}}
     <link rel="stylesheet" href="{{ asset('plugins/toastr/toastr.min.css') }}">
+    {{-- toastr --}}
+    <link rel="stylesheet" href="{{ asset('plugins/toastr/toastr.min.css') }}">
+
+     {{-- sweetalert2 --}}
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @stack('css')
 </head>
@@ -96,7 +101,7 @@ d<!DOCTYPE html>
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                         data-accordion="false">
-                        @if (session('hak_akses_id') == 2 || session('hak_akses_id') == 3 || session('hak_akses_id') == 4)
+                        @if (session('hak_akses_id') == 2 || session('hak_akses_id') == 3)
                             <li class="nav-item">
                                 <a href="{{ route('dashboard') }}" class="nav-link @yield('dashboard')">
                                     <i class="nav-icon fas fa-calendar-alt"></i>
