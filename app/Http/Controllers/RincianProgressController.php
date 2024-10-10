@@ -67,6 +67,7 @@ class RincianProgressController extends Controller
             'rincian_progress' => 'required|string',
             'tindak_lanjut' => 'required|string',
             'file_evidence' => 'nullable|mimes:pdf,jpg,zip,rar,xlsx,xls|max:10240',
+            'tanggal' => 'required|date|before_or_equal:today',
         ]);
 
         if ($validated->fails()) {
@@ -91,6 +92,7 @@ class RincianProgressController extends Controller
             $detail_progress->rincian_progress = $request->rincian_progress;
             $detail_progress->kendala = $request->kendala;
             $detail_progress->tindak_lanjut = $request->tindak_lanjut;
+            $detail_progress->tanggal = $request->tanggal;
             $data = $detail_progress->save();
 
             $file_evidence = $request->file('file_evidence');
@@ -144,6 +146,7 @@ class RincianProgressController extends Controller
                 'rincian_progress' => $request->rincian_progress,
                 'kendala' => $request->kendala,
                 'tindak_lanjut' => $request->tindak_lanjut,
+                'tanggal' => $request->tanggal,
             ]);
 
             DB::commit();
