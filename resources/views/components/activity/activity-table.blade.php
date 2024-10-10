@@ -14,6 +14,7 @@
                 <th>PIC</th>
                 <th>Rincian Progress</th>
                 <th>Evidence</th>
+                <th>Tanggal</th>
                 @if (session()->get('hak_akses_id') == 2)
                     <th>Status</th>
                 @endif
@@ -111,7 +112,17 @@
                             <em class="text-danger">No Evidence available</em>
                         @endif
                     </td>
-
+                    <td>
+                        @if ($activity->progress->isNotEmpty())
+                            <div class="text-muted">
+                                <span class="font-weight-bold">
+                                    {{ $activity->progress->first()->tanggal }}
+                                </span>
+                            </div>
+                        @else
+                            <em class="text-danger">No date available</em>
+                        @endif
+                    </td>
                     @if (session()->get('hak_akses_id') == 2)
                         <td>
                             @if ($activity->isActive)

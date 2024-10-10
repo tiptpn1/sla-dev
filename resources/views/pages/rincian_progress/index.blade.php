@@ -227,6 +227,12 @@
                             </div>
                         </div>
                         <div class="form-group">
+                            <label for="addTindakLanjut">Tanggal : </label>
+                            <div class="d-flex">
+                                <input type="date" class="form-control" name="tanggal" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label for="addEvidence">File Evidence : </label>
                             <div class="d-flex">
                                 <input type="file" class="form-control ml-2" id="addEvidence"
@@ -275,6 +281,12 @@
                             <div class="d-flex">
                                 <input type="text" class="form-control ml-2" id="ubahTindakLanjut"
                                     name="tindak_lanjut" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="addTindakLanjut">Tanggal : </label>
+                            <div class="d-flex">
+                                <input type="date" class="form-control" name="tanggal" required>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary" id="updateBagianBtn">Update</button>
@@ -427,7 +439,11 @@
                                 item.rincian_progress,
                                 item.kendala,
                                 item.tindak_lanjut,
-                                item.tanggal,
+                                new Date(item.tanggal).toLocaleDateString('id-ID', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric'
+                                }),
                                 `<button class="btn btn-info btn-sm status-btn"  onclick=showEvidence(this) data-id="${item.id}" data-rincian_progress="${item.rincian_progress}">Evidence</button>
                                 <button class="btn btn-warning btn-sm edit-btn" onclick="ubahRincianProgress(this)" data-id="${item.id}" data-rincian_progress="${item.rincian_progress}" data-kendala="${item.kendala}" data-tindak_lanjut="${item.tindak_lanjut}">Edit</button>
                                 <button class="btn btn-danger btn-sm delete-btn deleteButton" type="submit" type="button" data-toggle="modal" data-id="${item.id}">Hapus</button>`
@@ -438,7 +454,6 @@
                                 item.rincian_progress,
                                 item.kendala,
                                 item.tindak_lanjut,
-                                item.tanggal,
                             ]).draw();
                         }
                         });

@@ -29,7 +29,7 @@ class ActivityController extends Controller
             'scopes.activities.pics',
             'scopes.activities.pics.bagian',
             'scopes.activities.progress' => function ($query) {
-                $query->latest('created_at')->get();
+                $query->latest('tanggal')->get();
             },
             'scopes.activities.progress.evidences' => function ($query) {
                 $query->latest('created_at')->get();
