@@ -223,6 +223,13 @@
                 width: 120,
                 css: "wrap-text gantt_column_wrap"
             },
+            {
+                name: "tanggal",
+                label: "Tanggal Rincian",
+                align: "center",
+                width: 120,
+                css: "wrap-text gantt_column_wrap"
+            },
         ];
 
 
@@ -281,11 +288,13 @@
                                         }
 
                                         if (count($activity->progress)) {
-                                            $rincian_progress = $activity->progress->sortByDesc('created_at')[0];
+                                            $rincian_progress = $activity->progress->sortByDesc('tanggal')[0];
+                                            $tanggal = $activity->progress->sortByDesc('tanggal')[0];
                                             $evidence = $rincian_progress->evidences != null ? $rincian_progress->evidences->sortByDesc('created_at')[0]->filename : '';
                                         } else {
                                             $rincian_progress = '';
                                             $evidence = '';
+                                            $tanggal = '';
                                         }
 
                                     @endphp {
@@ -315,6 +324,8 @@
                                         pic: '{{ implode(', ', $pics) }}',
                                         rincian: '{{ $rincian_progress != '' ? $rincian_progress->rincian_progress : '' }}',
                                         evidence: '{{ $evidence }}',
+                                        tanggal: '{{ $tanggal != '' ? $rincian_progress->tanggal : '' }}',
+
                                     },
                                 @endforeach
                             @else
@@ -341,6 +352,7 @@
                                     pic: '',
                                     rincian: '',
                                     evidence: '',
+                                    tanggal: '',
                                 },
                             @endif
                         @endforeach
@@ -362,6 +374,7 @@
                             pic: '',
                             rincian: '',
                             evidence: '',
+                            tanggal: '',
                         },
                     @endif
                 @endforeach
