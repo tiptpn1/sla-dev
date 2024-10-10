@@ -175,6 +175,7 @@
                                         <th scope="col">Rincian Progress</th>
                                         <th scope="col">Kendala</th>
                                         <th scope="col">Tindak Lanjut</th>
+                                        <th scope="col">Tanggal</th>
                                         {{-- <th scope="col">Evidence</th> --}}
                                         @if ($hasAccess)
                                             <th scope="col" width="22%" style="text-align: center">Actions</th>
@@ -426,6 +427,7 @@
                                 item.rincian_progress,
                                 item.kendala,
                                 item.tindak_lanjut,
+                                item.tanggal,
                                 `<button class="btn btn-info btn-sm status-btn"  onclick=showEvidence(this) data-id="${item.id}" data-rincian_progress="${item.rincian_progress}">Evidence</button>
                                 <button class="btn btn-warning btn-sm edit-btn" onclick="ubahRincianProgress(this)" data-id="${item.id}" data-rincian_progress="${item.rincian_progress}" data-kendala="${item.kendala}" data-tindak_lanjut="${item.tindak_lanjut}">Edit</button>
                                 <button class="btn btn-danger btn-sm delete-btn deleteButton" type="submit" type="button" data-toggle="modal" data-id="${item.id}">Hapus</button>`
@@ -436,6 +438,7 @@
                                 item.rincian_progress,
                                 item.kendala,
                                 item.tindak_lanjut,
+                                item.tanggal,
                             ]).draw();
                         }
                         });
