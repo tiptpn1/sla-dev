@@ -14,7 +14,7 @@
                 <th>PIC</th>
                 <th>Rincian Progress</th>
                 <th>Evidence</th>
-                <th>Tanggal Rincian</th>
+                <th>Tanggal Rincian Progress</th>
                 @if (session()->get('hak_akses_id') == 2)
                     <th>Status</th>
                 @endif
