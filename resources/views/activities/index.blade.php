@@ -14,6 +14,16 @@
 
 @section('content')
     <section class="content">
+        @if (session('success'))
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: '{{ session('success') }}',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            </script>
+        @endif
         <div class="container-fluid">
             <div class="container-fluid">
                 <div class="row">
