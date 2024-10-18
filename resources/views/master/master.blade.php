@@ -217,13 +217,15 @@
 
 
         <!-- /.content-wrapper -->
-        <footer class="main-footer">
+        <footer class="main-footer" style="position: fixed; bottom: 0; left: 0; width: calc(100% - 250px); background-color: #f8f9fa; padding: 10px; z-index: 1030; transition: width 0.3s;">
             <strong>Copyright &copy; 2024 by <a href="https://ptpn1.co.id">PTPN I</a>.</strong>
             All rights reserved.
             <div class="float-right d-none d-sm-inline-block">
                 <b>Version</b> 1.0.0
             </div>
         </footer>
+        
+        
 
         <!-- Control Sidebar -->
         <aside class="control-sidebar control-sidebar-dark">
@@ -297,6 +299,20 @@
             ]
         });
     });
+</script>
+<script>
+    $(document).ready(function() {
+    $('[data-widget="pushmenu"]').on('click', function() {
+        setTimeout(function() {  
+            if ($('body').hasClass('sidebar-collapse')) {
+                $('.main-footer').css('width', '100%');
+            } else {
+                $('.main-footer').css('width', 'calc(100% - 250px)'); // 250px adalah lebar sidebar default
+            }
+        }, 300);  
+    });
+});
+
 </script>
 @stack('scripts')
 

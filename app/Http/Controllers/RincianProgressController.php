@@ -44,6 +44,7 @@ class RincianProgressController extends Controller
             ->select('dp.*') // Memilih kolom dari master_user dan master_bagian
             ->where('activity_id', '=', $request->activity_id)
             ->where('isActive', 1)
+            ->orderBy('tanggal', 'asc')
             // ->groupBy('dp.id')
             // ->paginate($perPage, ['*'], 'page', $currentPage);
             ->get();
