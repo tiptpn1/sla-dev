@@ -170,11 +170,30 @@ class RincianProgressController extends Controller
     public function delete($id)
     {
         try {
+            $rincian_progress = DB::table('detail_progress')->where('id', $id)->first();
+            if (!$rincian_progress) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Data tidak ditemukan',
+                ], 404);
+            }
+
+            $evidences = DB::table('evidence')->where('progress_id', $rincian_progress->id)->get();
+
+            foreach($evidences as $evidence) {
+                if (file_exists(public_path() . '/' . $evidence->file_path)) {
+                    unlink(public_path() . '/' . $evidence->file_path);
+                }
+            }
+
             DB::beginTransaction();
 
-            DB::table('detail_progress')->where('id', $id)->update([
-                'isActive' => 0,
-            ]);
+            // DB::table('detail_progress')->where('id', $id)->update([
+            //     'isActive' => 0,
+            // ]);
+
+            DB::table('evidence')->where('progress_id', $rincian_progress->id)->delete();
+            DB::table('detail_progress')->where('id', $id)->delete();
 
             DB::commit();
 

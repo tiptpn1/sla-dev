@@ -33,6 +33,11 @@
                         {{ $errors->first() }}
                     </div>
                 @endif
+                @error('captcha')
+                    <div class="alert alert-danger">
+                        {{ $message }}
+                    </div>
+                @enderror
                 <form action="{{ route('login') }}" method="POST">
                     @csrf
                     <div class="input-group mb-3">

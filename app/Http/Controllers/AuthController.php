@@ -20,7 +20,8 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'username' => 'required',
             'password' => 'required',
-        ]);
+            'captcha' => 'required|captcha',
+        ], ['captcha' =>  'Captcha is not valid', 'required' => 'The :attribute field is required']);
         if ($validator->fails()) {
             return redirect('login')
                 ->withErrors($validator)
@@ -49,6 +50,11 @@ class AuthController extends Controller
             ->withErrors([
                 'message' => 'Username atau password salah!!!',
             ]);
+    }
+
+    public function reloadCaptcha()
+    {
+        return response()->json(['captcha' => captcha_img('math')]);
     }
 
     public function logout(Request $request)
