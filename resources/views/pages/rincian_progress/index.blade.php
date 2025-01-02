@@ -131,6 +131,10 @@
     </style>
 @endpush
 
+@php
+    $bagianIdUser = session()->get('bagian_id');
+@endphp
+
 @section('content')
     <section class="content">
         <div class="col-md-12">
@@ -144,7 +148,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <p><strong>Nama Aktivitas:</strong> {{ $activity->nama_activity }}</p>
-                                <p><strong>Plan Start:</strong> {{ $activity->plan_start }}</p>
+                                <p><strong>:</strong> {{ $activity->plan_start }}</p>
                                 <p><strong>Plan Duration:</strong> {{ $activity->plan_duration }}</p>
                                 <p><strong>Actual Start:</strong> {{ $activity->actual_start }}</p>
                                 <p><strong>Actual Duration:</strong> {{ $activity->actual_duration }}</p>
@@ -158,7 +162,7 @@
                     </div>
                 </div>
                 <div class="card">
-                    @if ($hasAccess)
+                    @if ($hasAccess || $bagianIdUser == 33)
                     <div class="card-header">
                             <button type="button" class="btn btn-primary" data-toggle="modal"
                                 onclick="tambahRincianProgress()">
@@ -177,7 +181,7 @@
                                         <th scope="col">Tindak Lanjut</th>
                                         <th scope="col">Tanggal</th>
                                         {{-- <th scope="col">Evidence</th> --}}
-                                        @if ($hasAccess)
+                                        @if ($hasAccess || $bagianIdUser == 33)
                                             <th scope="col" width="22%" style="text-align: center">Actions</th>
                                         @endif
                                     </tr>
@@ -412,7 +416,7 @@
 
 @push('scripts')
     <script>
-        let hasAccess = {{ $hasAccess ? 'true' : 'false' }};
+      let hasAccess = {{ ($hasAccess || $bagianIdUser == 33) ? 'true' : 'false' }};
 
         $(document).ready(function() {
             $.ajaxSetup({
