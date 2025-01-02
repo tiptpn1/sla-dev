@@ -30,7 +30,7 @@
 
                     // Periksa apakah user yang login adalah PIC dari aktivitas ini
                     foreach ($activity->pics as $pic) {
-                        if ($pic->bagian_id == $bagianIdUser) {
+                        if ($pic->bagian_id == $bagianIdUser || $bagianIdUser == 33) {
                             $isPic = true;
                             break;
                         }
