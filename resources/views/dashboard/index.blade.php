@@ -1,6 +1,6 @@
 @extends('master/master')
 
-@section('title', 'Dashboard SLA')
+@section('title', 'Dashboard Monitoring Program Kerja')
 
 @section('dashboard', 'active')
 
@@ -24,7 +24,7 @@
         <div class="col-md-12">
             <div class="card mt-4 mb-4 w-100">
                 <div class="card-header bg-primary text-white">
-                    <h4 class="font-weight-bold">Progress Activity Overview by Gantt Chart</h4>
+                    <h4 class="font-weight-bold">Progress Overview by Gantt Chart</h4>
                 </div>
                 <div class="card-body" id="gantt-chart-field"></div>
             </div>

@@ -287,15 +287,17 @@
                                             array_push($pics, $pic->bagian->master_bagian_kode);
                                         }
 
-                                        if (count($activity->progress)) {
-                                            $rincian_progress = $activity->progress->sortByDesc('tanggal')[0];
-                                            $tanggal = $activity->progress->sortByDesc('tanggal')[0];
-                                            $evidence = $rincian_progress->evidences != null ? $rincian_progress->evidences->sortByDesc('created_at')[0]->filename : '';
-                                        } else {
-                                            $rincian_progress = '';
-                                            $evidence = '';
-                                            $tanggal = '';
-                                        }
+                                    if (count($activity->progress)) {
+                                        $rincian_progress = $activity->progress->sortByDesc('tanggal')->first();
+                                        $tanggal = $rincian_progress ? $rincian_progress->tanggal : '';
+                                        $evidence = $rincian_progress && $rincian_progress->evidences
+                                            ? $rincian_progress->evidences->sortByDesc('created_at')->first()->filename ?? ''
+                                            : '';
+                                    } else {
+                                        $rincian_progress = '';
+                                        $evidence = '';
+                                        $tanggal = '';
+                                    }
 
                                     @endphp {
                                         id: '{{ $activity->id_activity }}',

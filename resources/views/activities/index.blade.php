@@ -1,6 +1,6 @@
 @extends('master/master')
 
-@section('title', 'Activity SLA')
+@section('title', 'Activity Program Kerja')
 
 @section('activity', 'active')
 

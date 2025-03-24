@@ -82,7 +82,7 @@
             <a href="/dash_data" class="brand-link">
                 <img src="{{ asset('dist/img/n1-white.png') }}" alt="AdminLTE Logo"
                     class="brand-image img-circle elevation-3" style="opacity: .8">
-                <span class="brand-text font-weight">SLA</span>
+                <span class="brand-text font-weight">Aplikasi Monitoring<br>Program Kerja</span>
             </a>
 
             <!-- Sidebar -->

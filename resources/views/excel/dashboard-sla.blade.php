@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Dashboard SLA</title>
+    <title>Dashboard Program Kerja</title>
     <style>
         /* body {
             transform: scale(0.5);
@@ -148,7 +148,7 @@
         }
     @endphp
 
-    <h2>Dashboard SLA</h2>
+    <h2>Dashboard Program Kerja</h2>
 
     <table>
         <thead>

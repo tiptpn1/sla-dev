@@ -1,6 +1,6 @@
 @extends('master/master')
 
-@section('title', 'Dashboard SLA')
+@section('title', 'Aplikasi Monitoring Program Kerja')
 
 @section('dash', 'active')
 

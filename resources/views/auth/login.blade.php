@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Aplikasi Monitoring SLA | Log in</title>
+    <title>Aplikasi Monitoring Program Kerja | Log in</title>
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet"
@@ -22,7 +22,7 @@
 <body class="hold-transition login-page">
     <div class="login-box">
         <div class="login-logo">
-            <h1>APLIKASI <b>MONITORING SLA</b></h1>
+            <h1>APLIKASI <b>MONITORING PROGRAM KERJA</b></h1>
         </div>
         <!-- /.login-logo -->
         <div class="card">
