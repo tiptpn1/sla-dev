@@ -18,6 +18,7 @@ class ActivityController extends Controller
     {
         $adminAccess = Session::get('hak_akses_id');
         $masterBagianId = Session::get('bagian_id');
+        $direktoratId = Session::get('direktorat_id');
 
         // Mulai query builder untuk proyek
         $query = Proyek::with([
@@ -43,6 +44,10 @@ class ActivityController extends Controller
         // filter proyek berdasarkan master_bagian_id
         if ($adminAccess == 3 && $masterBagianId) {
             $query->where('master_bagian_id', $masterBagianId);
+        }
+
+        if ($adminAccess == 6 && $masterBagianId) {
+            $query->where('direktorat_id', $direktoratId);
         }
 
         // Eksekusi query dan dapatkan hasilnya

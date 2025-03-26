@@ -40,6 +40,7 @@ class AuthController extends Controller
             $request->session()->put('bagian_id', $user->master_nama_bagian_id);
             $request->session()->put('bagian_nama', $user->master_bagian_nama);
             $request->session()->put('hak_akses_id', $user->master_hak_akses_id);
+            $request->session()->put('direktorat_id', $user->direktorat_id);
             $request->session()->put('username', $user->master_user_nama);
 
             return redirect()->intended('dashboard');
