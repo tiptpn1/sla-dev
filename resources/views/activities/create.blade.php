@@ -55,7 +55,7 @@
 
                             <!-- Project Dropdown -->
                             <div class="form-group">
-                                <label for="project_id">Project</label>
+                                <label for="project_id">Divisi</label>
                                 <select name="project_id" class=" form-control @error('project_id') is-invalid @enderror"
                                     id="project_id" required>
                                     @if (old('project_id'))
@@ -73,7 +73,7 @@
 
                             <!-- Scope Dropdown -->
                             <div class="form-group">
-                                <label for="scope_id">Scope</label>
+                                <label for="scope_id">Sub Divisi</label>
                                 <select name="scope_id" class="form-control @error('scope_id') is-invalid @enderror"
                                     id="scope_id" required>
                                     @if (old('scope_id'))

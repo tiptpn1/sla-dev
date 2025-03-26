@@ -17,7 +17,10 @@ class ActivityController extends Controller
     public function index()
     {
         $adminAccess = Session::get('hak_akses_id');
-        $projects = Proyek::with([
+        $masterBagianId = Session::get('bagian_id');
+
+        // Mulai query builder untuk proyek
+        $query = Proyek::with([
             'scopes' => function ($query) {
                 $query->where('isActive', 1);
             },
@@ -34,9 +37,16 @@ class ActivityController extends Controller
             'scopes.activities.progress.evidences' => function ($query) {
                 $query->latest('created_at')->get();
             }
-        ])->where('isActive', true)->get();
+        ])->where('isActive', true);
 
-        // return response()->json($projects);
+        // Jika user adalah level divisi (hak_akses_id = 3), 
+        // filter proyek berdasarkan master_bagian_id
+        if ($adminAccess == 3 && $masterBagianId) {
+            $query->where('master_bagian_id', $masterBagianId);
+        }
+
+        // Eksekusi query dan dapatkan hasilnya
+        $projects = $query->get();
 
         return view('activities.index', compact('projects'));
     }

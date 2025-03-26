@@ -81,6 +81,7 @@ Route::middleware(['checkLogin'])->group(function () {
         Route::post('status/{id}', [ProjectController::class, 'updateStatus'])->name('update-status');
         Route::post('form/{id}', [ProjectController::class, 'updateForm'])->name('update-form');
         Route::delete('delete/{id}', [ProjectController::class, 'delete'])->name('delete');
+        Route::get('get-data-divisi', [ProjectController::class, 'getDataDivisi'])->name('get-data-divisi');
     });
 
     // Master Scope
