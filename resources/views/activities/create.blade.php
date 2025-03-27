@@ -177,10 +177,10 @@
                                 <label for="bagian_id">Select PIC(s)</label>
                                 <select name="bagian_id[]"
                                     class="form-control select2 @error('bagian_id') is-invalid @enderror" multiple required>
-                                    @foreach ($bagians as $bagian)
-                                        <option value="{{ $bagian->master_bagian_id }}"
-                                            {{ in_array($bagian->master_bagian_id, old('bagian_id', [])) ? 'selected' : '' }}>
-                                            {{ $bagian->master_bagian_nama }}
+                                    @foreach ($subBagians as $subbagian)
+                                        <option value="{{ $subbagian->id }}"
+                                            {{ in_array($subbagian->id, old('bagian_id', [])) ? 'selected' : '' }}>
+                                            {{ $subbagian->sub_bagian_nama }}
                                         </option>
                                     @endforeach
                                 </select>

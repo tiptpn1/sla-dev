@@ -76,8 +76,8 @@
                             @foreach ($activity->pics as $pic)
                                 <span class="badge badge-primary"
                                     style="margin: 2px; padding: 5px 10px; background-color: #007bff; color: white; border-radius: 15px; cursor: pointer;"
-                                    title="{{ $pic->bagian->master_bagian_nama }}">
-                                    {{ $pic->bagian->master_bagian_kode }}
+                                    title="{{ $pic->subBagian->sub_bagian_nama }}">
+                                    {{ $pic->subBagian->sub_bagian_kode }}
                                 </span>
                             @endforeach
                         @else

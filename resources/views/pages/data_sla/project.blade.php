@@ -201,8 +201,14 @@
                     <div class="modal-body">
                         <input type="hidden" id="editId" name="editId">
                         <div class="form-group">
-                            <label for="editProyek">Nama Proyek</label>
-                            <input type="text" class="form-control" id="editProyek" name="editProyek" required>
+                            <label for="editProyek">Nama Divisi</label>
+                            <select class="form-control" id="editProyek" name="editProyek" required>
+                                <option value="">Pilih Divisi</option>
+                                <!-- Options akan diisi dari AJAX -->
+                            </select>
+                            <input type="hidden" id="edit_direktorat_id" name="edit_direktorat_id">
+                            <input type="hidden" id="edit_master_bagian_id" name="edit_master_bagian_id">
+                            <input type="hidden" id="edit_master_bagian_nama" name="edit_master_bagian_nama">
                         </div>
                         <div class="form-group">
                             <label for="editIsActive">Status Aktif</label>

@@ -24,6 +24,11 @@ class Pic extends Model
         return $this->belongsTo(Bagian::class, 'bagian_id', 'master_bagian_id');
     }
 
+    public function subBagian()
+    {
+        return $this->belongsTo(subBagian::class, 'sub_bagian_id', 'id');
+    }
+
     public function activity()
     {
         return $this->belongsTo(Activity::class, 'activity_id', 'id_activity');
