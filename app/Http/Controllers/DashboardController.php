@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\ProgressDataExport;
 use App\Models\Activity;
+use App\Models\Bagian;
 use App\Models\Eviden;
 use App\Models\Proyek;
 use App\Traits\RoleTrait;
@@ -17,26 +18,154 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Writer\Pdf as WriterPdf;
 use ZipArchive;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
         // dd(session()->all());
-        $projects = Proyek::where('isActive', true)->select('id_project', 'project_nama')->get();
+        $direktoratId = Session::get('direktorat_id');
+        $adminAccess = Session::get('hak_akses_id');
+        $bagianId = Session::get('master_nama_bagian_id'); 
 
-        // return response()->json($projects);
+        if ($adminAccess == 6) {
+            $projects = Proyek::where('isActive', true)
+                            ->where('direktorat_id', $direktoratId)
+                            ->with(['scopes' => function($query) {
+                                $query->where('isActive', true);
+                            }]) 
+                            ->select('id_project', 'project_nama')                  
+                            ->get();
+        } 
+        elseif ($adminAccess == 7 && $bagianId){
+            $projects = Proyek::where('isActive', true)
+                            ->where('master_nama_bagian_id', $bagianId)
+                            ->select('id_project', 'project_nama')
+                            ->get();
+        }
 
+        elseif ($adminAccess == 3 && $bagianId) {
+            $projects = Proyek::where('isActive', true)
+                            ->where('master_nama_bagian_id', $bagianId)
+                            ->select('id_project', 'project_nama')
+                            ->get();
+        }
+        else {
+            $projects = Proyek::where('isActive', true)
+                            ->select('id_project', 'project_nama')
+                            ->get();
+        }
+
+        // dd($projects);
         return view('dashboard.index', compact('projects'));
     }
 
     public function ganchart()
     {
-        // Data aktivitas dengan start, durasi dalam minggu, dan perhitungan tanggal akhir
-        $projects = Proyek::with(['scopes', 'scopes.activities', 'scopes.activities.pics', 'scopes.activities.progress', 'scopes.activities.progress.evidences'])->where('isActive', 1)->get();
+        // dd(session()->all());
+        $direktoratId = Session::get('direktorat_id');
+        $adminAccess = Session::get('hak_akses_id');
+        $bagianId = Session::get('master_nama_bagian_id'); 
 
+        if ($adminAccess == 6 ) {
+            // Jika admin direktorat, hanya tampilkan proyek dan scope dari direktoratnya
+            $projects = Proyek::with([
+                'scopes' => function($query) {
+                    $query->where('isActive', true);
+                },
+                'scopes.activities' => function($query) use ($bagianId) {
+                    $query->where('isActive', true)
+                          ->whereHas('pics', function($q) use ($bagianId) {
+                              $q->where('bagian_id', $bagianId);
+                          });
+                },
+                'scopes.activities.pics',
+                'scopes.activities.progress',
+                'scopes.activities.progress.evidences'
+            ])
+            ->where('isActive', true)
+            ->where('direktorat_id', $direktoratId)
+            ->get();
+
+        } elseif ($adminAccess == 3) {
+            // Jika admin divisi, tampilkan proyek dan scope dari bagian yang diakses
+            $projects = Proyek::with([
+                'scopes' => function($query) {
+                    $query->where('isActive', true);
+                },
+                'scopes.activities' => function($query) use ($bagianId) {
+                    $query->where('isActive', true)
+                          ->whereHas('pics', function($q) use ($bagianId) {
+                              $q->where('bagian_id', $bagianId);
+                          });
+                },
+                'scopes.activities.pics',
+                'scopes.activities.progress',
+                'scopes.activities.progress.evidences'
+            ])
+            ->where('isActive', true)
+            ->where('master_nama_bagian_id', $bagianId)
+            ->get();
+        } else {
+            // Jika bukan admin direktorat, tampilkan semua proyek aktif
+            $projects = Proyek::with(['scopes' => function($query) {
+                                $query->where('isActive', true);
+                            }, 
+                            'scopes.activities' => function($query) {
+                                $query->where('isActive', true);
+                            }, 
+                            'scopes.activities.pics', 
+                            'scopes.activities.progress', 
+                            'scopes.activities.progress.evidences'])
+                            ->where('isActive', true)
+                            ->get();
+        }
+        // dd($projects);
         return view('pages.ganchart.dashboard', compact('projects'));
+    }
+
+    public function activity()
+    {
+        $adminAccess = Session::get('hak_akses_id');
+        $bagianId = Session::get('master_nama_bagian_id');
+        $direktoratId = Session::get('direktorat_id');
+
+        // Mulai query builder untuk proyek
+        $query = Proyek::with([
+            'scopes' => function ($query) {
+                $query->where('isActive', 1);
+            },
+            'scopes.activities' => function ($query) use ($adminAccess) {
+                if ($adminAccess != 2) {
+                    $query->where('isActive', 1);
+                }
+            },
+            'scopes.activities.pics',
+            'scopes.activities.pics.bagian',
+            'scopes.activities.progress' => function ($query) {
+                $query->latest('tanggal')->get();
+            },
+            'scopes.activities.progress.evidences' => function ($query) {
+                $query->latest('created_at')->get();
+            }
+        ])->where('isActive', true);
+
+        // Jika user adalah level divisi (hak_akses_id = 3), 
+        // filter proyek berdasarkan master_nama_bagian_id
+        if ($adminAccess == 3 && $bagianId) {
+            $query->where('master_nama_bagian_id', $bagianId);
+        }
+
+        if ($adminAccess == 6 && $bagianId) {
+            $query->where('direktorat_id', $direktoratId);
+        }
+
+        // Eksekusi query dan dapatkan hasilnya
+        $projects = $query->get();
+
+        return view('activities.index', compact('projects'));
     }
 
     public function downloadPdf(Request $request)

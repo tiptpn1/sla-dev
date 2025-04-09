@@ -43,6 +43,7 @@
 
      {{-- sweetalert2 --}}
      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     @stack('css')
 </head>
@@ -96,12 +97,12 @@
                         <a href="#" class="d-block">{{ session('bagian_nama') }}</a>
                     </div>
                 </div>
-
+ 
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                         data-accordion="false">
-                        @if (session('hak_akses_id') == 2 || session('hak_akses_id') == 3 || session('hak_akses_id') == 4)
+                        @if (session('hak_akses_id') == 2 || session('hak_akses_id') == 3 || session('hak_akses_id') == 4 || session('hak_akses_id') == 6)
                             <li class="nav-item">
                                 <a href="{{ route('dashboard') }}" class="nav-link @yield('dashboard')">
                                     <i class="nav-icon fas fa-calendar-alt"></i>
@@ -149,7 +150,7 @@
                                 </ul>
                             </li>
                         @endif
-
+ 
                         @if (session()->get('hak_akses_id') == 1)
                             <!-- Parent Menu Item for Master Data -->
                             <li class="nav-item has-treeview">
@@ -182,6 +183,20 @@
                                             class="nav-link @yield('master-role')">
                                             <i class="nav-icon fas fa-key"></i>
                                             <p>Hak Akses</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('master-direktorat.index') }}"
+                                            class="nav-link @yield('master-direktorat')">
+                                            <i class="nav-icon fas fa-user"></i>
+                                            <p>Direktorat</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('master-sub-divisi.index') }}"
+                                            class="nav-link @yield('master-sub-divisi')">
+                                            <i class="nav-icon fas fa-user"></i>
+                                            <p>Sub Divisi</p>
                                         </a>
                                     </li>
                                 </ul>

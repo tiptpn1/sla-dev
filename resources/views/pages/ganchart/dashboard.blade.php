@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{ asset('plugins/dhtmlx-gantt-chart/codebase/sources/dhtmlxgantt.css') }}">
     {{-- <script src="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js"></script> --}}
     <script src="{{ asset('plugins/dhtmlx-gantt-chart/codebase/sources/dhtmlxgantt.js') }}"></script>
-
+ 
     <style>
         /* Menyembunyikan konten bar tugas */
         .gantt_task_line.gantt_bar_task > .gantt_task_content {
@@ -159,7 +159,7 @@
             },
             {
                 name: "activity",
-                label: "Nama Aktivitas",
+                label: "Nama Aktivitas", 
                 tree: false,
                 width: 180,
                 css: "wrap-text gantt_column_wrap"
@@ -231,7 +231,6 @@
                 css: "wrap-text gantt_column_wrap"
             },
         ];
-
 
         @php
             $arrayProyek = [];

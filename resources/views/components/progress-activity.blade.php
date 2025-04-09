@@ -1,7 +1,7 @@
 <div class="col-md-12">
     <div class="card mt-4 mb-4 w-100">
         <div class="card-header bg-primary text-white">
-            <h4 class="font-weight-bold">Progress Overview</h4>
+            <h4 class="font-weight-bold">Progress Overview</h4> 
         </div>
         <div class="card-body">
             <!-- Card for each project -->

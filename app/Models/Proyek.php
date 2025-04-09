@@ -17,7 +17,9 @@ class Proyek extends Model
 
     protected $fillable = [
         'project_nama',
-        'is_active'
+        'is_active',
+        'direktorat_id',
+        'master_nama_bagian_id'
     ];
 
     protected $guarded = ['id_project'];
@@ -36,4 +38,11 @@ class Proyek extends Model
     {
         return $this->hasMany(Scope::class, 'project_id', 'id_project');
     }
+
+    public function bagian()
+    {
+        return $this->belongsTo(Bagian::class, 'master_nama_bagian_id', 'master_bagian_id');
+    }
+
+
 }

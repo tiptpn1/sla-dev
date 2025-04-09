@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BagianController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DirektoratController;
 use App\Http\Controllers\DivisiController;
 use App\Http\Controllers\MasterBagianController;
 use App\Http\Controllers\MonitoringController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ScopeController;
 use App\Http\Controllers\ServerSide\ActivityController as ServerSideActivityController;
 use App\Http\Controllers\ServerSide\ProjectScopeController;
+use App\Http\Controllers\SubDivisiController;
 use App\Http\Controllers\SummaryIndicatorController;
 use App\Http\Controllers\UsernameController;
 use Illuminate\Support\Facades\Route;
@@ -70,6 +72,32 @@ Route::middleware(['checkLogin'])->group(function () {
         Route::post('status/{id}', [BagianController::class, 'updateStatus'])->name('update-status');
         Route::post('form/{id}', [BagianController::class, 'updateForm'])->name('update-form');
         Route::delete('delete/{id}', [BagianController::class, 'delete'])->name('delete');
+    });
+
+    // Master Direktorat
+    Route::group(['prefix' => 'master-direktorat', 'as' => 'master-direktorat.'], function () {
+        Route::get('/', [DirektoratController::class, 'index'])->name('index');
+        Route::get('get-data', [DirektoratController::class, 'getData'])->name('get-data');
+        Route::get('get-data/{id}', [DirektoratController::class, 'getDataById'])->name('get-data-id');
+        Route::post('store', [DirektoratController::class, 'store'])->name('store');
+        Route::post('status/{id}', [DirektoratController::class, 'updateStatus'])->name('update-status');
+        Route::get('form/{id}', [DirektoratController::class, 'updateForm'])->name('update-form');
+        Route::post('form/{id}', [DirektoratController::class, 'updateForm'])->name('update-form');
+        Route::delete('delete/{id}', [DirektoratController::class, 'delete'])->name('delete');
+    });
+
+    // Master Sub-Divisi 
+    Route::group(['prefix' => 'master-sub-divisi', 'as' => 'master-sub-divisi.'], function () {
+        Route::get('/', [SubDivisiController::class, 'index'])->name('index');
+        Route::get('/get-data', [SubDivisiController::class, 'getData'])->name('data');
+        Route::get('create', [SubDivisiController::class, 'create'])->name('create');
+        Route::post('/store', [SubDivisiController::class, 'store'])->name('store');
+        Route::post('status/{id}', [SubDivisiController::class, 'updateStatus'])->name('update-status');
+        Route::get('{id}/show', [SubDivisiController::class, 'show'])->name('show');
+        Route::get('{id}/edit', [SubDivisiController::class, 'edit'])->name('edit');
+        Route::get('{id}/data', [SubDivisiController::class, 'getDataById'])->name('get-data-by-id');
+        Route::put('update/{id}', [SubDivisiController::class, 'update'])->name('update');
+        Route::delete('destroy/{id}', [SubDivisiController::class, 'destroy'])->name('destroy');
     });
 
     // Master Project

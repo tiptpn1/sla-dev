@@ -140,7 +140,7 @@
         <div class="col-md-12">
             <div class="container">
                 <!-- Activity Detail Section -->
-                <div class="card mt-4 mb-4">
+                <div class="card mt-4 mb-4"> 
                     <div class="card-header">
                         <h4>Detail Activity</h4>
                     </div>

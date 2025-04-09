@@ -37,10 +37,11 @@ class AuthController extends Controller
         if ($user && password_verify($credentials['password'], $user->master_user_password)) {
             $request->session()->regenerate();
             $request->session()->put('id', $user->master_user_id);
-            $request->session()->put('bagian_id', $user->master_nama_bagian_id);
+            $request->session()->put('master_nama_bagian_id', $user->master_nama_bagian_id);
             $request->session()->put('bagian_nama', $user->master_bagian_nama);
             $request->session()->put('hak_akses_id', $user->master_hak_akses_id);
             $request->session()->put('username', $user->master_user_nama);
+            $request->session()->put('direktorat_id', $user->direktorat_id);
 
             return redirect()->intended('dashboard');
         }
@@ -49,7 +50,7 @@ class AuthController extends Controller
             ->withErrors([
                 'message' => 'Username atau password salah!!!',
             ]);
-    }
+    } 
 
     public function logout(Request $request)
     {

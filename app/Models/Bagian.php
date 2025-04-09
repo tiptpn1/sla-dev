@@ -27,4 +27,14 @@ class Bagian extends Model
     {
         return $this->hasMany(Pic::class, 'bagian_id', 'master_bagian_id');
     }
+
+    public function proyek()
+    {
+        return $this->hasMany(Proyek::class, 'master_nama_bagian_id', 'master_bagian_id');
+    }
+
+    public function direktorat()
+    {
+        return $this->hasOne(Direktorat::class, 'master_bagian_id', 'master_bagian_id');
+    }
 }
