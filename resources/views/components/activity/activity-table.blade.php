@@ -26,11 +26,11 @@
             @foreach ($activities as $activity)
                 @php
                     $isPic = false; // Default: bukan PIC
-                    $bagianIdUser = session()->get('bagian_id'); // Dapatkan ID user yang sedang login
+                    $bagianIdUser = session()->get('sub_bagian_id'); // Dapatkan ID user yang sedang login
 
                     // Periksa apakah user yang login adalah PIC dari aktivitas ini
                     foreach ($activity->pics as $pic) {
-                        if ($pic->bagian_id == $bagianIdUser || $bagianIdUser == 33) {                            $isPic = true;
+                        if ($pic->sub_bagian_id == $bagianIdUser) {                            $isPic = true;
                             break;
                         }
                     }
