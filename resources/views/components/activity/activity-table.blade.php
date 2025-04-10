@@ -26,11 +26,11 @@
             @foreach ($activities as $activity)
                 @php
                     $isPic = false; // Default: bukan PIC
-                    $bagianIdUser = session()->get('bagian_id'); // Dapatkan ID user yang sedang login
+                    $bagianIdUser = session()->get('sub_bagian_id'); // Dapatkan ID user yang sedang login
 
                     // Periksa apakah user yang login adalah PIC dari aktivitas ini
                     foreach ($activity->pics as $pic) {
-                        if ($pic->bagian_id == $bagianIdUser || $bagianIdUser == 33) {                            $isPic = true;
+                        if ($pic->sub_bagian_id == $bagianIdUser) {                            $isPic = true;
                             break;
                         }
                     }
@@ -76,8 +76,8 @@
                             @foreach ($activity->pics as $pic)
                                 <span class="badge badge-primary"
                                     style="margin: 2px; padding: 5px 10px; background-color: #007bff; color: white; border-radius: 15px; cursor: pointer;"
-                                    title="{{ $pic->bagian->master_bagian_nama }}">
-                                    {{ $pic->bagian->master_bagian_kode }}
+                                    title="{{ $pic->subBagian->sub_bagian_nama }}">
+                                    {{ $pic->subBagian->sub_bagian_kode }}
                                 </span>
                             @endforeach
                         @else

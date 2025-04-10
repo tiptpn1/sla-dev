@@ -55,7 +55,7 @@
 
                             <!-- Project Dropdown -->
                             <div class="form-group">
-                                <label for="project_id">Project</label>
+                                <label for="project_id">Divisi</label>
                                 <select name="project_id" class=" form-control @error('project_id') is-invalid @enderror"
                                     id="project_id" required>
                                     @if (old('project_id'))
@@ -73,7 +73,7 @@
 
                             <!-- Scope Dropdown -->
                             <div class="form-group">
-                                <label for="scope_id">Scope</label>
+                                <label for="scope_id">Sub Divisi</label>
                                 <select name="scope_id" class="form-control @error('scope_id') is-invalid @enderror"
                                     id="scope_id" required>
                                     @if (old('scope_id'))
@@ -177,10 +177,10 @@
                                 <label for="bagian_id">Select PIC(s)</label>
                                 <select name="bagian_id[]"
                                     class="form-control select2 @error('bagian_id') is-invalid @enderror" multiple required>
-                                    @foreach ($bagians as $bagian)
-                                        <option value="{{ $bagian->master_bagian_id }}"
-                                            {{ in_array($bagian->master_bagian_id, old('bagian_id', [])) ? 'selected' : '' }}>
-                                            {{ $bagian->master_bagian_nama }}
+                                    @foreach ($subBagians as $subbagian)
+                                        <option value="{{ $subbagian->id }}"
+                                            {{ in_array($subbagian->id, old('bagian_id', [])) ? 'selected' : '' }}>
+                                            {{ $subbagian->sub_bagian_nama }}
                                         </option>
                                     @endforeach
                                 </select>

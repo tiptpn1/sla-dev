@@ -20,6 +20,9 @@ class Proyek extends Model
         'is_active',
         'direktorat_id',
         'master_nama_bagian_id'
+        'master_bagian_id',
+        'project_nama',
+        'is_active'
     ];
 
     protected $guarded = ['id_project'];

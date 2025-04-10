@@ -47,10 +47,10 @@
                                         @endphp
 
                                         @foreach ($projects as $project)
-                                            @php
-                                                $segmentAlpha = numberToAlpha($segmentIndex++);
-                                            @endphp
-                                            <x-activity.project-accordion :project="$project" :alphabet="$segmentAlpha" />
+                                                                            @php
+                                                                                $segmentAlpha = numberToAlpha($segmentIndex++);
+                                                                            @endphp
+                                                                            <x-activity.project-accordion :project="$project" :alphabet="$segmentAlpha" />
                                         @endforeach
                                     </div>
                                 </div>

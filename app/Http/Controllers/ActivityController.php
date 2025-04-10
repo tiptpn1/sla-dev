@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Activity;
-use App\Models\Bagian;
 use App\Models\Pic;
+use App\Models\Bagian;
 use App\Models\Proyek;
+use App\Models\Activity;
+use App\Models\SubBagian;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
@@ -17,30 +18,67 @@ class ActivityController extends Controller
     public function index()
     {
         $adminAccess = Session::get('hak_akses_id');
-        $projects = Proyek::with([
-            'scopes' => function ($query) {
+        $masterBagianId = Session::get('bagian_id');
+        $direktoratId = Session::get('direktorat_id');
+        $subBagianId = Session::get('sub_bagian_id');
+
+        // Mulai query builder untuk proyek
+        $query = Proyek::with([
+            'scopes' => function ($query) use ($adminAccess, $subBagianId) {
                 $query->where('isActive', 1);
+
+                // Filter scopes untuk level 7, hanya yang memiliki aktivitas di mana user adalah PIC
+                if ($adminAccess == 7 && $subBagianId) {
+                    $query->whereHas('activities.pics', function ($q) use ($subBagianId) {
+                        $q->where('sub_bagian_id', $subBagianId);
+                    });
+                }
             },
-            'scopes.activities' => function ($query) use ($adminAccess) {
+            'scopes.activities' => function ($query) use ($adminAccess, $subBagianId) {
                 if ($adminAccess != 2) {
                     $query->where('isActive', 1);
                 }
+
+                // Filter aktivitas untuk level 7
+                if ($adminAccess == 7 && $subBagianId) {
+                    $query->whereHas('pics', function ($q) use ($subBagianId) {
+                        $q->where('sub_bagian_id', $subBagianId);
+                    });
+                }
             },
             'scopes.activities.pics',
-            'scopes.activities.pics.bagian',
+            'scopes.activities.pics.subBagian',
             'scopes.activities.progress' => function ($query) {
                 $query->latest('tanggal')->get();
             },
             'scopes.activities.progress.evidences' => function ($query) {
                 $query->latest('created_at')->get();
             }
-        ])->where('isActive', true)->get();
+        ])->where('isActive', true);
 
-        // return response()->json($projects);
+        // Jika user adalah level divisi (hak_akses_id = 3)
+        if (in_array($adminAccess, [3, 7]) && $masterBagianId) {
+            $query->where('master_bagian_id', $masterBagianId);
+        }
+
+
+        // Jika user adalah level direktorat (hak_akses_id = 6)
+        if ($adminAccess == 6 && $direktoratId) {
+            $query->where('direktorat_id', $direktoratId);
+        }
+
+        // Filter proyek di level paling atas untuk level 7
+        if ($adminAccess == 7 && $subBagianId) {
+            $query->whereHas('scopes.activities.pics', function ($q) use ($subBagianId) {
+                $q->where('sub_bagian_id', $subBagianId);
+            });
+        }
+
+        // Eksekusi query dan dapatkan hasilnya
+        $projects = $query->get();
 
         return view('activities.index', compact('projects'));
     }
-
     /**
      * Show the form for creating a new resource.
      */
@@ -48,10 +86,11 @@ class ActivityController extends Controller
     {
         $projects = Proyek::select('id_project', 'project_nama')->get();
         $bagians = Bagian::select('master_bagian_id', 'master_bagian_nama')->get();
+        $subBagians = SubBagian::select('id', 'sub_bagian_nama')->get();
 
         $bagianId = Session::get('bagian_id');
 
-        return view('activities.create', compact('projects', 'bagians'));
+        return view('activities.create', compact('projects', 'bagians', 'subBagians'));
     }
 
     /**
@@ -92,7 +131,7 @@ class ActivityController extends Controller
         foreach ($request->bagian_id as $bagianId) {
             Pic::create([
                 'activity_id' => $activity->id_activity,
-                'bagian_id' => $bagianId,
+                'sub_bagian_id' => $bagianId,
             ]);
         }
         session()->flash('success', 'Activity insert successfully!');
@@ -161,7 +200,7 @@ class ActivityController extends Controller
         foreach ($request->bagian_id as $bagianId) {
             Pic::create([
                 'activity_id' => $activity->id_activity,
-                'bagian_id' => $bagianId,
+                'master_bagian_id' => $bagianId,
             ]);
         }
         session()->flash('success', 'Activity updated successfully!');
@@ -171,6 +210,7 @@ class ActivityController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+
     public function destroy(string $id)
     {
         try {
@@ -229,7 +269,6 @@ class ActivityController extends Controller
                     $activity->actual_end = $actualEnd->format('Y-m-d');
                     $activity->save();
                 }
-
 
 
                 // Return hasil update

@@ -55,8 +55,7 @@
             <!-- Left navbar links -->
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i
-                            class="fas fa-bars"></i></a>
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
             </ul>
 
@@ -102,7 +101,8 @@
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                         data-accordion="false">
-                        @if (session('hak_akses_id') == 2 || session('hak_akses_id') == 3 || session('hak_akses_id') == 4 || session('hak_akses_id') == 6)
+
+                        @if (session('hak_akses_id') == 2 || session('hak_akses_id') == 3 || session('hak_akses_id') == 4 || session('hak_akses_id') == 6 || session('hak_akses_id') == 7)
                             <li class="nav-item">
                                 <a href="{{ route('dashboard') }}" class="nav-link @yield('dashboard')">
                                     <i class="nav-icon fas fa-calendar-alt"></i>
@@ -137,14 +137,13 @@
                                         <a href="{{ route('master-proyek.index') }}"
                                             class="nav-link @yield('master-proyek')">
                                             <i class="nav-icon fas fa-project-diagram"></i>
-                                            <p>Master Project</p>
+                                            <p>Data Divisi</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('master-scope.index') }}"
-                                            class="nav-link @yield('master-scope')">
+                                        <a href="{{ route('master-scope.index') }}" class="nav-link @yield('master-scope')">
                                             <i class="nav-icon fas fa-briefcase"></i>
-                                            <p>Master Scope</p>
+                                            <p>Data Sub Divisi</p>
                                         </a>
                                     </li>
                                 </ul>
@@ -164,8 +163,7 @@
                                 <ul class="nav nav-treeview">
                                     <!-- Child Menu Item for Sub Segment -->
                                     <li class="nav-item">
-                                        <a href="{{ route('master-bagian.index') }}"
-                                            class="nav-link @yield('subSegment')">
+                                        <a href="{{ route('master-bagian.index') }}" class="nav-link @yield('subSegment')">
                                             <i class="nav-icon fas fa-sitemap"></i>
                                             <p>Bagian</p>
                                         </a>
@@ -179,8 +177,7 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('master-role.index') }}"
-                                            class="nav-link @yield('master-role')">
+                                        <a href="{{ route('master-role.index') }}" class="nav-link @yield('master-role')">
                                             <i class="nav-icon fas fa-key"></i>
                                             <p>Hak Akses</p>
                                         </a>
@@ -232,15 +229,16 @@
 
 
         <!-- /.content-wrapper -->
-        <footer class="main-footer" style="position: fixed; bottom: 0; left: 0; width: calc(100% - 250px); background-color: #f8f9fa; padding: 10px; z-index: 1030; transition: width 0.3s;">
+        <footer class="main-footer"
+            style="position: fixed; bottom: 0; left: 0; width: calc(100% - 250px); background-color: #f8f9fa; padding: 10px; z-index: 1030; transition: width 0.3s;">
             <strong>Copyright &copy; 2024 by <a href="https://ptpn1.co.id">PTPN I</a>.</strong>
             All rights reserved.
             <div class="float-right d-none d-sm-inline-block">
                 <b>Version</b> 1.0.0
             </div>
         </footer>
-        
-        
+
+
 
         <!-- Control Sidebar -->
         <aside class="control-sidebar control-sidebar-dark">
@@ -296,7 +294,7 @@
     <script src="{{ asset('plugins/sweetalert2/sweetalert2.all.min.js') }}"></script>
 </body>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('#table_a1').DataTable({
             "paging": true,
             "lengthChange": false,
@@ -306,27 +304,27 @@
             "autoWidth": false,
             "responsive": true,
             "columnDefs": [{
-                    "targets": [3, 4, 5, 13],
-                    "orderable": false,
-                    "searchable": false
-                }
+                "targets": [3, 4, 5, 13],
+                "orderable": false,
+                "searchable": false
+            }
                 // Kolom 3 (direktorat), 4 (divisi), dan 5 (regional), 13 (total) tidak dapat diurutkan dan dicari
             ]
         });
     });
 </script>
 <script>
-    $(document).ready(function() {
-    $('[data-widget="pushmenu"]').on('click', function() {
-        setTimeout(function() {  
-            if ($('body').hasClass('sidebar-collapse')) {
-                $('.main-footer').css('width', '100%');
-            } else {
-                $('.main-footer').css('width', 'calc(100% - 250px)'); // 250px adalah lebar sidebar default
-            }
-        }, 300);  
+    $(document).ready(function () {
+        $('[data-widget="pushmenu"]').on('click', function () {
+            setTimeout(function () {
+                if ($('body').hasClass('sidebar-collapse')) {
+                    $('.main-footer').css('width', '100%');
+                } else {
+                    $('.main-footer').css('width', 'calc(100% - 250px)'); // 250px adalah lebar sidebar default
+                }
+            }, 300);
+        });
     });
-});
 
 </script>
 @stack('scripts')
