@@ -45,11 +45,14 @@ class ScopeController extends Controller
         $validated = $request->validate([
             'namaScope' => 'required|string|max:255',
             'namaProyek' => 'required|string|max:255',
+            'sub_bagian_id' => 'required|string|max:255',
+            'sub_bagian_nama' => 'required|string|max:255',
             'isActive' => 'required|boolean',
         ]);
 
         Scope::create([
-            'nama' => $validated['namaScope'],
+            'nama' => $validated['sub_bagian_nama'],
+            'sub_bagian_id' => $validated['sub_bagian_id'],
             'project_id' => $validated['namaProyek'],
             'isActive' => $validated['isActive'],
         ]);
@@ -101,8 +104,17 @@ class ScopeController extends Controller
 
     public function getProjectList()
     {
-        $projects = Proyek::select('id_project', 'project_nama')->get();
+        $projects = Proyek::select('id_project', 'project_nama', 'master_nama_bagian_id')->get();
         return response()->json($projects);
+    }
+
+    public function getSubbagianList($master_nama_bagian_id)
+    {
+        $subBagian = DB::table('master_sub_bagian')
+            ->where('master_bagian_id', $master_nama_bagian_id)
+            ->get();
+
+        return response()->json($subBagian);
     }
 
     public function getProcess($id)

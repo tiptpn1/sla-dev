@@ -27,11 +27,9 @@ class ActivityController extends Controller
             'scopes' => function ($query) use ($adminAccess, $subBagianId) {
                 $query->where('isActive', 1);
 
-                // Filter scopes untuk level 7, hanya yang memiliki aktivitas di mana user adalah PIC
+                // Filter scopes untuk level 7, berdasarkan sub_bagian_id dari scope
                 if ($adminAccess == 7 && $subBagianId) {
-                    $query->whereHas('activities.pics', function ($q) use ($subBagianId) {
-                        $q->where('sub_bagian_id', $subBagianId);
-                    });
+                    $query->where('sub_bagian_id', $subBagianId);
                 }
             },
             'scopes.activities' => function ($query) use ($adminAccess, $subBagianId) {
@@ -39,15 +37,10 @@ class ActivityController extends Controller
                     $query->where('isActive', 1);
                 }
 
-                // Filter aktivitas untuk level 7
-                if ($adminAccess == 7 && $subBagianId) {
-                    $query->whereHas('pics', function ($q) use ($subBagianId) {
-                        $q->where('sub_bagian_id', $subBagianId);
-                    });
-                }
+                // Tidak perlu filter berdasarkan PIC lagi di sini
             },
             'scopes.activities.pics',
-            'scopes.activities.pics.subBagian',
+            'scopes.activities.pics.bagian',
             'scopes.activities.progress' => function ($query) {
                 $query->latest('tanggal')->get();
             },
@@ -58,9 +51,8 @@ class ActivityController extends Controller
 
         // Jika user adalah level divisi (hak_akses_id = 3)
         if (in_array($adminAccess, [3, 7]) && $masterBagianId) {
-            $query->where('master_bagian_id', $masterBagianId);
+            $query->where('master_nama_bagian_id', $masterBagianId);
         }
-
 
         // Jika user adalah level direktorat (hak_akses_id = 6)
         if ($adminAccess == 6 && $direktoratId) {
@@ -69,14 +61,14 @@ class ActivityController extends Controller
 
         // Filter proyek di level paling atas untuk level 7
         if ($adminAccess == 7 && $subBagianId) {
-            $query->whereHas('scopes.activities.pics', function ($q) use ($subBagianId) {
+            // Ubah filter ini untuk mengacu pada sub_bagian_id di scopes
+            $query->whereHas('scopes', function ($q) use ($subBagianId) {
                 $q->where('sub_bagian_id', $subBagianId);
             });
         }
 
         // Eksekusi query dan dapatkan hasilnya
         $projects = $query->get();
-
         return view('activities.index', compact('projects'));
     }
     /**
@@ -131,7 +123,7 @@ class ActivityController extends Controller
         foreach ($request->bagian_id as $bagianId) {
             Pic::create([
                 'activity_id' => $activity->id_activity,
-                'sub_bagian_id' => $bagianId,
+                'bagian_id' => $bagianId,
             ]);
         }
         session()->flash('success', 'Activity insert successfully!');

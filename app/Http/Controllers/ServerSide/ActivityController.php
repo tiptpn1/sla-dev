@@ -9,7 +9,7 @@ use Yajra\DataTables\Facades\DataTables;
 
 class ActivityController extends Controller
 {
-    public function data(Request $request)
+    public function adata(Request $request)
     {
         $activities = Activity::with(['pics', 'proyek'])->select(['id_activity', 'nama_activity', 'plan_start', 'plan_duration', 'actual_start', 'actual_duration', 'percent_complete', 'project_id'])->get();
 

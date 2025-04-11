@@ -17,7 +17,8 @@ class Proyek extends Model
 
     protected $fillable = [
         'project_nama',
-        'master_bagian_id',
+        'master_nama_bagian_id',
+        'direktorat_id',
         'project_nama',
         'is_active'
     ];

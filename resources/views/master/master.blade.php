@@ -92,6 +92,10 @@
                         <img src="{{ asset('dist/img/user.png') }}" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info">
+
+                        @if (session()->get('hak_akses_id') == 7)
+                            <a href="#" class="d-block">{{ session('username') }}</a>
+                        @endif
                         <a href="#" class="d-block">{{ session('bagian_nama') }}</a>
                     </div>
                 </div>
@@ -125,7 +129,7 @@
                                 <a href="#" class="nav-link @yield('mast')">
                                     <i class="nav-icon fas fa-database"></i>
                                     <p>
-                                        Data SLA
+                                        Data Dashboard
                                         <i class="right fas fa-angle-left"></i>
                                     </p>
                                 </a>

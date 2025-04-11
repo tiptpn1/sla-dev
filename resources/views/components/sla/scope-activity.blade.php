@@ -1,4 +1,4 @@
-<div class="row align-items-center mb-3">
+s<div class="row align-items-center mb-3">
     <div class="col-md-3">
         <h6 class="text-secondary">{{ $activity->nama_activity }}</h6>
     </div>
