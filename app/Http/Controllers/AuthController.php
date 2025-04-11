@@ -28,12 +28,12 @@ class AuthController extends Controller
         }
 
         $credentials = $request->only('username', 'password');
-        //$user = db::table('kpi_master_user')->where('kpi_master_user_nama', $credentials['username'])->first();
         $user = db::table('master_user')
             ->leftJoin('master_bagian', 'master_user.master_nama_bagian_id', '=', 'master_bagian.master_bagian_id')
             ->where('master_user.master_user_nama', $credentials['username'])
             ->select('master_user.*', 'master_bagian.*')  // Anda bisa menentukan kolom spesifik jika diperlukan
             ->first();
+
         if ($user && password_verify($credentials['password'], $user->master_user_password)) {
             $request->session()->regenerate();
             $request->session()->put('id', $user->master_user_id);
@@ -43,7 +43,7 @@ class AuthController extends Controller
             $request->session()->put('direktorat_id', $user->direktorat_id);
             $request->session()->put('username', $user->master_user_nama);
             $request->session()->put('direktorat_id', $user->direktorat_id);
-            $request->session()->put('sub_bagian_id', $user->master_sub_bagian_id);
+            $request->session()->put('id_sub_divisi', $user->id_sub_divisi);
 
             return redirect()->intended('dashboard');
         }

@@ -1,8 +1,8 @@
 @extends('master/master')
 
-@section('title', 'Data Master Username')
+@section('title', 'Data Master Sub Divisi')
 
-@section('master-username', 'active')
+@section('master-sub-divisi', 'active')
 
 @push('css')
     <style>
@@ -14,7 +14,7 @@
             color: #ffa500 !important;
             /* Warna oranye untuk 'Edit' */
         }
-
+ 
         .btn-edit:hover {
             color: #cc8400 !important;
             /* Warna oranye gelap saat hover */
@@ -120,18 +120,20 @@
         <div class="container-fluid">
             <div class="card">
                 <div class="card-header">
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#createUserModal">Create Master
-                        Username</button>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#createSubDivisiModal">Create Master
+                        Sub Divisi</button>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="masterUserTable" class="table table-bordered table-striped">
+                        <table id="masterSubDivisiTable" class="table table-bordered table-striped">
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>Username</th>
-                                    <th>Role</th>
-                                    <th>Nama Bagian</th>
+                                    <th>Sub Divisi</th>
+                                    <th>Kode</th>
+                                    <th>Divisi</th>
+                                    <th>Direktorat</th>
+                                    <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -146,47 +148,54 @@
     </div>
 
     {{-- Create Segment Modal --}}
-    <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-labelledby="createUserModalLabel"
+    <div class="modal fade" id="createSubDivisiModal" tabindex="-1" role="dialog" aria-labelledby="createSubDivisiModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createUserModalLabel">Create Master Username</h5>
+                    <h5 class="modal-title" id="createSubDivisiModalLabel">Create Master Sub Divisi</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form id="createUserForm">
+                <form id="createSubDivisiForm">
                     <div class="modal-body">
                         @csrf
                         {{-- <div class="alert alert-danger d-none" id="error-message"></div> --}}
                         <div class="form-group">
-                            <label for="username">Username : </label>
-                            <input type="text" class="form-control ml-2" id="username" name="username" required>
+                            <label for="nama">Sub Divisi : </label>
+                            <input type="text" class="form-control ml-2" id="nama" name="nama" required>
                         </div>
                         <div class="form-group">
-                            <label for="password">Password : </label>
-                            <input type="password" class="form-control ml-2" id="password" name="password" required>
+                            <label for="kode">Kode : </label>
+                            <input type="text" class="form-control ml-2" id="kode" name="kode" required>
                         </div>
                         <div class="form-group">
-                            <label for="role">Role : </label>
-                            <select class="form-control" id="role" name="role">
-                                <option selected>Pilih Role</option>
-                                @foreach ($hak_akses as $ha)
-                                    <option value="{{ $ha->hak_akses_id }}">{{ $ha->hak_akses_nama }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="divisi">Nama Bagian : </label>
+                            <label for="divisi">Divisi : </label>
                             <select class="form-control" id="divisi" name="divisi">
-                                <option selected>Pilih Bagian</option>
+                                <option selected>Pilih Divisi</option>
                                 @foreach ($all_divisi as $divisi)
-                                    <option value="{{ $divisi->master_bagian_id }}" data-posisi="{{ $divisi->master_bagian_posisi }}">
-                                        {{ $divisi->master_bagian_nama }}
+                                    <option value="{{ $divisi->master_bagian_id }}">{{ $divisi->master_bagian_nama }}
                                     </option>
                                 @endforeach
                             </select>
+                            <div class="form-group">
+                                <label for="direktorat">Direktorat : </label>
+                                <input type="hidden" id="direktorat" name="direktorat">
+                                <select class="form-control" id="direktorat" name="direktorat">
+                                    <option selected>Pilih Direktorat</option>
+                                    @foreach ($direktorat as $dir)
+                                        <option value="{{ $dir->direktorat_id }}">{{ $dir->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="status">Status Aktif</label>
+                                <select class="form-control" id="status" name="status" required>
+                                    <option value="1">Aktif</option>
+                                    <option value="0">Nonaktif</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
@@ -199,39 +208,49 @@
     </div>
 
     {{-- Update Segment Modal --}}
-    <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel"
+    <div class="modal fade" id="editSubDivisiModal" tabindex="-1" role="dialog" aria-labelledby="editSubDivisiModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editUserModalLabel">Edit Master User</h5>
+                    <h5 class="modal-title" id="editSubDivisiModalLabel">Edit Master Sub Divisi</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form id="editUserForm">
+                <form id="editSubDivisiForm">
                     <div class="modal-body">
                         <input type="hidden" id="editId" name="id"> <!-- Menyimpan ID bagian -->
                         <div class="form-group">
-                            <label for="editUsername">Username : </label>
-                            <input type="text" class="form-control ml-2" id="editUsername" name="editUsername" required>
+                            <label for="editSubDivisi">Sub Divisi : </label>
+                            <input type="text" class="form-control ml-2" id="editSubDivisi" name="editSubDivisi" required>
                         </div>
                         <div class="form-group">
-                            <label for="editRole">Role : </label>
-                            <select class="form-control" id="editRole" name="editRole">
-                                @foreach ($hak_akses as $ha)
-                                    <option value="{{ $ha->hak_akses_id }}">{{ $ha->hak_akses_nama }}</option>
+                            <label for="editKode">Kode : </label>
+                            <input type="text" class="form-control ml-2" id="editKode" name="editKode" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editDivisi">Divisi : </label>
+                            <select class="form-control" id="editDivisi" name="editDivisi">
+                                @foreach ($all_divisi as $divisi)
+                                    <option value="{{ $divisi->master_bagian_id }}">{{ $divisi->master_bagian_nama }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="editUserDivisi">Nama Bagian : </label>
-                            <select class="form-control" id="editUserDivisi" name="editUserDivisi">
-                                @foreach ($all_divisi as $divisi)
-                                    <option value="{{ $divisi->master_bagian_id }}" data-posisi="{{ $divisi->master_bagian_posisi }}">
-                                        {{ $divisi->master_bagian_nama }}
-                                    </option>
+                            <label for="editDirektorat">Direktorat : </label>
+                            <select class="form-control" id="editDirektorat" name="editDirektorat">
+                                @foreach ($direktorat as $dir)
+                                    <option value="{{ $dir->direktorat_id }}">{{ $dir->nama }}</option>
                                 @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editStatus">Status Aktif</label>
+                            <select class="form-control" id="editStatus" name="editStatus" required>
+                                <option value="1">Aktif</option>
+                                <option value="0">Nonaktif</option>
                             </select>
                         </div>
                     </div>
@@ -276,58 +295,26 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-
-            let originalDivisiOptions = $('#divisi').html(); // Simpan semua <option>
-
-            // Role-Bagian filtering
-            $('#role').on('change', function() {
-                var selectedRoleText = $('#role option:selected').text();
-                var roleKeyword = '';
-
-                if (selectedRoleText.toLowerCase().includes('direktorat')) {
-                    roleKeyword = 'Dir';
-                } else if (selectedRoleText.toLowerCase().includes('divisi')) {
-                    roleKeyword = 'Div';
-                } else if (selectedRoleText.toLowerCase().includes('direksi')) {
-                    roleKeyword = 'Reg';
-                } else if (selectedRoleText.toLowerCase().includes('admin')) {
-                    roleKeyword = 'Admin';
-                } else if (selectedRoleText.toLowerCase().includes('kordinator')) {
-                    roleKeyword = 'Koor';
-                } else if (selectedRoleText.toLowerCase().includes('subdivisi')) {
-                    roleKeyword = 'Subdiv';
-                }
-
-                // Reset opsi ke semula
-                $('#divisi').html(originalDivisiOptions);
-
-                // Filter berdasarkan posisi
-                $('#divisi option').each(function () {
-                    let posisi = $(this).data('posisi');
-                    if (posisi !== roleKeyword && posisi !== undefined) {
-                        $(this).remove(); // Hapus option yang tidak sesuai
-                    }
-                });
-            });
-
+ 
             function fetchUserData() {
                 $.ajax({
-                    url: "{{ route('master-username.data') }}",
+                    url: "{{ route('master-sub-divisi.data') }}",
                     method: 'GET',
                     dataType: 'json',
                     success: function(data) {
-                        var table = $('#masterUserTable').DataTable();
+                        var table = $('#masterSubDivisiTable').DataTable();
                         table.clear();
                         $.each(data, function(index, item) {
                             table.row.add([
                                 index + 1,
-                                item.master_user_nama ?? '—',
-                                item.hak_akses?.hak_akses_nama ?? '—',
-                                item.bagian ? item.bagian.master_bagian_nama : '—',
-                                '<button class="btn btn-warning btn-sm edit-btn" data-id="' +
-                                item.master_user_id + '">Edit</button> ' +
-                                '<button class="btn btn-danger btn-sm delete-btn" data-id="' +
-                                item.master_user_id + '">Hapus</button> '
+                                item.sub_bagian_nama,
+                                item.sub_bagian_kode,
+                                item.bagian.master_bagian_nama,
+                                item.direktorat.nama,
+                                '<span class="badge ' + (item.status ? 'badge-success' : 'badge-danger') + '">' + (item.status ? 'Aktif' : 'Nonaktif') + '</span>',
+                                '<button class="btn btn-warning btn-sm edit-btn" data-id="' + item.id + '">Edit</button> ' +
+                                '<button class="btn btn-danger btn-sm delete-btn" data-id="' + item.id + '">Hapus</button> ' +
+                                '<button class="btn btn-info btn-sm status-btn" data-id="'+ item.id +'" data-status="'+ (item.status ? 0 : 1) +'">' + (item.status ? 'Nonaktifkan' : 'Aktifkan') + '</button>'
                             ]).draw();
                         });
                     }
@@ -337,15 +324,15 @@
             fetchUserData();
 
             // Create User
-            $('#createUserForm').on('submit', function(e) {
+            $('#createSubDivisiForm').on('submit', function(e) {
                 e.preventDefault();
                 $.ajax({
-                    url: "{{ route('master-username.store') }}",
+                    url: "{{ route('master-sub-divisi.store') }}",
                     method: 'POST',
                     data: $(this).serialize(),
                     success: function(response) {
                         if (response.status === 'success') {
-                            $('#createUserModal').modal('hide');
+                            $('#createSubDivisiModal').modal('hide');
                             fetchUserData();
                             Swal.fire({
                                 icon: 'success',
@@ -358,41 +345,47 @@
                 })
             });
 
-            // Edit User
-            $('#masterUserTable').on('click', '.edit-btn', function(e) {
+            // Edit Sub Divisi
+            $('#masterSubDivisiTable').on('click', '.edit-btn', function(e) {
                 var id = $(this).data('id');
                 $.ajax({
-                    url: "{{ route('master-username.get-data-by-id', ':id') }}".replace(':id', id),
+                    url: "{{ route('master-sub-divisi.get-data-by-id', ':id') }}".replace(':id', id),
                     method: 'GET',
                     dataType: 'json',
                     success: function(response) {
-                        $('#editUserModal').modal('show');
-                        $('#editId').val(response.master_user_id);
-                        $('#editUsername').val(response.master_user_nama);
-                        $('#editUserDivisi').val(response.master_nama_bagian_id);
-                        $('#editRole').val(response.master_hak_akses_id);
+                        $('#editSubDivisiModal').modal('show');
+                        $('#editId').val(response.id);
+                        $('#editSubDivisi').val(response.sub_bagian_nama);
+                        $('#editKode').val(response.sub_bagian_kode);
+                        $('#editDivisi').val(response.master_bagian_id);
+                        $('#editDirektorat').val(response.direktorat_id);
+                        $('#editStatus').val(response.status ? 1 : 0);
                     }
                 })
             })
 
-            $('#editUserForm').on('submit', function(e) {
+            $('#editSubDivisiForm').on('submit', function(e) {
                 e.preventDefault();
                 var id = $('#editId').val();
-                var username = $('#editUsername').val();
-                var divisi = $('#editUserDivisi').val();
-                var role = $('#editRole').val();
+                var nama = $('#editSubDivisi').val();
+                var kode = $('#editKode').val();
+                var divisi = $('#editDivisi').val();
+                var direktorat = $('#editDirektorat').val();
+                var status = $('#editStatus').val()
                 $.ajax({
-                    url: "{{ route('master-username.update') }}",
+                    url: "{{ route('master-sub-divisi.update', ':id') }}".replace(':id', id),
                     method: 'PUT',
                     data: {
                         id: id,
-                        username: username,
+                        nama: nama,
+                        kode: kode,
                         divisi: divisi,
-                        role: role
+                        direktorat: direktorat,
+                        status: status,
                     },
                     success: function(response) {
                         if (response.status === 'success') {
-                            $('#editUserModal').modal('hide');
+                            $('#editSubDivisiModal').modal('hide');
                             fetchUserData();
                             Swal.fire({
                                 icon: 'success',
@@ -414,7 +407,7 @@
             })
 
             // Delete User
-            $('#masterUserTable').on('click', '.delete-btn', function(e) {
+            $('#masterSubDivisiTable').on('click', '.delete-btn', function(e) {
                 var id = $(this).data('id');
                 $('#confirmDelete').data('id', id);
                 $('#deleteModal').modal('show');
@@ -423,7 +416,7 @@
             $('#confirmDelete').on('click', function() {
                 var id = $(this).data('id');
                 $.ajax({
-                    url: "{{ route('master-username.destroy', ':id') }}".replace(':id', id),
+                    url: "{{ route('master-sub-divisi.destroy', ':id') }}".replace(':id', id),
                     method: 'DELETE',
                     success: function(response) {
                         if (response.status === 'success') {
@@ -439,6 +432,29 @@
                     }
                 })
             })
+
+            // Update status aktif/nonaktif
+            $('#masterSubDivisiTable').on('click', '.status-btn', function() {
+                var id = $(this).data('id');
+                var status = $(this).data('status');
+                $.ajax({
+                    url: '{{ route("master-sub-divisi.update-status", ":id") }}'.replace(':id', id),
+                    method: 'POST',
+                    data: { status: status },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            fetchUserData();
+                            Swal.fire({
+                            icon: 'success',
+                            title: 'Data berhasil diperbarui',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+
+                        }
+                    }
+                });
+            });
         });
     </script>
 @endpush

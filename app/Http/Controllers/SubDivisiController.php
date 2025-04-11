@@ -2,35 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Bagian;
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Models\SubDivisi;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
-class UsernameController extends Controller
+class SubDivisiController extends Controller
 {
     public function index()
     {
         $all_divisi = DB::table('master_bagian')->select('*')->get();
-        $hak_akses = DB::table('master_hak_akses')->select('*')->where('status', '!=', 0)->get();
-        return view('pages.master_username.index', compact('all_divisi', 'hak_akses'));
+        $direktorat = DB::table('master_direktorat')->select('*')->where('status', '!=', 0)->get();
+        return view('pages.master_sub_divisi.index', compact('all_divisi', 'direktorat'));
     }
-
     public function getData()
     {
-        $user = User::with('bagian', 'hakAkses')->get();
-        return response()->json($user);
+        $subDivisi = SubDivisi::with('bagian', 'direktorat')->get();
+        return response()->json($subDivisi);
     }
 
     public function store(Request $request)
     {
         $validated = Validator::make($request->all(), [
-            'username' => 'required|string',
-            'password' => 'required|string',
-            'role' => 'required|string',
+            'nama' => 'required|string',
+            'kode' => 'required|string',
             'divisi' => 'required|string',
+            'direktorat' => 'required|string',
+            'status' => 'required|boolean',
         ]);
 
         if ($validated->fails()) {
@@ -41,31 +40,21 @@ class UsernameController extends Controller
 
         try {
             DB::beginTransaction();
-
-            // Ambil direktorat_id dan id_sub_divisi dari master_bagian
-            $bagian = DB::table('master_bagian')->where('master_bagian_id', $request->divisi)->first();
-
-            if (!$bagian) {
-                return response()->json([
-                    'message' => 'Divisi tidak ditemukan.'
-                ], 404);
-            }
-
-            $username = DB::table('master_user')->insert([
-                'master_user_nama' => $request->username,
-                'master_nama_bagian_id' => $request->divisi,
-                'master_user_password' => Hash::make($request->password),
-                'master_hak_akses_id' => $request->role,
-                'direktorat_id' => $bagian->direktorat_id,
+            $subdivisi = DB::table('master_sub_bagian')->insert([
+                'sub_bagian_nama' => $request->nama,
+                'sub_bagian_kode' => $request->kode,
+                'master_bagian_id' => $request->divisi,
+                'direktorat_id' => $request->direktorat,
+                'status' => $request->status,
             ]);
-            //dd($username);
+            //dd($subdivisi);
             DB::commit();
 
             return response()->json([
                 'status' => 'success',
                 'data' => [
-                    'id' => $username,
-                    'nama' => $request->nama
+                    'id' => $subdivisi,
+                    'nama' => $request->subdivisi
                 ]
             ], 200);
         } catch (\Exception $e) {
@@ -78,18 +67,19 @@ class UsernameController extends Controller
 
     public function getDataById($id)
     {
-        $data = User::with('bagian', 'hakAkses')->find($id);
-
+        $data = SubDivisi::with('bagian', 'direktorat')->find($id);
         return response()->json($data, 200);
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
         $validated = Validator::make($request->all(), [
-            'id' => 'required|exists:master_user,master_user_id',
-            'username' => 'required|string',
-            'role' => 'required|exists:master_hak_akses,hak_akses_id',
+            'id' => 'required|exists:master_sub_bagian,id',
+            'nama' => 'required|string',
+            'kode' => 'required|string',
             'divisi' => 'required|exists:master_bagian,master_bagian_id',
+            'direktorat' => 'required|exists:master_direktorat,direktorat_id',
+            'status' => 'required|boolean',
         ]);
 
         if ($validated->fails()) {
@@ -101,19 +91,21 @@ class UsernameController extends Controller
         try {
             DB::beginTransaction();
 
-            $user = DB::table('master_user')
-                ->where('master_user_id', $request->id)
+            $subdivisi = DB::table('master_sub_bagian')
+                ->where('id', $id)
                 ->update([
-                    'master_user_nama' => $request->username,
-                    'master_nama_bagian_id' => $request->divisi,
-                    'master_hak_akses_id' => $request->role,
+                    'sub_bagian_nama' => $request->nama,
+                    'sub_bagian_kode' => $request->kode,
+                    'master_bagian_id' => $request->divisi,
+                    'direktorat_id' => $request->direktorat,
+                    'status' => $request->status,
                 ]);
 
             DB::commit();
 
             return response()->json([
                 'status' => 'success',
-                'data' => $user
+                'data' => $subdivisi
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -124,6 +116,19 @@ class UsernameController extends Controller
         }
     }
 
+    public function updateStatus($id, Request $request)
+    {
+        $validated = $request->validate([
+            'status' => 'required|boolean',
+        ]);
+
+        $subdivisi = SubDivisi::find($id);
+        $subdivisi->status = $validated['status'];
+        $subdivisi->save();
+
+        return response()->json(['status' => 'success']);
+    }
+
     public function destroy($id)
     {
         DB::beginTransaction();
@@ -132,7 +137,7 @@ class UsernameController extends Controller
             // Pastikan $id diubah menjadi array
             // $ids = [$id];
 
-            User::destroy($id);
+            SubDivisi::destroy($id);
 
             DB::commit();
 
