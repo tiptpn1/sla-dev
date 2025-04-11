@@ -68,8 +68,7 @@ class DashboardController extends Controller
         // dd(session()->all());
         $direktoratId = Session::get('direktorat_id');
         $adminAccess = Session::get('hak_akses_id');
-        $bagianId = Session::get('master_nama_bagian_id');
-        $subDivisiId = Session::get('id_sub_divisi');
+        $bagianId = Session::get('master_nama_bagian_id'); 
 
         if ($adminAccess == 6 ) {
             // Jika admin direktorat, hanya tampilkan proyek dan scope dari direktoratnya
