@@ -24,11 +24,12 @@ use ZipArchive;
 class DashboardController extends Controller
 {
     public function index()
-    {
+    {   
         // dd(session()->all());
         $direktoratId = Session::get('direktorat_id');
         $adminAccess = Session::get('hak_akses_id');
         $bagianId = Session::get('master_nama_bagian_id'); 
+        $subDivisiId = Session::get('id_sub_divisi'); 
 
         if ($adminAccess == 6) {
             $projects = Proyek::where('isActive', true)
@@ -39,9 +40,9 @@ class DashboardController extends Controller
                             ->select('id_project', 'project_nama')                  
                             ->get();
         } 
-        elseif ($adminAccess == 7 && $bagianId){
+        elseif ($adminAccess == 7 && $subDivisiId){
             $projects = Proyek::where('isActive', true)
-                            ->where('master_nama_bagian_id', $bagianId)
+                            ->where('id_sub_divisi', $subDivisiId)
                             ->select('id_project', 'project_nama')
                             ->get();
         }
@@ -67,7 +68,8 @@ class DashboardController extends Controller
         // dd(session()->all());
         $direktoratId = Session::get('direktorat_id');
         $adminAccess = Session::get('hak_akses_id');
-        $bagianId = Session::get('master_nama_bagian_id'); 
+        $bagianId = Session::get('master_nama_bagian_id');
+        $subDivisiId = Session::get('id_sub_divisi');
 
         if ($adminAccess == 6 ) {
             // Jika admin direktorat, hanya tampilkan proyek dan scope dari direktoratnya

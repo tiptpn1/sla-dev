@@ -47,8 +47,9 @@ class ActivityController extends Controller
     public function create()
     {
         $projects = Proyek::select('id_project', 'project_nama')->get();
-        $bagians = Bagian::select('master_bagian_id', 'master_bagian_nama')->get();
-
+        $bagians = Bagian::where('master_bagian_posisi', 'Subdiv') 
+                ->select('master_bagian_id', 'master_bagian_nama')
+                ->get();
         $bagianId = Session::get('bagian_id');
 
         return view('activities.create', compact('projects', 'bagians'));
