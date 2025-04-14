@@ -36,9 +36,9 @@ class SubDivisi extends Model
         return $this->hasMany(User::class, 'id_sub_divisi', 'id_sub_divisi');
     }
 
-    public function proyek()
+    public function scopes()
     {
-        return $this->hasMany(Proyek::class, 'id_sub_divisi', 'id_sub_divisi');
+        return $this->hasMany(Proyek::class, 'project_id', 'project_id');
     }
 
 }

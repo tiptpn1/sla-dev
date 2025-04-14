@@ -21,14 +21,7 @@ class ProgressActivityController extends Controller
             ->whereYear('created_at', $year) 
             ->get();
 
-        $progressColors = [
-            '#007bff', // biru
-            '#28a745', // hijau
-            '#ffc107', // kuning
-            '#dc3545', // merah
-            '#17a2b8', // cyan
-            '#6f42c1', // ungu
-        ];
+            $progressColors = ['bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-primary'];
 
          return view('dashboard.progress-activity', compact('projects', 'progressColors'));
     }

@@ -30,6 +30,7 @@ class DashboardController extends Controller
         $adminAccess = Session::get('hak_akses_id');
         $bagianId = Session::get('master_nama_bagian_id'); 
         $subDivisiId = Session::get('id_sub_divisi'); 
+        $scopeProjectId = Session::get('project_id');
 
         if ($adminAccess == 6) {
             $projects = Proyek::where('isActive', true)
@@ -40,10 +41,12 @@ class DashboardController extends Controller
                             ->select('id_project', 'project_nama')                  
                             ->get();
         } 
-        elseif ($adminAccess == 7 && $subDivisiId){
+        elseif ($adminAccess == 7 ){
             $projects = Proyek::where('isActive', true)
-                            ->where('id_sub_divisi', $subDivisiId)
-                            ->select('id_project', 'project_nama')
+                            ->with(['scopes' => function($query) {
+                                $query->where('isActive', true);
+                            }]) 
+                            ->select('id_project', 'project_nama')                  
                             ->get();
         }
 
@@ -59,8 +62,9 @@ class DashboardController extends Controller
                             ->get();
         }
 
+        $progressColors = ['bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-primary'];
         // dd($projects);
-        return view('dashboard.index', compact('projects'));
+        return view('dashboard.index', compact('projects', 'progressColors'));
     }
 
     public function activity()
