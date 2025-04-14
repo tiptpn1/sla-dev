@@ -19,24 +19,33 @@
             </div>
         </div>
 
-        <x-progress-activity />
-
         <div class="col-md-12">
             <div class="card mt-4 mb-4 w-100">
                 <div class="card-header bg-primary text-white">
-                    <h4 class="font-weight-bold">Progress Overview by Gantt Chart</h4>
+                    <h4 class="font-weight-bold">Progress Overview</h4> 
                 </div>
-                <div class="card-body" id="gantt-chart-field">
-                    @if(count($projects) > 0)
-                        <div id="gantt_here" style="width:100%; height:500px;"></div>
-                    @else
-                        <div class="alert alert-info">
-                            Tidak ada proyek yang tersedia untuk ditampilkan.
+                <div class="card-body">
+                    <!-- Card for each project -->
+                    @foreach ($projects as $project)
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header d-flex align-items-center bg-light">
+                                <i class="fas fa-project-diagram mr-2 text-primary"></i>
+                                <h5 class="font-weight-bold mb-0">{{ $project->project_nama }}</h5>
+                            </div>
+                            <div class="card-body">
+                                @foreach ($project->scopes as $scope)
+                                    @php
+                                        $randomColor = $progressColors[array_rand($progressColors)];
+                                    @endphp
+                                    <x-sla.project-scope :scope="$scope" :color="$randomColor" />
+                                @endforeach
+                            </div>
                         </div>
-                    @endif
+                    @endforeach
+        
                 </div>
             </div>
-        </div>
+        </div>        
     </section>
 
     <div class="modal fade" id="reportPdfModal" tabindex="-1" role="dialog" aria-labelledby="reportPdfModalLabel"
@@ -133,14 +142,6 @@
 
     <script>
         $(document).ready(function() {
-            $.ajax({
-                url: '{{ route('ganchart') }}',
-                method: 'GET',
-                success: function(response) {
-                    $('#gantt-chart-field').html(response);
-                }
-            })
-
             $('#reportPdfForm').on('submit', function(e) {
                 e.preventDefault(); // Prevent normal form submission
 

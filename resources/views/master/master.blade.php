@@ -108,9 +108,17 @@
                         @if (session('hak_akses_id') == 2 || session('hak_akses_id') == 3 || session('hak_akses_id') == 4 || session('hak_akses_id') == 6 || session('hak_akses_id') == 7)
                             <li class="nav-item">
                                 <a href="{{ route('dashboard') }}" class="nav-link @yield('dashboard')">
-                                    <i class="nav-icon fas fa-calendar-alt"></i>
+                                    <i class="nav-icon fas fa-tachometer-alt"></i>
                                     <p>
                                         Dashboard
+                                    </p>
+                                </a>
+                            </li>    
+                            <li class="nav-item">
+                                <a href="{{ route('dashboard.progress') }}" class="nav-link @yield('progress-activity')">
+                                    <i class="nav-icon fas fa-calendar-alt"></i>
+                                    <p>
+                                        Gantt Chart
                                     </p>
                                 </a>
                             </li>
