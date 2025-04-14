@@ -40,6 +40,7 @@ class ScopeController extends Controller
         return response()->json($data);
     }
 
+
     public function store(Request $request)
     {
         $validated = $request->validate([
