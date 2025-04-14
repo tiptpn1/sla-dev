@@ -93,7 +93,7 @@
                     </div>
                     <div class="info">
 
-                        @if (session()->get('hak_akses_id') == 7)
+                        @if (in_array(session()->get('hak_akses_id'), [7, 9, 10]))
                             <a href="#" class="d-block">{{ session('username') }}</a>
                         @endif
                         <a href="#" class="d-block">{{ session('bagian_nama') }}</a>
@@ -104,7 +104,7 @@
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                         data-accordion="false">
-                        @if (session('hak_akses_id') == 2 || session('hak_akses_id') == 3 || session('hak_akses_id') == 4 || session('hak_akses_id') == 6 || session('hak_akses_id') == 7)
+                        @if (in_array(session('hak_akses_id'), [2, 3, 4, 6, 7, 9, 10]))
                             <li class="nav-item">
                                 <a href="{{ route('dashboard') }}" class="nav-link @yield('dashboard')">
                                     <i class="nav-icon fas fa-calendar-alt"></i>
@@ -123,7 +123,7 @@
                             </li>
                         @endif
 
-                        @if (session('hak_akses_id') == 2)
+                        @if (in_array(session()->get('hak_akses_id'), [7, 10]))
                             <!-- Parent Menu Item for Pembentuk SLA Data -->
                             <li class="nav-item has-treeview">
                                 <a href="#" class="nav-link @yield('mast')">

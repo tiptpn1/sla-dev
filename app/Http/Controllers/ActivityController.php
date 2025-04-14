@@ -26,7 +26,7 @@ class ActivityController extends Controller
         $query = Proyek::where('isActive', true);
 
         // Menerapkan filter direktorat_id di awal query jika user level direktorat (hak_akses_id = 6)
-        if ($adminAccess == 6 ) {
+        if ($adminAccess == 6) {
             $query->where('direktorat_id', $direktoratId);
         }
 
@@ -76,11 +76,21 @@ class ActivityController extends Controller
      */
     public function create()
     {
-        $projects = Proyek::select('id_project', 'project_nama')->get();
+        $hakAkses = Session::get('hak_akses_id');
+        $bagianId = Session::get('bagian_id');
+
+
+        $query = Proyek::select('id_project', 'project_nama');
+
+        if (in_array($hakAkses, [9, 10]) && $bagianId) {
+            $query->where('master_nama_bagian_id', $bagianId);
+        }
+
+        $projects = $query->get();
+
         $bagians = Bagian::select('master_bagian_id', 'master_bagian_nama')->get();
         $subBagians = SubBagian::select('id', 'sub_bagian_nama')->get();
 
-        $bagianId = Session::get('bagian_id');
 
         return view('activities.create', compact('projects', 'bagians', 'subBagians'));
     }
