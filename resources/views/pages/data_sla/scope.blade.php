@@ -499,6 +499,7 @@
                 console.log('Sub Bagian Nama:', subBagianNama);
             });
 
+
             // Event listener untuk perubahan project/divisi
             $('#namaProyek').on('change', function () {
                 var id_project = $(this).val();
