@@ -36,7 +36,17 @@ class ScopeController extends Controller
      */
     public function getDataById($id)
     {
-        $data = Scope::find($id);
+        $hakAkses = session()->get('hak_akses_id');
+        $subBagianId = session()->get('sub_bagian_id');
+
+        $query = Scope::where('id', $id);
+
+        if ($hakAkses == 9 && $subBagianId) {
+            $query->where('sub_bagian_id', $subBagianId);
+        }
+
+        $data = $query->first();
+
         return response()->json($data);
     }
 
@@ -105,7 +115,17 @@ class ScopeController extends Controller
 
     public function getProjectList()
     {
-        $projects = Proyek::select('id_project', 'project_nama', 'master_nama_bagian_id')->get();
+        $hakAkses = session()->get('hak_akses_id');
+        $masterBagianId = session()->get('master_bagian_id');
+
+        $query = Proyek::select('id_project', 'project_nama', 'master_nama_bagian_id');
+
+        if ($hakAkses == 10 && $masterBagianId) {
+            $query->where('master_nama_bagian_id', $masterBagianId);
+        }
+
+        $projects = $query->get();
+
         return response()->json($projects);
     }
 

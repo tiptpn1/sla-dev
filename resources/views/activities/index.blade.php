@@ -32,7 +32,7 @@
                             <div class="card-header">
 
                                 {{-- Hak Akses Koordinator --}}
-                                @if (session()->get('hak_akses_id') == 2)
+                                @if (in_array(session()->get('hak_akses_id'), [2, 9, 10]))
                                     <a href="{{ route('activities.create') }}" class="btn btn-primary btn-sm">
                                         <i class="fas fa-plus"></i> Add New Activity
                                     </a>

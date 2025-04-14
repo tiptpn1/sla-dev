@@ -85,7 +85,16 @@ class ProjectController extends Controller
 
     public function getDataDivisi()
     {
-        $projects = Bagian::select('master_bagian_id', 'master_bagian_nama', 'direktorat_id')->get();
+        $hakAkses = session()->get('hak_akses_id');
+        $masterBagianId = session()->get('bagian_id');
+
+        $query = Bagian::select('master_bagian_id', 'master_bagian_nama', 'direktorat_id');
+
+        if ($hakAkses == 10 && $masterBagianId) {
+            $query->where('master_bagian_id', $masterBagianId);
+        }
+
+        $projects = $query->get();
         return response()->json($projects);
     }
 }
