@@ -23,7 +23,27 @@ class ActivityController extends Controller
         $subBagianId = Session::get('sub_bagian_id');
 
         // Mulai query builder untuk proyek
-        $query = Proyek::with([
+        $query = Proyek::where('isActive', true);
+
+        // Menerapkan filter direktorat_id di awal query jika user level direktorat (hak_akses_id = 6)
+        if ($adminAccess == 6 ) {
+            $query->where('direktorat_id', $direktoratId);
+        }
+
+        // Jika user adalah level divisi (hak_akses_id = 3 atau 7)
+        if (in_array($adminAccess, [3, 7]) && $masterBagianId) {
+            $query->where('master_nama_bagian_id', $masterBagianId);
+        }
+
+        // Filter proyek di level paling atas untuk level 7
+        if ($adminAccess == 7 && $subBagianId) {
+            $query->whereHas('scopes', function ($q) use ($subBagianId) {
+                $q->where('sub_bagian_id', $subBagianId);
+            });
+        }
+
+        // Setelah menerapkan semua filter, baru kita tambahkan eager loading
+        $query->with([
             'scopes' => function ($query) use ($adminAccess, $subBagianId) {
                 $query->where('isActive', 1);
 
@@ -36,8 +56,6 @@ class ActivityController extends Controller
                 if ($adminAccess != 2) {
                     $query->where('isActive', 1);
                 }
-
-                // Tidak perlu filter berdasarkan PIC lagi di sini
             },
             'scopes.activities.pics',
             'scopes.activities.pics.bagian',
@@ -47,25 +65,7 @@ class ActivityController extends Controller
             'scopes.activities.progress.evidences' => function ($query) {
                 $query->latest('created_at')->get();
             }
-        ])->where('isActive', true);
-
-        // Jika user adalah level divisi (hak_akses_id = 3)
-        if (in_array($adminAccess, [3, 7]) && $masterBagianId) {
-            $query->where('master_nama_bagian_id', $masterBagianId);
-        }
-
-        // Jika user adalah level direktorat (hak_akses_id = 6)
-        if ($adminAccess == 6 && $direktoratId) {
-            $query->where('direktorat_id', $direktoratId);
-        }
-
-        // Filter proyek di level paling atas untuk level 7
-        if ($adminAccess == 7 && $subBagianId) {
-            // Ubah filter ini untuk mengacu pada sub_bagian_id di scopes
-            $query->whereHas('scopes', function ($q) use ($subBagianId) {
-                $q->where('sub_bagian_id', $subBagianId);
-            });
-        }
+        ]);
 
         // Eksekusi query dan dapatkan hasilnya
         $projects = $query->get();
