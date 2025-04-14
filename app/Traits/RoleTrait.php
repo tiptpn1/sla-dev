@@ -16,6 +16,8 @@ trait RoleTrait
             return 'Direktorat';
         } else if (strpos($bagianName, 'Divisi') !== false) {
             return 'Divisi';
+        } else if (strpos($bagianName, 'SubDivisi') !== false) {
+            return 'SubDivisi';
         } else if (strpos($bagianName, 'Regional') !== false) {
             return 'Regional';
         } else if (strpos($bagianName, 'PTPN') !== false) {
