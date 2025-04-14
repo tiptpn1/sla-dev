@@ -111,7 +111,7 @@
                                 </a>
                             </li>    
                             <li class="nav-item">
-                                <a href="{{ route('dashboard') }}" class="nav-link @yield('dashboard')">
+                                <a href="{{ route('dashboard.progress') }}" class="nav-link @yield('progress-activity')">
                                     <i class="nav-icon fas fa-calendar-alt"></i>
                                     <p>
                                         Gantt Chart

@@ -9,6 +9,7 @@ use App\Http\Controllers\DirektoratController;
 use App\Http\Controllers\DivisiController;
 use App\Http\Controllers\MasterBagianController;
 use App\Http\Controllers\MonitoringController;
+use App\Http\Controllers\ProgressActivityController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RincianProgressController;
 use App\Http\Controllers\RoleController;
@@ -144,7 +145,8 @@ Route::middleware(['checkLogin'])->group(function () {
     });
 
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('ganchart', [DashboardController::class, 'ganchart'])->name('ganchart');
+    Route::get('ganchart', [ProgressActivityController::class, 'ganchart'])->name('ganchart');
+    Route::get('progress-activity', [ProgressActivityController::class, 'index'])->name('dashboard.progress');
 
     Route::get('activities/data', [ServerSideActivityController::class, 'data'])->name('activities.data');
     Route::resource('activities', ActivityController::class);
