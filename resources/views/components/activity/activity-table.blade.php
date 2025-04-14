@@ -11,7 +11,7 @@
                 <th>Actual Duration (Week)</th>
                 <th>Actual End</th>
                 <th>Percent Complete</th>
-                <th>PIC</th>
+                <th>PIC Project</th>
                 <th>Rincian Progress</th>
                 <th>Evidence</th>
                 <th>Tanggal Rincian Progress</th>
@@ -26,11 +26,11 @@
             @foreach ($activities as $activity)
                 @php
                     $isPic = false; // Default: bukan PIC
-                    $bagianIdUser = session()->get('sub_bagian_id'); // Dapatkan ID user yang sedang login
+                    $hakAksesIdUser = session()->get('hak_akses_id');
 
                     // Periksa apakah user yang login adalah PIC dari aktivitas ini
                     foreach ($activity->pics as $pic) {
-                        if ($pic->sub_bagian_id == $bagianIdUser) {                            $isPic = true;
+                        if ( $hakAksesIdUser == 7) {                            $isPic = true;
                             break;
                         }
                     }
@@ -76,8 +76,8 @@
                             @foreach ($activity->pics as $pic)
                                 <span class="badge badge-primary"
                                     style="margin: 2px; padding: 5px 10px; background-color: #007bff; color: white; border-radius: 15px; cursor: pointer;"
-                                    title="{{ $pic->subBagian->sub_bagian_nama }}">
-                                    {{ $pic->subBagian->sub_bagian_kode }}
+                                    title="{{ $pic->bagian->master_bagian_nama }}">
+                                    {{ $pic->bagian->master_bagian_kode }}
                                 </span>
                             @endforeach
                         @else

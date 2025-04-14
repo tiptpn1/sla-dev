@@ -42,7 +42,7 @@ class ProjectController extends Controller
 
         Proyek::create([
             'project_nama' => $validated['master_bagian_nama'],
-            'master_bagian_id' => $validated['master_bagian_id'],
+            'master_nama_bagian_id' => $validated['master_bagian_id'],
             'direktorat_id' => $validated['direktorat_id'],
             'isActive' => $validated['isActive'],
         ]);

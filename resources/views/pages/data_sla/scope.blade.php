@@ -167,12 +167,18 @@
                             <select class="form-control" id="namaProyek" name="namaProyek" required>
                                 <!-- Options will be loaded dynamically with JavaScript -->
                             </select>
-                            <div class="form-group">
-                                <label for="namaScope">Nama Sub Divisi</label>
-                                <input type="text" class="form-control" id="namaScope" name="namaScope" required>
-                            </div>
-
                         </div>
+
+                        <div class="form-group">
+                            <label for="namaScope">Nama Sub Divisi</label>
+                            <select class="form-control" id="namaScope" name="namaScope" required>
+                                <option value="">-- Pilih Sub Divisi --</option>
+                                <!-- Options will be loaded dynamically with JavaScript -->
+                            </select>
+                        </div>
+
+                        <input type="hidden" id="hiddenSubBagianId" name="sub_bagian_id">
+                        <input type="hidden" id="hiddenSubBagianNama" name="sub_bagian_nama">
 
                         <div class="form-group">
                             <label for="isActive">Status Aktif</label>
@@ -416,20 +422,29 @@
 
     <script>
         $(document).ready(function () {
+            // Object untuk menyimpan mapping id_project ke master_nama_bagian_id
+            var projectBagianMapping = {};
+
+            // Load divisi (menggunakan kode yang sudah ada)
             function loadProjects() {
                 $.ajax({
-                    url: '{{ route("master-scope.get-project-list") }}',  // URL untuk mengambil data project
+                    url: '{{ route("master-scope.get-project-list") }}',
                     method: 'GET',
                     success: function (response) {
-                        var currentNamaProyekValue = $('#namaProyek').val(); // Simpan nilai yang sudah terpilih
-                        var currentEditProyekValue = $('#editProyek').val(); // Simpan nilai yang sudah terpilih
+                        var currentNamaProyekValue = $('#namaProyek').val();
+                        var currentEditProyekValue = $('#editProyek').val();
 
-                        $('#namaProyek').empty(); // Kosongkan dulu opsi sebelumnya
+                        $('#namaProyek').empty();
                         $('#editProyek').empty();
 
-                        // Append option untuk Tambah
+                        // Reset mapping
+                        projectBagianMapping = {};
+
+                        // Append option untuk Tambah dan simpan mapping
                         $.each(response, function (index, project) {
                             $('#namaProyek').append('<option value="' + project.id_project + '">' + project.project_nama + '</option>');
+                            // Simpan master_nama_bagian_id untuk setiap id_project
+                            projectBagianMapping[project.id_project] = project.master_nama_bagian_id;
                         });
 
                         // Append option untuk Edit
@@ -440,11 +455,83 @@
                         // Set nilai yang sudah terpilih sebelumnya
                         $('#namaProyek').val(currentNamaProyekValue);
                         $('#editProyek').val(currentEditProyekValue);
+
+                        // Trigger change event untuk load sub divisi jika ada nilai terpilih
+                        if (currentNamaProyekValue) {
+                            $('#namaProyek').trigger('change');
+                        }
+                        if (currentEditProyekValue) {
+                            $('#editProyek').trigger('change');
+                        }
                     }
                 });
             }
 
-            // Panggil fungsi untuk load data project
+            // Load sub divisi berdasarkan master_nama_bagian_id
+            function loadSubBagian(master_nama_bagian_id, targetElement) {
+                $.ajax({
+                    url: '/master-scope/get-subbagian-list/' + master_nama_bagian_id,
+                    method: 'GET',
+                    success: function (response) {
+                        $(targetElement).empty();
+                        $(targetElement).append('<option value="">-- Pilih Sub Divisi --</option>');
+
+                        $.each(response, function (index, subBagian) {
+                            // Tambahkan data-nama yang menyimpan nama sub bagian
+                            $(targetElement).append('<option value="' + subBagian.id + '" data-nama="' + subBagian.sub_bagian_nama + '">' + subBagian.sub_bagian_nama + '</option>');
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error saat mengambil data sub bagian:', error);
+                    }
+                });
+            }
+
+            $('#namaScope').on('change', function () {
+                var subBagianId = $(this).val();
+                var subBagianNama = $(this).find('option:selected').data('nama');
+
+                // Simpan kedua data
+                $('#hiddenSubBagianId').val(subBagianId);
+                $('#hiddenSubBagianNama').val(subBagianNama);
+
+                console.log('Sub Bagian ID:', subBagianId);
+                console.log('Sub Bagian Nama:', subBagianNama);
+            });
+
+            // Event listener untuk perubahan project/divisi
+            $('#namaProyek').on('change', function () {
+                var id_project = $(this).val();
+                if (id_project) {
+                    // Gunakan master_nama_bagian_id dari mapping
+                    var master_nama_bagian_id = projectBagianMapping[id_project];
+                    if (master_nama_bagian_id) {
+                        loadSubBagian(master_nama_bagian_id, '#namaScope');
+                    }
+                } else {
+                    $('#namaScope').empty();
+                    $('#namaScope').append('<option value="">-- Pilih Sub Divisi --</option>');
+                }
+            });
+
+
+
+            // Event listener untuk form edit
+            $('#editProyek').on('change', function () {
+                var id_project = $(this).val();
+                if (id_project) {
+                    // Gunakan master_nama_bagian_id dari mapping
+                    var master_nama_bagian_id = projectBagianMapping[id_project];
+                    if (master_nama_bagian_id) {
+                        loadSubBagian(master_nama_bagian_id, '#editScope');
+                    }
+                } else {
+                    $('#editScope').empty();
+                    $('#editScope').append('<option value="">-- Pilih Sub Divisi --</option>');
+                }
+            });
+
+            // Load data project saat halaman dimuat
             loadProjects();
 
             // Panggil loadProjects() ketika membuka modal tambah atau edit
