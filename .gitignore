@@ -3,6 +3,7 @@
 /public/build
 /public/hot
 /public/storage
+/public/evidance
 /storage/*.key
 /vendor
 .env
