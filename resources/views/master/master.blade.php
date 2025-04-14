@@ -101,7 +101,9 @@
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                         data-accordion="false">
-                        @if (session('hak_akses_id') == 2 || session('hak_akses_id') == 3 || session('hak_akses_id') == 4 || session('hak_akses_id') == 6 || session('hak_akses_id') == 7)
+                        @if (session('hak_akses_id') == 2 || session('hak_akses_id') == 3 || session('hak_akses_id') == 4 || session('hak_akses_id') == 6 || session('hak_akses_id') == 7 || session('hak_akses_id') == 9 || session('hak_akses_id') == 10)
+                        <li class="nav-item">
+                            <li class="nav-item">
                             <li class="nav-item">
                                 <a href="{{ route('dashboard') }}" class="nav-link @yield('dashboard')">
                                     <i class="nav-icon fas fa-tachometer-alt"></i>

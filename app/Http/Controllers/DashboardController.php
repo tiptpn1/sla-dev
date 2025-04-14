@@ -30,7 +30,7 @@ class DashboardController extends Controller
         $adminAccess = Session::get('hak_akses_id');
         $bagianId = Session::get('master_nama_bagian_id'); 
         $subDivisiId = Session::get('id_sub_divisi'); 
-        $scopeProjectId = Session::get('project_id');
+        $scopeProjectId = Session::get('sub_bagian_id');
 
         if ($adminAccess == 6) {
             $projects = Proyek::where('isActive', true)
@@ -41,16 +41,21 @@ class DashboardController extends Controller
                             ->select('id_project', 'project_nama')                  
                             ->get();
         } 
-        elseif ($adminAccess == 7 ){
+        elseif ($adminAccess == 7 && $adminAccess == 9 && $subDivisiId) {
             $projects = Proyek::where('isActive', true)
-                            ->with(['scopes' => function($query) {
-                                $query->where('isActive', true);
-                            }]) 
-                            ->select('id_project', 'project_nama')                  
-                            ->get();
+                ->whereHas('scopes', function ($query) use ($subDivisiId) {
+                    $query->where('isActive', true)
+                          ->where('sub_bagian_id', $subDivisiId);
+                })
+                ->with(['scopes' => function ($query) use ($subDivisiId) {
+                    $query->where('isActive', true)
+                          ->where('sub_bagian_id', $subDivisiId);
+                }])
+                ->select('id_project', 'project_nama')
+                ->get();
         }
 
-        elseif ($adminAccess == 3 && $bagianId) {
+        elseif ($adminAccess == 3 && $adminAccess == 10 && $bagianId) {
             $projects = Proyek::where('isActive', true)
                             ->where('master_nama_bagian_id', $bagianId)
                             ->select('id_project', 'project_nama')
