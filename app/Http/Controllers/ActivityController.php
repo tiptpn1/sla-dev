@@ -23,60 +23,52 @@ class ActivityController extends Controller
         $subBagianId = Session::get('sub_bagian_id');
 
         // Mulai query builder untuk proyek
-        $query = Proyek::with([
+        $query = Proyek::where('isActive', true);
+
+        // Menerapkan filter direktorat_id di awal query jika user level direktorat (hak_akses_id = 6)
+        if ($adminAccess == 6) {
+            $query->where('direktorat_id', $direktoratId);
+        }
+
+        // Jika user adalah level divisi (hak_akses_id = 3 atau 7)
+        if (in_array($adminAccess, [3, 7]) && $masterBagianId) {
+            $query->where('master_nama_bagian_id', $masterBagianId);
+        }
+
+        // Filter proyek di level paling atas untuk level 7
+        if ($adminAccess == 7 && $subBagianId) {
+            $query->whereHas('scopes', function ($q) use ($subBagianId) {
+                $q->where('sub_bagian_id', $subBagianId);
+            });
+        }
+
+        // Setelah menerapkan semua filter, baru kita tambahkan eager loading
+        $query->with([
             'scopes' => function ($query) use ($adminAccess, $subBagianId) {
                 $query->where('isActive', 1);
 
-                // Filter scopes untuk level 7, hanya yang memiliki aktivitas di mana user adalah PIC
+                // Filter scopes untuk level 7, berdasarkan sub_bagian_id dari scope
                 if ($adminAccess == 7 && $subBagianId) {
-                    $query->whereHas('activities.pics', function ($q) use ($subBagianId) {
-                        $q->where('sub_bagian_id', $subBagianId);
-                    });
+                    $query->where('sub_bagian_id', $subBagianId);
                 }
             },
             'scopes.activities' => function ($query) use ($adminAccess, $subBagianId) {
                 if ($adminAccess != 2) {
                     $query->where('isActive', 1);
                 }
-
-                // Filter aktivitas untuk level 7
-                if ($adminAccess == 7 && $subBagianId) {
-                    $query->whereHas('pics', function ($q) use ($subBagianId) {
-                        $q->where('sub_bagian_id', $subBagianId);
-                    });
-                }
             },
             'scopes.activities.pics',
-            'scopes.activities.pics.subBagian',
+            'scopes.activities.pics.bagian',
             'scopes.activities.progress' => function ($query) {
                 $query->latest('tanggal')->get();
             },
             'scopes.activities.progress.evidences' => function ($query) {
                 $query->latest('created_at')->get();
             }
-        ])->where('isActive', true);
-
-        // Jika user adalah level divisi (hak_akses_id = 3)
-        if (in_array($adminAccess, [3, 7]) && $masterBagianId) {
-            $query->where('master_bagian_id', $masterBagianId);
-        }
-
-
-        // Jika user adalah level direktorat (hak_akses_id = 6)
-        if ($adminAccess == 6 && $direktoratId) {
-            $query->where('direktorat_id', $direktoratId);
-        }
-
-        // Filter proyek di level paling atas untuk level 7
-        if ($adminAccess == 7 && $subBagianId) {
-            $query->whereHas('scopes.activities.pics', function ($q) use ($subBagianId) {
-                $q->where('sub_bagian_id', $subBagianId);
-            });
-        }
+        ]);
 
         // Eksekusi query dan dapatkan hasilnya
         $projects = $query->get();
-
         return view('activities.index', compact('projects'));
     }
     /**
@@ -84,11 +76,21 @@ class ActivityController extends Controller
      */
     public function create()
     {
-        $projects = Proyek::select('id_project', 'project_nama')->get();
+        $hakAkses = Session::get('hak_akses_id');
+        $bagianId = Session::get('bagian_id');
+
+
+        $query = Proyek::select('id_project', 'project_nama');
+
+        if (in_array($hakAkses, [9, 10]) && $bagianId) {
+            $query->where('master_nama_bagian_id', $bagianId);
+        }
+
+        $projects = $query->get();
+
         $bagians = Bagian::select('master_bagian_id', 'master_bagian_nama')->get();
         $subBagians = SubBagian::select('id', 'sub_bagian_nama')->get();
 
-        $bagianId = Session::get('bagian_id');
 
         return view('activities.create', compact('projects', 'bagians', 'subBagians'));
     }
@@ -131,7 +133,7 @@ class ActivityController extends Controller
         foreach ($request->bagian_id as $bagianId) {
             Pic::create([
                 'activity_id' => $activity->id_activity,
-                'sub_bagian_id' => $bagianId,
+                'bagian_id' => $bagianId,
             ]);
         }
         session()->flash('success', 'Activity insert successfully!');

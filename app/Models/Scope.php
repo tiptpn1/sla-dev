@@ -18,8 +18,10 @@ class Scope extends Model
     protected $fillable = [
         'nama',
         'isActive',
-        'project_id'
+        'project_id',
+        'sub_bagian_id'
     ];
+
 
     protected $guarded = ['id'];
 

@@ -118,6 +118,7 @@ Route::middleware(['checkLogin'])->group(function () {
         Route::get('/', [ScopeController::class, 'index'])->name('index');
         Route::get('get-data', [ScopeController::class, 'getData'])->name('get-data');
         Route::get('get-project-list', [ScopeController::class, 'getProjectList'])->name('get-project-list');
+        Route::get('get-subbagian-list/{master_nama_bagian_id}', [ScopeController::class, 'getSubbagianList'])->name('get-subbagian-list');
         Route::get('get-data/{id}', [ScopeController::class, 'getDataById'])->name('get-data-id');
         Route::post('store', [ScopeController::class, 'store'])->name('store');
         Route::post('status/{id}', [ScopeController::class, 'updateStatus'])->name('update-status');

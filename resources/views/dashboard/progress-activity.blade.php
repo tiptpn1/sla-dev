@@ -8,13 +8,33 @@
 
     <script>
         $(document).ready(function() {
+            var selectedYear = $('#filter-year').val() || new Date().getFullYear();
+            
             $.ajax({
                 url: '{{ route('ganchart') }}',
                 method: 'GET',
+                data: { year: selectedYear },
                 success: function(response) {
                     $('#gantt-chart-field').html(response);
                 }
             })
+
+            // Year filter change event
+            $('#filter-year').on('change', function() {
+                var selectedYear = $(this).val();
+                gantt.config.start_date = new Date(selectedYear, 0, 1);
+                gantt.config.readonly = true;
+                
+                $.ajax({
+                    url: '{{ route('ganchart') }}',
+                    method: 'GET',
+                    data: { year: selectedYear },
+                    success: function(response) {
+                        $('#gantt-chart-field').html(response);
+                        // You may need to reinitialize gantt here depending on your setup
+                    }
+                });
+            });
 
             $('#reportPdfForm').on('submit', function(e) {
                 e.preventDefault(); // Prevent normal form submission
@@ -53,11 +73,10 @@
         gantt.config.row_height = 60; // Tinggi setiap baris aktivitas
         gantt.config.bar_height = 20; // Tinggi bar Gantt untuk setiap aktivitas
 
-        // Batasi tampilan Gantt Chart hingga Desember
-        gantt.config.start_date = new Date(2024, 0, 1); // 1 Januari 2024
-        gantt.config.end_date = new Date(2024, 11, 31); // 31 Desember 2024
-
-        gantt.config.readonly = true; // Nonaktifkan mode hanya baca
+            // You might need to reinitialize gantt here depending on how your code works
+            // gantt.init("gantt_here");
+            // gantt.parse(data);
+    
         // gantt.config.resizable = true;
 
         // gantt.attachEvent("onBeforeTaskDrag", function(id, mode) {
@@ -326,8 +345,6 @@
                     @endif
                 @endforeach
             ]
-
-
         });
     </script>
 @endsection

@@ -46,6 +46,4 @@ class Proyek extends Model
     {
         return $this->belongsTo(Bagian::class, 'master_nama_bagian_id', 'master_bagian_id');
     }
-
-
 }

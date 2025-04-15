@@ -41,19 +41,21 @@ class DashboardController extends Controller
                             ->select('id_project', 'project_nama')                  
                             ->get();
         } 
-        elseif ($adminAccess == 7 && $adminAccess == 9 && $subDivisiId) {
+
+        elseif ($adminAccess == 7 && $subDivisiId) {
             $projects = Proyek::where('isActive', true)
                 ->whereHas('scopes', function ($query) use ($subDivisiId) {
                     $query->where('isActive', true)
-                          ->where('sub_bagian_id', $subDivisiId);
+                        ->where('sub_bagian_id', $subDivisiId);
                 })
                 ->with(['scopes' => function ($query) use ($subDivisiId) {
                     $query->where('isActive', true)
-                          ->where('sub_bagian_id', $subDivisiId);
+                        ->where('sub_bagian_id', $subDivisiId);
                 }])
                 ->select('id_project', 'project_nama')
                 ->get();
         }
+
 
         elseif ($adminAccess == 3 && $adminAccess == 10 && $bagianId) {
             $projects = Proyek::where('isActive', true)
@@ -77,6 +79,7 @@ class DashboardController extends Controller
         $adminAccess = Session::get('hak_akses_id');
         $bagianId = Session::get('master_nama_bagian_id');
         $direktoratId = Session::get('direktorat_id');
+        $subDivisiId = Session::get('id_sub_divisi');
 
         // Mulai query builder untuk proyek
         $query = Proyek::with([
@@ -107,6 +110,13 @@ class DashboardController extends Controller
         if ($adminAccess == 6 && $bagianId) {
             $query->where('direktorat_id', $direktoratId);
         }
+
+        if ($adminAccess == 7 && $subDivisiId) {
+            $query->whereHas('scopes', function ($q) use ($subDivisiId) {
+            $q->where('isActive', true)
+              ->where('sub_bagian_id', $subDivisiId);
+        });
+    }
 
         // Eksekusi query dan dapatkan hasilnya
         $projects = $query->get();

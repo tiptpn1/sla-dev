@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Session;
 
 class ProgressActivityController extends Controller
 {
+    
     public function index(Request $request)
     {
         // dd(session()->all());
@@ -26,12 +27,14 @@ class ProgressActivityController extends Controller
          return view('dashboard.progress-activity', compact('projects', 'progressColors'));
     }
 
-    public function ganchart()
+    public function ganchart(Request $request)
     {
         // dd(session()->all());
         $direktoratId = Session::get('direktorat_id');
         $adminAccess = Session::get('hak_akses_id');
         $bagianId = Session::get('master_nama_bagian_id'); 
+
+        $year = $request->input('year', date('Y'));
 
         if ($adminAccess == 6 ) {
             // Jika admin direktorat, hanya tampilkan proyek dan scope dari direktoratnya
@@ -51,6 +54,7 @@ class ProgressActivityController extends Controller
             ])
             ->where('isActive', true)
             ->where('direktorat_id', $direktoratId)
+            ->whereYear('created_at', $year)
             ->get();
 
         } elseif ($adminAccess == 3) {
@@ -71,6 +75,7 @@ class ProgressActivityController extends Controller
             ])
             ->where('isActive', true)
             ->where('master_nama_bagian_id', $bagianId)
+            ->whereYear('created_at', $year)
             ->get();
         } else {
             // Jika bukan admin direktorat, tampilkan semua proyek aktif
@@ -84,6 +89,7 @@ class ProgressActivityController extends Controller
                             'scopes.activities.progress', 
                             'scopes.activities.progress.evidences'])
                             ->where('isActive', true)
+                            ->whereYear('created_at', $year)
                             ->get();
         }
         // dd($projects);

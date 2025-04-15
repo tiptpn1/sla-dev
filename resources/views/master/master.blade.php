@@ -93,6 +93,10 @@
                         <img src="{{ asset('dist/img/user.png') }}" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info">
+
+                        @if (in_array(session()->get('hak_akses_id'), [7, 9, 10]))
+                            <a href="#" class="d-block">{{ session('username') }}</a>
+                        @endif
                         <a href="#" class="d-block">{{ session('bagian_nama') }}</a>
                     </div>
                 </div>
@@ -130,13 +134,13 @@
                             </li>
                         @endif
 
-                        @if (session('hak_akses_id') == 2)
+                        @if (in_array(session()->get('hak_akses_id'), [1, 2]))
                             <!-- Parent Menu Item for Pembentuk SLA Data -->
                             <li class="nav-item has-treeview">
                                 <a href="#" class="nav-link @yield('mast')">
                                     <i class="nav-icon fas fa-database"></i>
                                     <p>
-                                        Data SLA
+                                        Data Dashboard
                                         <i class="right fas fa-angle-left"></i>
                                     </p>
                                 </a>

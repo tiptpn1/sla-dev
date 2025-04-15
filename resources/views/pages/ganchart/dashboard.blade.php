@@ -86,13 +86,13 @@
     
 
     <script>
+        var selectedYear = $('#filter-year').val() || new Date().getFullYear();
+    
+        // Konfigurasi awal Gantt Chart
         gantt.config.date_format = "%Y-%m-%d";
-
-        // Konfigurasi Gantt Chart
-        gantt.config.scale_unit = "month"; // Unit utama skala adalah bulan
-        gantt.config.date_scale = "%F %Y"; // Tampilkan nama bulan dan tahun (Januari 2024, dst.)
-
-        // Sub skala untuk minggu 1-4 di setiap bulan
+        gantt.config.scale_unit = "month"; 
+        gantt.config.date_scale = "%F %Y"; 
+        
         gantt.config.subscales = [{
             unit: "week",
             step: 1,
@@ -100,50 +100,44 @@
                 var weekNum = gantt.date.getWeek(date);
                 var monthStartWeek = gantt.date.getWeek(gantt.date.month_start(date));
                 var weekInMonth = weekNum - monthStartWeek + 1;
-
-                // Batasi hanya hingga minggu 4
+                
                 if (weekInMonth < 1 || weekInMonth > 5) {
                     return "Week 1";
                 }
                 return "Week " + weekInMonth;
             }
         }];
-
-        gantt.config.scale_height = 60; // Tinggi skala (header)
-        gantt.config.row_height = 60; // Tinggi setiap baris aktivitas
-        gantt.config.bar_height = 20; // Tinggi bar Gantt untuk setiap aktivitas
-
-        // Batasi tampilan Gantt Chart hingga Desember
-        gantt.config.start_date = new Date(2024, 0, 1); // 1 Januari 2024
-        gantt.config.end_date = new Date(2024, 11, 31); // 31 Desember 2024
-
-        gantt.config.readonly = true; // Nonaktifkan mode hanya baca
-        // gantt.config.resizable = true;
-
-        // gantt.attachEvent("onBeforeTaskDrag", function(id, mode) {
-        //     return true; // Mengizinkan drag
-        // });
-
+        
+        gantt.config.scale_height = 60;
+        gantt.config.row_height = 60;
+        gantt.config.bar_height = 20;
+        
+        // Set tanggal awal dan akhir berdasarkan tahun yang dipilih
+        gantt.config.start_date = new Date(selectedYear, 0, 1);
+        gantt.config.end_date = new Date(selectedYear, 11, 31);
+        
+        gantt.config.readonly = true;
+        
         gantt.config.layout = {
-        css: "gantt_container",
-        cols: [
-            {
-                width: 500, // lebar tabel (sidebar)
-                min_width: 300,
-                rows: [
-                    { view: "grid", scrollX: "gridScroll", scrollable: true, scrollY: "scrollVer" },
-                    { view: "scrollbar", id: "gridScroll", group: "horizontal" }
-                ]
-            },
-            { resizer: true, width: 1 },
-            {
-                rows: [
-                    { view: "timeline", scrollX: "scrollHor", scrollY: "scrollVer" },
-                    { view: "scrollbar", id: "scrollHor", group: "horizontal" }
-                ]
-            },
-            { view: "scrollbar", id: "scrollVer" }
-        ]
+            css: "gantt_container",
+            cols: [
+                {
+                    width: 500,
+                    min_width: 300,
+                    rows: [
+                        { view: "grid", scrollX: "gridScroll", scrollable: true, scrollY: "scrollVer" },
+                        { view: "scrollbar", id: "gridScroll", group: "horizontal" }
+                    ]
+                },
+                { resizer: true, width: 1 },
+                {
+                    rows: [
+                        { view: "timeline", scrollX: "scrollHor", scrollY: "scrollVer" },
+                        { view: "scrollbar", id: "scrollHor", group: "horizontal" }
+                    ]
+                },
+                { view: "scrollbar", id: "scrollVer" }
+            ]
         };
 
         gantt.init("gantt_here");
