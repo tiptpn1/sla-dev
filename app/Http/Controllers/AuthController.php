@@ -44,6 +44,7 @@ class AuthController extends Controller
             $request->session()->put('username', $user->master_user_nama);
             $request->session()->put('sub_bagian_id', $user->id_sub_divisi);
 
+
             return redirect()->intended('dashboard');
         }
         return redirect('login')
