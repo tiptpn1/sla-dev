@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Session;
 
 class ProgressActivityController extends Controller
 {
-    
     public function index(Request $request)
     {
         // dd(session()->all());
@@ -27,14 +26,12 @@ class ProgressActivityController extends Controller
          return view('dashboard.progress-activity', compact('projects', 'progressColors'));
     }
 
-    public function ganchart(Request $request)
+    public function ganchart()
     {
         // dd(session()->all());
         $direktoratId = Session::get('direktorat_id');
         $adminAccess = Session::get('hak_akses_id');
         $bagianId = Session::get('master_nama_bagian_id'); 
-
-        $year = $request->input('year', date('Y'));
 
         if ($adminAccess == 6 ) {
             // Jika admin direktorat, hanya tampilkan proyek dan scope dari direktoratnya
@@ -54,7 +51,6 @@ class ProgressActivityController extends Controller
             ])
             ->where('isActive', true)
             ->where('direktorat_id', $direktoratId)
-            ->whereYear('created_at', $year)
             ->get();
 
         } elseif ($adminAccess == 3) {
@@ -75,7 +71,6 @@ class ProgressActivityController extends Controller
             ])
             ->where('isActive', true)
             ->where('master_nama_bagian_id', $bagianId)
-            ->whereYear('created_at', $year)
             ->get();
         } else {
             // Jika bukan admin direktorat, tampilkan semua proyek aktif
@@ -89,15 +84,20 @@ class ProgressActivityController extends Controller
                             'scopes.activities.progress', 
                             'scopes.activities.progress.evidences'])
                             ->where('isActive', true)
-                            ->whereYear('created_at', $year)
                             ->get();
         }
         // dd($projects);
 
-        $progressColors = ['bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-primary'];
+        $progressColors = [
+            '#007bff', // biru
+            '#28a745', // hijau
+            '#ffc107', // kuning
+            '#dc3545', // merah
+            '#17a2b8', // cyan
+            '#6f42c1', // ungu
+        ];
+
         return view('pages.ganchart.dashboard', compact('projects', 'progressColors'));
     }
 }
-
-
 
