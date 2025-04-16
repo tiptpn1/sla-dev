@@ -32,21 +32,20 @@ class ProgressActivityController extends Controller
         // dd(session()->all());
         $direktoratId = Session::get('direktorat_id');
         $adminAccess = Session::get('hak_akses_id');
-        $bagianId = Session::get('master_nama_bagian_id'); 
-
+        $bagianId = Session::get('master_nama_bagian_id');
+        $subDivisiId = Session::get('id_sub_divisi');
+        $scopeProjectId = Session::get('sub_bagian_id');
+        
         $year = $request->input('year', date('Y'));
-
-        if ($adminAccess == 6 ) {
-            // Jika admin direktorat, hanya tampilkan proyek dan scope dari direktoratnya
+        
+        if ($adminAccess == 6) {
+            // Untuk admin direktorat
             $projects = Proyek::with([
                 'scopes' => function($query) {
                     $query->where('isActive', true);
                 },
-                'scopes.activities' => function($query) use ($bagianId) {
-                    $query->where('isActive', true)
-                          ->whereHas('pics', function($q) use ($bagianId) {
-                              $q->where('bagian_id', $bagianId);
-                          });
+                'scopes.activities' => function($query) {
+                    $query->where('isActive', true);
                 },
                 'scopes.activities.pics',
                 'scopes.activities.progress',
@@ -56,19 +55,34 @@ class ProgressActivityController extends Controller
             ->where('direktorat_id', $direktoratId)
             ->whereYear('created_at', $year)
             ->get();
-
-        } elseif ($adminAccess == 3) {
-            // Jika admin divisi, tampilkan proyek dan scope dari bagian yang diakses
+        }
+        elseif ($adminAccess == 7 && $subDivisiId) {
+            // Untuk admin sub divisi
+            $projects = Proyek::with([
+                'scopes' => function($query) use ($subDivisiId) {
+                    $query->where('isActive', true)
+                        ->where('sub_bagian_id', $subDivisiId);
+                },
+                'scopes.activities',
+                'scopes.activities.pics',
+                'scopes.activities.progress',
+                'scopes.activities.progress.evidences'
+            ])
+            ->where('isActive', true)
+            ->whereHas('scopes', function ($query) use ($subDivisiId) {
+                $query->where('isActive', true)
+                    ->where('sub_bagian_id', $subDivisiId);
+            })
+            ->whereYear('created_at', $year)
+            ->get();
+        }
+        elseif (($adminAccess == 3 || $adminAccess == 10) && $bagianId) {
+            // Untuk admin divisi dan admin dengan akses 10
             $projects = Proyek::with([
                 'scopes' => function($query) {
                     $query->where('isActive', true);
                 },
-                'scopes.activities' => function($query) use ($bagianId) {
-                    $query->where('isActive', true)
-                          ->whereHas('pics', function($q) use ($bagianId) {
-                              $q->where('bagian_id', $bagianId);
-                          });
-                },
+                'scopes.activities',
                 'scopes.activities.pics',
                 'scopes.activities.progress',
                 'scopes.activities.progress.evidences'
@@ -77,23 +91,23 @@ class ProgressActivityController extends Controller
             ->where('master_nama_bagian_id', $bagianId)
             ->whereYear('created_at', $year)
             ->get();
-        } else {
-            // Jika bukan admin direktorat, tampilkan semua proyek aktif
-            $projects = Proyek::with(['scopes' => function($query) {
-                                $query->where('isActive', true);
-                            }, 
-                            'scopes.activities' => function($query) {
-                                $query->where('isActive', true);
-                            }, 
-                            'scopes.activities.pics', 
-                            'scopes.activities.progress', 
-                            'scopes.activities.progress.evidences'])
-                            ->where('isActive', true)
-                            ->whereYear('created_at', $year)
-                            ->get();
         }
-        // dd($projects);
-
+        else {
+            // Untuk hak akses lainnya (default)
+            $projects = Proyek::with([
+                'scopes' => function($query) {
+                    $query->where('isActive', true);
+                },
+                'scopes.activities',
+                'scopes.activities.pics',
+                'scopes.activities.progress',
+                'scopes.activities.progress.evidences'
+            ])
+            ->where('isActive', true)
+            ->whereYear('created_at', $year)
+            ->get();
+        }
+        
         $progressColors = ['bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-primary'];
         return view('pages.ganchart.dashboard', compact('projects', 'progressColors'));
     }

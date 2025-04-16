@@ -25,7 +25,7 @@ class DashboardController extends Controller
 {
     public function index()
     {   
-        // dd(session()->all());
+        dd(session()->all());
         $direktoratId = Session::get('direktorat_id');
         $adminAccess = Session::get('hak_akses_id');
         $bagianId = Session::get('master_nama_bagian_id'); 
