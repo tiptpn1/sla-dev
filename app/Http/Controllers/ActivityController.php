@@ -17,6 +17,7 @@ class ActivityController extends Controller
      */
     public function index()
     {
+
         $adminAccess = Session::get('hak_akses_id');
         $masterBagianId = Session::get('bagian_id');
         $direktoratId = Session::get('direktorat_id');

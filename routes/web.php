@@ -117,7 +117,7 @@ Route::middleware(['checkLogin'])->group(function () {
     });
 
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('ganchart', [DashboardController::class, 'ganchart'])->name('ganchart');
+    Route::get('ganchart', [DashboardController::class, ''])->name('ganchart');
 
     Route::get('activities/data', [ServerSideActivityController::class, 'data'])->name('activities.data');
     Route::resource('activities', ActivityController::class);
