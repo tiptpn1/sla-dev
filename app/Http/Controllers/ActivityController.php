@@ -22,6 +22,7 @@ class ActivityController extends Controller
         $masterBagianId = Session::get('bagian_id');
         $direktoratId = Session::get('direktorat_id');
         $subBagianId = Session::get('sub_bagian_id');
+      
 
         // Mulai query builder untuk proyek
         $query = Proyek::where('isActive', true);
