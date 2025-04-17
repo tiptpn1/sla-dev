@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Session;
 
 class ProgressActivityController extends Controller
 {
-    
     public function index(Request $request)
     {
         // dd(session()->all());
@@ -53,7 +52,6 @@ class ProgressActivityController extends Controller
             ])
             ->where('isActive', true)
             ->where('direktorat_id', $direktoratId)
-            ->whereYear('created_at', $year)
             ->get();
         }
         elseif ($adminAccess == 7 && $subDivisiId) {
@@ -89,7 +87,6 @@ class ProgressActivityController extends Controller
             ])
             ->where('isActive', true)
             ->where('master_nama_bagian_id', $bagianId)
-            ->whereYear('created_at', $year)
             ->get();
         }
         else {
@@ -112,6 +109,4 @@ class ProgressActivityController extends Controller
         return view('pages.ganchart.dashboard', compact('projects', 'progressColors'));
     }
 }
-
-
 

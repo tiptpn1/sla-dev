@@ -93,11 +93,15 @@
                         <img src="{{ asset('dist/img/user.png') }}" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info">
-
-                        @if (in_array(session()->get('hak_akses_id'), [7, 9, 10]))
-                            <a href="#" class="d-block">{{ session('username') }}</a>
+                        <a href="#" class="d-block"><strong>{{ session('username') }}</strong></a>
+                    
+                        @if (session('hak_akses_id') == 6)
+                            <a href="#" class="d-block"> {{ session('nama_direktorat') }}</a>
+                        @elseif (session('hak_akses_id') == 7 && session('hak_akses_id'))
+                            <a href="#" class="d-block">{{ session('nama_sub_divisi') }}</a>
+                        @else
+                            <a href="#" class="d-block"> {{ session('bagian_nama') }}</a>
                         @endif
-                        <a href="#" class="d-block">{{ session('bagian_nama') }}</a>
                     </div>
                 </div>
  

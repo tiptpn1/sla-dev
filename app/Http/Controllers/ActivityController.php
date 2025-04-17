@@ -17,10 +17,12 @@ class ActivityController extends Controller
      */
     public function index()
     {
+
         $adminAccess = Session::get('hak_akses_id');
         $masterBagianId = Session::get('bagian_id');
         $direktoratId = Session::get('direktorat_id');
         $subBagianId = Session::get('sub_bagian_id');
+      
 
         // Mulai query builder untuk proyek
         $query = Proyek::where('isActive', true);

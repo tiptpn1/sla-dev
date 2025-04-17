@@ -70,8 +70,10 @@ Route::middleware(['checkLogin'])->group(function () {
         Route::get('get-data', [BagianController::class, 'getData'])->name('get-data');
         Route::get('get-data/{id}', [BagianController::class, 'getDataById'])->name('get-data-id');
         Route::post('store', [BagianController::class, 'store'])->name('store');
+        Route::get('{id}/edit', [BagianController::class, 'edit'])->name('edit');
         Route::post('status/{id}', [BagianController::class, 'updateStatus'])->name('update-status');
         Route::post('form/{id}', [BagianController::class, 'updateForm'])->name('update-form');
+        Route::put('update/{id}', [BagianController::class, 'update'])->name('update');
         Route::delete('delete/{id}', [BagianController::class, 'delete'])->name('delete');
     });
 

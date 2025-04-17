@@ -115,8 +115,6 @@
     </style>
 @endpush
 
-
-
 @section('content')
 <div class="content">
     <div class="container-fluid">
@@ -135,6 +133,8 @@
                             <tr>
                                 <th>NO</th>
                                 <th>Nama Bagian</th>
+                                <th>Kode</th>
+                                <th>Nama Direktorat</th>
                                 <th>Status Aktif</th>
                                 <th>Action</th>
                             </tr>
@@ -164,6 +164,20 @@
                     <div class="form-group">
                         <label for="namaBagian">Nama Bagian</label>
                         <input type="text" class="form-control" id="namaBagian" name="namaBagian" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="kode">Kode : </label>
+                        <input type="text" class="form-control ml-2" id="kode" name="kode" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="direktorat">Direktorat : </label>
+                        <input type="hidden" id="direktorat" name="direktorat">
+                        <select class="form-control" id="direktorat" name="direktorat">
+                            <option selected>Pilih Direktorat</option>
+                            @foreach ($direktorat as $dir)
+                                <option value="{{ $dir->direktorat_id }}">{{ $dir->nama }}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="isActive">Status Aktif</label>
@@ -198,6 +212,18 @@
                     <div class="form-group">
                         <label for="editNamaBagian">Nama Bagian</label>
                         <input type="text" class="form-control" id="editNamaBagian" name="editNamaBagian" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editKode">Kode : </label>
+                        <input type="text" class="form-control ml-2" id="editKode" name="editKode" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editDirektorat">Direktorat : </label>
+                        <select class="form-control" id="editDirektorat" name="editDirektorat">
+                            @foreach ($direktorat as $dir)
+                                <option value="{{ $dir->direktorat_id }}">{{ $dir->nama }}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="editIsActive">Status Aktif</label>
@@ -262,12 +288,17 @@ $(document).ready(function() {
                     table.row.add([
                         index + 1,
                         item.master_bagian_nama,
+                        item.master_bagian_kode,
+                        (item.direktorat !== null) ? item.direktorat.nama : '-',
                         '<span class="badge ' + (item.is_active ? 'badge-success' : 'badge-danger') + '">' + (item.is_active ? 'Aktif' : 'Nonaktif') + '</span>',
                         '<button class="btn btn-warning btn-sm edit-btn" data-id="'+ item.master_bagian_id +'">Edit</button> ' +
                         '<button class="btn btn-danger btn-sm delete-btn" data-id="'+ item.master_bagian_id +'">Hapus</button> ' +
                         '<button class="btn btn-info btn-sm status-btn" data-id="'+ item.master_bagian_id +'" data-status="'+ (item.is_active ? 0 : 1) +'">' + (item.is_active ? 'Nonaktifkan' : 'Aktifkan') + '</button>'
                     ]).draw();
                 });
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching data:", error);
             }
         });
     }
@@ -306,6 +337,8 @@ $(document).ready(function() {
             success: function(data) {
                 $('#editId').val(data.master_bagian_id);
                 $('#editNamaBagian').val(data.master_bagian_nama);
+                $('#editKode').val(data.master_bagian_kode);
+                $('#editDirektorat').val(data.direktorat_id);
                 $('#editIsActive').val(data.is_active ? 1 : 0);
                 $('#editModal').modal('show');
             }
@@ -315,13 +348,19 @@ $(document).ready(function() {
     $('#editForm').on('submit', function(e) {
     e.preventDefault();
     var id = $('#editId').val();
+    var bagian = $('#editNamaBagian').val();
+    var kode = $('#editKode').val();
+    var direktorat = $('#editDirektorat').val();
+    var status = $('#editIsActive').val()
     
     $.ajax({
         url: '{{ route("master-bagian.update-form", ":id") }}'.replace(':id', id),
         method: 'POST',
         data: {
-            namaBagian: $('#editNamaBagian').val(),
-            status: $('#editIsActive').val()
+            bagian: bagian,
+            kode: kode,
+            direktorat: direktorat,
+            status: status,
         },
         
         success: function(response) {
@@ -335,6 +374,14 @@ $(document).ready(function() {
                     timer: 1500
                 });
             }
+        },
+        error: function(xhr, status, error) {
+            var errors = xhr.responseJSON.message;
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: errors
+            });
         }
     });
 });

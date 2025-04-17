@@ -30,8 +30,15 @@ class AuthController extends Controller
         $credentials = $request->only('username', 'password');
         $user = db::table('master_user')
             ->leftJoin('master_bagian', 'master_user.master_nama_bagian_id', '=', 'master_bagian.master_bagian_id')
+            ->leftJoin('master_direktorat', 'master_user.direktorat_id', '=', 'master_direktorat.direktorat_id')
+            ->leftJoin('master_sub_bagian', 'master_user.id_sub_divisi', '=', 'master_sub_bagian.id')
             ->where('master_user.master_user_nama', $credentials['username'])
-            ->select('master_user.*', 'master_bagian.*')  // Anda bisa menentukan kolom spesifik jika diperlukan
+            ->select(
+                'master_user.*',
+                'master_bagian.*',
+                'master_direktorat.*',
+                'master_sub_bagian.*'
+            )  
             ->first();
 
         if ($user && password_verify($credentials['password'], $user->master_user_password)) {
@@ -41,9 +48,11 @@ class AuthController extends Controller
             $request->session()->put('bagian_nama', $user->master_bagian_nama);
             $request->session()->put('hak_akses_id', $user->master_hak_akses_id);
             $request->session()->put('direktorat_id', $user->direktorat_id);
+            $request->session()->put('nama_sub_divisi', $user->sub_bagian_nama);
+            $request->session()->put('nama_direktorat', $user->nama);
             $request->session()->put('username', $user->master_user_nama);
-            $request->session()->put('direktorat_id', $user->direktorat_id);
             $request->session()->put('id_sub_divisi', $user->id_sub_divisi);
+            $request->session()->put('sub_bagian_id', $user->id_sub_divisi);
 
             return redirect()->intended('dashboard');
         }
