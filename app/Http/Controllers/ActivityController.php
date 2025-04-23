@@ -33,7 +33,7 @@ class ActivityController extends Controller
         }
 
         // Jika user adalah level divisi (hak_akses_id = 3 atau 7)
-        if (in_array($adminAccess, [3, 7]) && $masterBagianId) {
+        if (in_array($adminAccess, [3, 7, 9, 10]) && $masterBagianId) {
             $query->where('master_nama_bagian_id', $masterBagianId);
         }
 
