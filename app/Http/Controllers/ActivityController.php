@@ -10,6 +10,7 @@ use App\Models\SubBagian;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
+
 class ActivityController extends Controller
 {
     /**
