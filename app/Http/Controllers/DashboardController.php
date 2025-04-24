@@ -24,66 +24,37 @@ use ZipArchive;
 class DashboardController extends Controller
 {
     public function index()
-    {   
+    {
         // dd(session()->all());
         $direktoratId = Session::get('direktorat_id');
         $adminAccess = Session::get('hak_akses_id');
         $bagianId = Session::get('master_nama_bagian_id'); 
-        $subDivisiId = Session::get('id_sub_divisi'); 
-        $scopeProjectId = Session::get('sub_bagian_id');
+        $subDivisiId = Session::get('id_sub_divisi');
 
         $query = Proyek::with([
-            'scopes' => function ($query) {
-                $query->where('isActive', 1);
-            },
-            'scopes.activities' => function ($query) use ($adminAccess) {
-                if ($adminAccess != 2) {
-                    $query->where('isActive', 1);
-                }
-            },
+            'scopes' => fn($q) => $q->where('isActive', 1),
+            'scopes.activities' => fn($q) => $adminAccess != 2 ? $q->where('isActive', 1) : $q,
             'scopes.activities.pics',
             'scopes.activities.pics.bagian',
-            'scopes.activities.progress' => function ($query) {
-                $query->latest('tanggal')->get();
-            },
-            'scopes.activities.progress.evidences' => function ($query) {
-                $query->latest('created_at')->get();
-            }
+            'scopes.activities.progress' => fn($q) => $q->latest('tanggal'),
+            'scopes.activities.progress.evidences' => fn($q) => $q->latest('created_at'),
         ])->where('isActive', true);
 
-        if (($adminAccess == 3 || $adminAccess == 10) && $bagianId) {
+        // Filter berdasarkan hak akses
+        if (in_array($adminAccess, [3, 10]) && $bagianId) {
             $query->where('master_nama_bagian_id', $bagianId);
-        }
-        
-        if ($adminAccess == 6 && $bagianId) {
+        } elseif ($adminAccess == 6 && $direktoratId) {
             $query->where('direktorat_id', $direktoratId);
-        }
-
-        if (($adminAccess == 7 || $adminAccess == 9) && $subDivisiId) {
-            $query->whereHas('scopes', function ($q) use ($subDivisiId) {
-            $q->where('isActive', true)
-              ->where('sub_bagian_id', $subDivisiId);
-        });
-        }
-
-
-        elseif ($adminAccess == 3 && $adminAccess == 10 && $bagianId) {
-            $projects = Proyek::where('isActive', true)
-                            ->where('master_nama_bagian_id', $bagianId)
-                            ->select('id_project', 'project_nama')
-                            ->get();
-        }
-        else {
-            $projects = Proyek::where('isActive', true)
-                            ->select('id_project', 'project_nama')
-                            ->get();
+        } elseif (in_array($adminAccess, [7, 9]) && $subDivisiId) {
+            $query->whereHas('scopes', fn($q) => $q->where('isActive', true)->where('sub_bagian_id', $subDivisiId));
         }
 
         $projects = $query->get();
         $progressColors = ['bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-primary'];
-        // dd($projects);
+
         return view('dashboard.index', compact('projects', 'progressColors'));
     }
+
 
     public function activity()
     {
