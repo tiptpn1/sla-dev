@@ -54,7 +54,7 @@ class ProgressActivityController extends Controller
             ->where('direktorat_id', $direktoratId)
             ->get();
         }
-        elseif ($adminAccess == 7 && $subDivisiId) {
+        elseif (($adminAccess == 7 || $adminAccess == 9) && $subDivisiId) {
             // Untuk admin sub divisi
             $projects = Proyek::with([
                 'scopes' => function($query) use ($subDivisiId) {
