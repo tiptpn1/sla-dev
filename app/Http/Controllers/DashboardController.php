@@ -55,7 +55,6 @@ class DashboardController extends Controller
         return view('dashboard.index', compact('projects', 'progressColors'));
     }
 
-
     public function activity()
     {
         $adminAccess = Session::get('hak_akses_id');
@@ -81,6 +80,7 @@ class DashboardController extends Controller
             'scopes.activities.progress.evidences' => function ($query) {
                 $query->latest('created_at')->get();
             }
+            
         ])->where('isActive', true);
 
         // Jika user adalah level divisi (hak_akses_id = 3), 
