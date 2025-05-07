@@ -396,64 +396,85 @@
             });
 
             // Edit User
-            $('#masterUserTable').on('click', '.edit-btn', function(e) {
-                var id = $(this).data('id');
-                $.ajax({
-                    url: "{{ route('master-username.get-data-by-id', ':id') }}".replace(':id', id),
-                    method: 'GET',
-                    dataType: 'json',
-                    success: function(response) {
-                        $('#editUserModal').modal('show');
-                        $('#editId').val(response.master_user_id);
-                        $('#editUsername').val(response.master_user_nama);
-                        $('#editRole').val(response.master_hak_akses_id);
+            $('#masterUserTable').on('click', '.edit-btn', function () {
+                const id = $(this).data('id');
+                $.get("{{ route('master-username.get-data-by-id', ':id') }}".replace(':id', id), function (response) {
+                    $('#editUserModal').modal('show');
+                    $('#editId').val(response.master_user_id);
+                    $('#editUsername').val(response.master_user_nama);
+                    $('#editRole').val(response.master_hak_akses_id);
 
-                        // Set Nama Bagian berdasarkan data user yang di-fetch
-                        if (response.master_bagian_nama) {
-                            $('#editUserDivisi').val(response.master_bagian_nama);
-                        } else if (response.direktorat) {
-                            $('#editUserDivisi').val(response.direktorat.nama);
-                        } else if (response.sub_bagian) {
-                            $('#editUserDivisi').val(response.sub_bagian.sub_bagian_nama);
-                        }
-                    }
+                    loadDivisiOptions(response.master_hak_akses_id, response);
                 });
             });
 
-            // Update User
-            $('#editRole').on('change', function() {
-                let selectedRole = $(this).val();
-                let selectedRoleText = $('#editRole option:selected').text().toLowerCase();
+            // Load divisi berdasarkan role
+            function loadDivisiOptions(roleId, userData = {}) {
+                const roleText = $('#editRole option[value="' + roleId + '"]').text().toLowerCase();
+                let url = '';
+                let label = '-- Pilih Divisi --';
+                let idKey = '';
+                let nameKey = '';
+                let selectedValue = '';
 
-                // Reset divisi options berdasarkan role yang dipilih
-                if (selectedRoleText.includes('direktorat')) {
-                    $.ajax({
-                        url: "{{ route('master-direktorat.get-data') }}",
-                        type: 'GET',
-                        success: function(response) {
-                            let options = '<option value="">-- Pilih Direktorat --</option>';
-                            response.forEach(function(item) {
-                                options += `<option value="${item.direktorat_id}">${item.nama}</option>`;
-                            });
-                            $('#editUserDivisi').html(options); // Update dropdown dengan data direktorat
-                        }
-                    });
-                } else if (selectedRoleText.includes('subdivisi') || selectedRoleText.includes('koordinator sub divisi')) {
-                    $.ajax({
-                        url: "{{ route('master-sub-divisi.data') }}",
-                        type: 'GET',
-                        success: function(response) {
-                            let options = '<option value="">-- Pilih Sub Divisi --</option>';
-                            response.forEach(function(item) {
-                                options += `<option value="${item.id}">${item.sub_bagian_nama}</option>`;
-                            });
-                            $('#editUserDivisi').html(options); // Update dropdown dengan data sub divisi
-                        }
-                    });
+                if (roleText.includes('direktorat')) {
+                    url = "{{ route('master-direktorat.get-data') }}";
+                    label = '-- Pilih Direktorat --';
+                    idKey = 'direktorat_id';
+                    nameKey = 'nama';
+                    selectedValue = userData?.direktorat_id;
+                } else if (roleText.includes('subdivisi') || roleText.includes('koordinator sub divisi')) {
+                    url = "{{ route('master-sub-divisi.data') }}";
+                    label = '-- Pilih Sub Divisi --';
+                    idKey = 'id';
+                    nameKey = 'sub_bagian_nama';
+                    selectedValue = userData?.id_sub_divisi;
                 } else {
-                    // Untuk role selain 'direktorat' dan 'sub divisi', update divisi default
-                    $('#editUserDivisi').val(''); // Set nilai divisi default ke kosong
+                    url = "{{ route('master-bagian.get-data') }}";
+                    label = '-- Pilih Bagian --';
+                    idKey = 'master_bagian_id';
+                    nameKey = 'master_bagian_nama';
+                    selectedValue = userData?.master_nama_bagian_id;
                 }
+
+                $.get(url, function (data) {
+                    let options = `<option value="">${label}</option>`;
+                    data.forEach(item => {
+                        options += `<option value="${item[idKey]}">${item[nameKey]}</option>`;
+                    });
+                    $('#editUserDivisi').html(options).val(selectedValue || '');
+                });
+            }
+
+            // Saat Role diubah manual oleh user
+            $('#editRole').on('change', function () {
+                loadDivisiOptions($(this).val());
+            });
+
+            // Submit form
+            $('#editUserForm').on('submit', function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: "{{ route('master-username.update') }}",
+                    method: 'PUT',
+                    data: {
+                        id: $('#editId').val(),
+                        username: $('#editUsername').val(),
+                        divisi: $('#editUserDivisi').val(),
+                        role: $('#editRole').val(),
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (res) {
+                        if (res.status === 'success') {
+                            $('#editUserModal').modal('hide');
+                            fetchUserData(); // Refresh data
+                            Swal.fire({ icon: 'success', title: 'Data berhasil diperbarui', showConfirmButton: false, timer: 1500 });
+                        }
+                    },
+                    error: function (xhr) {
+                        Swal.fire({ icon: 'error', title: 'Error', text: xhr.responseJSON.message });
+                    }
+                });
             });
 
             // Delete User

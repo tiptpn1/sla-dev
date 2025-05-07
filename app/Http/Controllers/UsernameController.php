@@ -155,7 +155,7 @@ class UsernameController extends Controller
                 'master_hak_akses_id' => $request->role,
                 'master_nama_bagian_id' => $masterNamaBagianId,
                 'direktorat_id' => $direktoratId,
-                'sub_bagian_id' => $subBagianId,
+                'id_sub_divisi' => $subBagianId,
             ];
 
             DB::table('master_user')->where('master_user_id', $request->id)->update($updateData);
