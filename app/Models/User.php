@@ -69,4 +69,14 @@ class User extends Authenticatable
     {
         return $this->belongsTo(HakAkses::class, 'master_hak_akses_id', 'hak_akses_id');
     }
+
+    public function direktorat()
+    {
+        return $this->belongsTo(Direktorat::class, 'direktorat_id', 'direktorat_id');
+    }
+
+    public function sub_bagian()
+    {
+        return $this->belongsTo(SubBagian::class, 'id_sub_divisi', 'id');
+    }
 }
