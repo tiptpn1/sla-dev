@@ -20,7 +20,7 @@ class UsernameController extends Controller
 
     public function getData()
     {
-        $user = User::with('bagian', 'hakAkses')->get();
+        $user = User::with('bagian', 'hakAkses', 'direktorat', 'sub_bagian')->get();
         return response()->json($user);
     }
 
@@ -29,7 +29,7 @@ class UsernameController extends Controller
         $validated = Validator::make($request->all(), [
             'username' => 'required|string',
             'password' => 'required|string',
-            'role' => 'required|string',
+            'role' => 'required|string',  
             'divisi' => 'required|string',
         ]);
 
@@ -42,32 +42,53 @@ class UsernameController extends Controller
         try {
             DB::beginTransaction();
 
-            // Ambil direktorat_id dan id_sub_divisi dari master_bagian
-            $bagian = DB::table('master_bagian')->where('master_bagian_id', $request->divisi)->first();
+            $masterNamaBagianId = null;
+            $direktoratId = null;
+            $subDivisiId = null;
 
-            if (!$bagian) {
-                return response()->json([
-                    'message' => 'Divisi tidak ditemukan.'
-                ], 404);
+            $role = DB::table('master_hak_akses')->where('hak_akses_id', $request->role)->first();
+            $roleName = strtolower($role->hak_akses_nama);
+
+            if ($roleName === 'direktorat') {
+                $direktorat = DB::table('master_direktorat')->where('direktorat_id', $request->divisi)->first();
+                $direktoratId = $direktorat->direktorat_id;
+            } 
+            elseif ($roleName === 'subdivisi') {
+                $subdivisi = DB::table('master_sub_bagian')->where('id', $request->divisi)->first();
+                $subDivisiId = $subdivisi->id;
+                $masterNamaBagianId = $subdivisi->master_bagian_id;
+
+                $bagian = DB::table('master_bagian')->where('master_bagian_id', $subdivisi->master_bagian_id)->first();
+                if ($bagian) {
+                    $direktoratId = $bagian->direktorat_id;
+                }
+            }
+            else {
+                $bagian = DB::table('master_bagian')->where('master_bagian_id', $request->divisi)->first();
+                if ($bagian) {
+                    $masterNamaBagianId = $bagian->master_bagian_id;
+                    $direktoratId = $bagian->direktorat_id;
+                }
             }
 
-            $username = DB::table('master_user')->insert([
+            DB::table('master_user')->insert([
                 'master_user_nama' => $request->username,
-                'master_nama_bagian_id' => $request->divisi,
                 'master_user_password' => Hash::make($request->password),
                 'master_hak_akses_id' => $request->role,
-                'direktorat_id' => $bagian->direktorat_id,
+                'master_nama_bagian_id' => $masterNamaBagianId,
+                'direktorat_id' => $direktoratId,
+                'id_sub_divisi' => $subDivisiId,
             ]);
-            //dd($username);
+
             DB::commit();
 
             return response()->json([
                 'status' => 'success',
                 'data' => [
-                    'id' => $username,
-                    'nama' => $request->nama
+                    'nama' => $request->username
                 ]
             ], 200);
+
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -78,7 +99,7 @@ class UsernameController extends Controller
 
     public function getDataById($id)
     {
-        $data = User::with('bagian', 'hakAkses')->find($id);
+        $data = User::with('bagian', 'hakAkses', 'direktorat', 'sub_bagian')->find($id);
 
         return response()->json($data, 200);
     }
@@ -89,7 +110,7 @@ class UsernameController extends Controller
             'id' => 'required|exists:master_user,master_user_id',
             'username' => 'required|string',
             'role' => 'required|exists:master_hak_akses,hak_akses_id',
-            'divisi' => 'required|exists:master_bagian,master_bagian_id',
+            'divisi' => 'required|string',
         ]);
 
         if ($validated->fails()) {
@@ -101,25 +122,54 @@ class UsernameController extends Controller
         try {
             DB::beginTransaction();
 
-            $user = DB::table('master_user')
-                ->where('master_user_id', $request->id)
-                ->update([
-                    'master_user_nama' => $request->username,
-                    'master_nama_bagian_id' => $request->divisi,
-                    'master_hak_akses_id' => $request->role,
-                ]);
+            $masterNamaBagianId = null;
+            $direktoratId = null;
+            $subBagianId = null;
 
+            $role = DB::table('master_hak_akses')->where('hak_akses_id', $request->role)->first();
+            $roleName = strtolower($role->hak_akses_nama);
+
+            // Set divisi and related IDs based on the role
+            if ($roleName === 'direktorat') {
+                $direktorat = DB::table('master_direktorat')->where('direktorat_id', $request->divisi)->first();
+                $direktoratId = $direktorat->direktorat_id;
+            } elseif ($roleName === 'subdivisi') {
+                $subdivisi = DB::table('master_sub_bagian')->where('id', $request->divisi)->first();
+                $subBagianId = $subdivisi->id;
+                $masterNamaBagianId = $subdivisi->master_bagian_id;
+
+                $bagian = DB::table('master_bagian')->where('master_bagian_id', $subdivisi->master_bagian_id)->first();
+                if ($bagian) {
+                    $direktoratId = $bagian->direktorat_id;
+                }
+            } else {
+                $bagian = DB::table('master_bagian')->where('master_bagian_id', $request->divisi)->first();
+                if ($bagian) {
+                    $masterNamaBagianId = $bagian->master_bagian_id;
+                    $direktoratId = $bagian->direktorat_id;
+                }            
+            }
+
+            $updateData = [
+                'master_user_nama' => $request->username,
+                'master_hak_akses_id' => $request->role,
+                'master_nama_bagian_id' => $masterNamaBagianId,
+                'direktorat_id' => $direktoratId,
+                'id_sub_divisi' => $subBagianId,
+            ];
+
+            DB::table('master_user')->where('master_user_id', $request->id)->update($updateData);
             DB::commit();
 
             return response()->json([
                 'status' => 'success',
-                'data' => $user
+                'message' => 'Data user berhasil diperbarui'
             ], 200);
+
         } catch (\Exception $e) {
             DB::rollBack();
-
             return response()->json([
-                'message' => 'Failed to update master bagian. Error: ' . $e->getMessage()
+                'message' => 'Gagal memperbarui data. Error: ' . $e->getMessage()
             ], 500);
         }
     }

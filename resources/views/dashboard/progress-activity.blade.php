@@ -1,98 +1,199 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('master/master')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Gantt Chart</title>
-    {{-- <link rel="stylesheet" href="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.css"> --}}
-    <link rel="stylesheet" href="{{ asset('plugins/dhtmlx-gantt-chart/codebase/sources/dhtmlxgantt.css') }}">
-    {{-- <script src="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js"></script> --}}
-    <script src="{{ asset('plugins/dhtmlx-gantt-chart/codebase/sources/dhtmlxgantt.js') }}"></script>
- 
-    <style>
-        /* Menyembunyikan konten bar tugas */
-        .gantt_task_line.gantt_bar_task > .gantt_task_content {
-            display: none !important;
-        }
+@section('title', 'Gantt Chart Monitoring Program Kerja')
+@section('progress-activity', 'active')
 
-        .gantt_grid_head_cell {
-            white-space: normal; /* Membungkus teks panjang ke baris berikutnya */
-            word-wrap: break-word; /* Memecah kata yang panjang */
-            overflow-wrap: break-word; /* Memastikan kata panjang tidak melampaui batas */
-            word-break: break-word; /* Memecah kata panjang untuk pembungkusan */
-            font-size: 12px; /* Ukuran font header kolom */
-            font-weight: bold; /* Menebalkan teks header */
-            padding: 4px; /* Padding di dalam sel header */
-            box-sizing: border-box; /* Menyertakan padding dalam lebar elemen */
-        }
+@section('content')
 
-        /* Mengatur gaya untuk isi sel Gantt */
-        .gantt_tree_content {
-            white-space: normal; /* Membungkus teks panjang ke baris berikutnya */
-            word-wrap: break-word; /* Memecah kata yang panjang */
-            overflow-wrap: break-word; /* Memastikan kata panjang tidak melampaui batas */
-            word-break: break-word; /* Memecah kata panjang untuk pembungkusan */
-            font-size: 12px; /* Ukuran font isi sel */
-            padding: 4px; /* Padding di dalam sel */
-            box-sizing: border-box; /* Menyertakan padding dalam lebar elemen */
-            line-height: 1.2; /* Menyesuaikan tinggi baris untuk membuat teks lebih mudah dibaca */
-        }
-
-        /* Menyesuaikan tinggi baris secara otomatis */
-        .gantt_grid_body .gantt_grid_row {
-            height: auto; /* Mengatur tinggi baris otomatis */
-        }
-
-        .gantt_container {
-        display: flex;
-        width: 100%;
-        }
-
-        .gantt_column_wrap {
-            white-space: normal;
-            word-wrap: break-word;
-        }
-
-    </style>
-</head>
-
-<body>
-
-    <div class="mb-4">
-        <label for="filter-year">Filter Tahun:</label>
-        <select id="filter-year" class="form-control" style="width: 200px; display: inline-block;">
-            @for ($i = 2023; $i <= now()->year + 1; $i++)
-                <option value="{{ $i }}" {{ $i == now()->year ? 'selected' : '' }}>{{ $i }}</option>
-            @endfor
-        </select>
-    </div>   
-    
-    <div class="row">
-        <div class="col-auto mr-auto"></div>
-        <div class="col-auto mb-2" style="text-align: right;" >
-            <p style="margin: 0; font-size: 14px;">
-                <span style="display: inline-block; width: 40px; height: 10px; background-color: #007bff; border-radius: 5px; margin-right: 3px;"></span>
-                Plan
-                &nbsp;
-                <span style="display: inline-block; width: 40px; height: 10px; background-color: #3db9d3; border-radius: 5px; margin-right: 3px; margin-left: 10px;"></span>
-                Actual
-            </p>
+    <div class="col-md-12">
+        <div class="mb-3">
+            <button class="btn btn-danger" data-toggle="modal" data-target="#reportPdfModal" hidden>
+                <i class="fas fa-file-pdf mr-2"></i>
+                Report PDF Progress
+            </button>
+            <button class="btn btn-success" data-toggle="modal" data-target="#reportExcelModal">
+                <i class="fas fa-file-excel mr-2"></i>
+                Report Excel Progress
+            </button>
         </div>
-      </div>
-    
-    <div id="gantt_here" style="width:100%; height:500px;"></div>
+    </div>
+    <x-progress-activity />
 
-    
+    <div class="modal fade" id="reportPdfModal" tabindex="-1" role="dialog" aria-labelledby="reportPdfModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reportPdfModalLabel">Pilih Tahun dan Proyek</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="#" method="GET">
+                    @csrf
+                    <div class="modal-body">
+                        <!-- Pilih Tahun -->
+                        <div class="form-group">
+                            <label for="year">Pilih Tahun Progress</label>
+                            <select name="year" id="year" class="form-control">
+                                @for ($i = 2023; $i <= now()->year + 1; $i++)
+                                    <option value="{{ $i }}" {{ $i == now()->year ? 'selected' : '' }}>{{ $i }}</option>
+                                @endfor
+                            </select>
+                        </div>
+
+                        <!-- Pilih Proyek -->
+                        <div class="form-group">
+                            <label for="project">Pilih Proyek</label>
+                            <select name="project" id="project" class="form-control">
+                                @foreach ($projects as $project)
+                                    <option value="{{ $project->project_id }}">{{ $project->project_nama }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <span class="text-muted text-sm">*Report berupa PDF dengan data activity</span>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Download Report</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="reportExcelModal" tabindex="-1" role="dialog" aria-labelledby="reportPdfModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reportPdfModalLabel">Pilih Tahun dan Proyek</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{{ route('dashboard.download-excel') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <!-- Pilih Tahun -->
+                        <div class="form-group">
+                            <label for="year">Pilih Tahun Progress</label>
+                            <select name="year" id="year" class="form-control">
+                                @for ($i = 2023; $i <= now()->year + 1; $i++)
+                                    <option value="{{ $i }}" {{ $i == now()->year ? 'selected' : '' }}>{{ $i }}</option>
+                                @endfor
+                            </select>
+                        </div>
+
+                        <!-- Pilih Proyek -->
+                        <div class="form-group">
+                            <label for="project">Pilih Proyek</label>
+                            <select name="project" id="project" class="form-control">
+                                <option value="0" selected>Semua Proyek</option>
+                                @foreach ($projects as $project)
+                                    <option value="{{ $project->id_project }}">{{ $project->project_nama }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <span class="text-muted text-sm">*Report berupa Excel dengan data activity</span>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Download Excel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <script>
-        var selectedYear = $('#filter-year').val() || new Date().getFullYear();
-    
-        // Konfigurasi awal Gantt Chart
+        $(document).ready(function() {
+            var selectedYear = $('#filter-year').val() || new Date().getFullYear();
+            
+            $.ajax({
+                url: '{{ route('ganchart') }}',
+                method: 'GET',
+                data: { year: selectedYear },
+                success: function(response) {
+                    $('#gantt-chart-field').html(response);
+                }
+            })
+
+            $('#reportPdfForm').on('submit', function(e) {
+                e.preventDefault(); // Prevent normal form submission
+
+                var year = $('#year').val();
+                var projectId = $('#project').val();
+                var projectName = $('#project option:selected').data('name'); // Get project name
+                var randomNum = Math.floor(Math.random() * 100000); // Generate random number
+
+                // AJAX request to generate the PDF
+                $.ajax({
+                    url: '{{ route('dashboard.download-pdf') }}',
+                    method: 'GET',
+                    data: {
+                        year: year,
+                        project: projectId
+                    },
+                    xhrFields: {
+                        responseType: 'blob' // Handle binary data for file download
+                    },
+                    success: function(response) {
+                        var blob = new Blob([response], {
+                            type: 'application/pdf'
+                        });
+                        var link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = 'report_' + projectName + '_' + year + '_' + randomNum +
+                            '.pdf';
+                        link.click();
+
+                        // Close the modal after successful download
+                        $('#reportPdfModal').modal('hide');
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Failed to generate report. Please try again.');
+                    }
+                });
+            });
+
+            // Year filter change event
+            $('#filter-year').on('change', function() {
+                var selectedYear = $(this).val();
+                gantt.config.start_date = new Date(selectedYear, 0, 1);
+                gantt.config.readonly = true;
+                
+                $.ajax({
+                    url: '{{ route('ganchart') }}',
+                    method: 'GET',
+                    data: { year: selectedYear },
+                    success: function(response) {
+                        $('#gantt-chart-field').html(response);
+                        // You may need to reinitialize gantt here depending on your setup
+                    }
+                });
+            });
+
+            $('#reportPdfForm').on('submit', function(e) {
+                e.preventDefault(); // Prevent normal form submission
+
+                var year = $('#year').val();
+                var projectId = $('#project').val();
+                var projectName = $('#project option:selected').data('name'); // Get project name
+                var randomNum = Math.floor(Math.random() * 100000); // Generate random number
+            });
+        });
+
         gantt.config.date_format = "%Y-%m-%d";
-        gantt.config.scale_unit = "month"; 
-        gantt.config.date_scale = "%F %Y"; 
-        
+
+        // Konfigurasi Gantt Chart
+        gantt.config.scale_unit = "month"; // Unit utama skala adalah bulan
+        gantt.config.date_scale = "%F %Y"; // Tampilkan nama bulan dan tahun (Januari 2024, dst.)
+
+        // Sub skala untuk minggu 1-4 di setiap bulan
         gantt.config.subscales = [{
             unit: "week",
             step: 1,
@@ -100,44 +201,49 @@
                 var weekNum = gantt.date.getWeek(date);
                 var monthStartWeek = gantt.date.getWeek(gantt.date.month_start(date));
                 var weekInMonth = weekNum - monthStartWeek + 1;
-                
+
+                // Batasi hanya hingga minggu 4
                 if (weekInMonth < 1 || weekInMonth > 5) {
                     return "Week 1";
                 }
                 return "Week " + weekInMonth;
             }
         }];
-        
-        gantt.config.scale_height = 60;
-        gantt.config.row_height = 60;
-        gantt.config.bar_height = 20;
-        
-        // Set tanggal awal dan akhir berdasarkan tahun yang dipilih
-        gantt.config.start_date = new Date(selectedYear, 0, 1);
-        gantt.config.end_date = new Date(selectedYear, 11, 31);
-        
-        gantt.config.readonly = true;
-        
+
+        gantt.config.scale_height = 60; // Tinggi skala (header)
+        gantt.config.row_height = 60; // Tinggi setiap baris aktivitas
+        gantt.config.bar_height = 20; // Tinggi bar Gantt untuk setiap aktivitas
+
+            // You might need to reinitialize gantt here depending on how your code works
+            // gantt.init("gantt_here");
+            // gantt.parse(data);
+    
+        // gantt.config.resizable = true;
+
+        // gantt.attachEvent("onBeforeTaskDrag", function(id, mode) {
+        //     return true; // Mengizinkan drag
+        // });
+
         gantt.config.layout = {
-            css: "gantt_container",
-            cols: [
-                {
-                    width: 500,
-                    min_width: 300,
-                    rows: [
-                        { view: "grid", scrollX: "gridScroll", scrollable: true, scrollY: "scrollVer" },
-                        { view: "scrollbar", id: "gridScroll", group: "horizontal" }
-                    ]
-                },
-                { resizer: true, width: 1 },
-                {
-                    rows: [
-                        { view: "timeline", scrollX: "scrollHor", scrollY: "scrollVer" },
-                        { view: "scrollbar", id: "scrollHor", group: "horizontal" }
-                    ]
-                },
-                { view: "scrollbar", id: "scrollVer" }
-            ]
+        css: "gantt_container",
+        cols: [
+            {
+                width: 500, // lebar tabel (sidebar)
+                min_width: 300,
+                rows: [
+                    { view: "grid", scrollX: "gridScroll", scrollable: true, scrollY: "scrollVer" },
+                    { view: "scrollbar", id: "gridScroll", group: "horizontal" }
+                ]
+            },
+            { resizer: true, width: 1 },
+            {
+                rows: [
+                    { view: "timeline", scrollX: "scrollHor", scrollY: "scrollVer" },
+                    { view: "scrollbar", id: "scrollHor", group: "horizontal" }
+                ]
+            },
+            { view: "scrollbar", id: "scrollVer" }
+        ]
         };
 
         gantt.init("gantt_here");
@@ -380,11 +486,6 @@
                     @endif
                 @endforeach
             ]
-
-
         });
     </script>
-
-</body>
-
-</html>
+@endsection

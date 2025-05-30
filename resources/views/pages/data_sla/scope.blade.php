@@ -470,7 +470,7 @@
             // Load sub divisi berdasarkan master_nama_bagian_id
             function loadSubBagian(master_nama_bagian_id, targetElement) {
                 $.ajax({
-                    url: '/master-scope/get-subbagian-list/' + master_nama_bagian_id,
+                    url: '{{ route("master-scope.get-subbagian-list", ":id") }}'.replace(':id', master_nama_bagian_id),
                     method: 'GET',
                     success: function (response) {
                         $(targetElement).empty();
@@ -498,6 +498,7 @@
                 console.log('Sub Bagian ID:', subBagianId);
                 console.log('Sub Bagian Nama:', subBagianNama);
             });
+
 
             // Event listener untuk perubahan project/divisi
             $('#namaProyek').on('change', function () {

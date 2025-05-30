@@ -93,11 +93,15 @@
                         <img src="{{ asset('dist/img/user.png') }}" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info">
-
-                        @if (session()->get('hak_akses_id') == 7)
-                            <a href="#" class="d-block">{{ session('username') }}</a>
+                        <a href="#" class="d-block"><strong>{{ session('username') }}</strong></a>
+                    
+                        @if (session('hak_akses_id') == 6)
+                            <a href="#" class="d-block"> {{ session('nama_direktorat') }}</a>
+                        @elseif (session('hak_akses_id') == 7 && session('hak_akses_id'))
+                            <a href="#" class="d-block">{{ session('nama_sub_divisi') }}</a>
+                        @else
+                            <a href="#" class="d-block"> {{ session('bagian_nama') }}</a>
                         @endif
-                        <a href="#" class="d-block">{{ session('bagian_nama') }}</a>
                     </div>
                 </div>
  
@@ -105,12 +109,22 @@
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                         data-accordion="false">
-                        @if (session('hak_akses_id') == 2 || session('hak_akses_id') == 3 || session('hak_akses_id') == 4 || session('hak_akses_id') == 6 || session('hak_akses_id') == 7)
+                        @if (session('hak_akses_id') == 2 || session('hak_akses_id') == 3 || session('hak_akses_id') == 4 || session('hak_akses_id') == 6 || session('hak_akses_id') == 7 || session('hak_akses_id') == 9 || session('hak_akses_id') == 10)
+                        <li class="nav-item">
+                            <li class="nav-item">
                             <li class="nav-item">
                                 <a href="{{ route('dashboard') }}" class="nav-link @yield('dashboard')">
-                                    <i class="nav-icon fas fa-calendar-alt"></i>
+                                    <i class="nav-icon fas fa-tachometer-alt"></i>
                                     <p>
                                         Dashboard
+                                    </p>
+                                </a>
+                            </li>    
+                            <li class="nav-item">
+                                <a href="{{ route('dashboard.progress') }}" class="nav-link @yield('progress-activity')">
+                                    <i class="nav-icon fas fa-calendar-alt"></i>
+                                    <p>
+                                        Gantt Chart
                                     </p>
                                 </a>
                             </li>
@@ -124,7 +138,7 @@
                             </li>
                         @endif
 
-                        @if (session('hak_akses_id') == 2)
+                        @if (in_array(session()->get('hak_akses_id'), [1, 2]))
                             <!-- Parent Menu Item for Pembentuk SLA Data -->
                             <li class="nav-item has-treeview">
                                 <a href="#" class="nav-link @yield('mast')">

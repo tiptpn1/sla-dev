@@ -135,6 +135,7 @@
                             <tr>
                                 <th>NO</th>
                                 <th>Nama Bagian</th>
+                                <th>Nama Bagian</th>
                                 <th>Status Aktif</th>
                                 <th>Action</th>
                             </tr>

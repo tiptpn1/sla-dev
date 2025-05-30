@@ -10,6 +10,7 @@ use App\Models\SubBagian;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
+
 class ActivityController extends Controller
 {
     /**
@@ -17,21 +18,23 @@ class ActivityController extends Controller
      */
     public function index()
     {
+
         $adminAccess = Session::get('hak_akses_id');
         $masterBagianId = Session::get('bagian_id');
         $direktoratId = Session::get('direktorat_id');
         $subBagianId = Session::get('sub_bagian_id');
+      
 
         // Mulai query builder untuk proyek
         $query = Proyek::where('isActive', true);
 
         // Menerapkan filter direktorat_id di awal query jika user level direktorat (hak_akses_id = 6)
-        if ($adminAccess == 6 ) {
+        if ($adminAccess == 6) {
             $query->where('direktorat_id', $direktoratId);
         }
 
         // Jika user adalah level divisi (hak_akses_id = 3 atau 7)
-        if (in_array($adminAccess, [3, 7]) && $masterBagianId) {
+        if (in_array($adminAccess, [3, 7, 9, 10]) && $masterBagianId) {
             $query->where('master_nama_bagian_id', $masterBagianId);
         }
 
@@ -76,11 +79,21 @@ class ActivityController extends Controller
      */
     public function create()
     {
-        $projects = Proyek::select('id_project', 'project_nama')->get();
+        $hakAkses = Session::get('hak_akses_id');
+        $bagianId = Session::get('bagian_id');
+
+
+        $query = Proyek::select('id_project', 'project_nama');
+
+        if (in_array($hakAkses, [9, 10]) && $bagianId) {
+            $query->where('master_nama_bagian_id', $bagianId);
+        }
+
+        $projects = $query->get();
+
         $bagians = Bagian::select('master_bagian_id', 'master_bagian_nama')->get();
         $subBagians = SubBagian::select('id', 'sub_bagian_nama')->get();
 
-        $bagianId = Session::get('bagian_id');
 
         return view('activities.create', compact('projects', 'bagians', 'subBagians'));
     }

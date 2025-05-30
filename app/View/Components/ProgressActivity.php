@@ -27,6 +27,7 @@ class ProgressActivity extends Component
         $adminAccess = Session::get('hak_akses_id');
         $bagianId = Session::get('master_nama_bagian_id');
         $subDivisiId = Session::get('id_sub_divisi'); 
+        $scopeProjectId = Session::get('project_id'); 
 
         $query = Proyek::with([
             'scopes' => function ($query) {
@@ -40,10 +41,10 @@ class ProgressActivity extends Component
         // Apply filter berdasarkan hak akses
         if ($adminAccess == 6 && $direktoratId) {
             $query->where('direktorat_id', $direktoratId);
-        } elseif ($adminAccess == 3 && $bagianId) {
+        } elseif (($adminAccess == 3 || $adminAccess == 10) && $bagianId) {
             $query->where('master_nama_bagian_id', $bagianId);
-        } elseif ($adminAccess == 7 && $subDivisiId) {
-            $query->where('id_sub_divisi', $subDivisiId);
+        } elseif (($adminAccess == 7 || $adminAccess == 9) && $scopeProjectId) {
+            $query->where('project_id', $scopeProjectId);
         }
 
         $projects = $query->get();

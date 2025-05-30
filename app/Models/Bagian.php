@@ -35,6 +35,7 @@ class Bagian extends Model
 
     public function direktorat()
     {
-        return $this->hasOne(Direktorat::class, 'master_bagian_id', 'master_bagian_id');
+        return $this->belongsTo(Direktorat::class, 'direktorat_id');
     }
+    
 }

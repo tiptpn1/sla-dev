@@ -22,6 +22,7 @@ class Scope extends Model
         'sub_bagian_id'
     ];
 
+
     protected $guarded = ['id'];
 
 
