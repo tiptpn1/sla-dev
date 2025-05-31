@@ -9,6 +9,7 @@ use App\Http\Controllers\DirektoratController;
 use App\Http\Controllers\DivisiController;
 use App\Http\Controllers\MasterBagianController;
 use App\Http\Controllers\MonitoringController;
+use App\Http\Controllers\ProgressActivityController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RincianProgressController;
 use App\Http\Controllers\RoleController;
@@ -69,8 +70,10 @@ Route::middleware(['checkLogin'])->group(function () {
         Route::get('get-data', [BagianController::class, 'getData'])->name('get-data');
         Route::get('get-data/{id}', [BagianController::class, 'getDataById'])->name('get-data-id');
         Route::post('store', [BagianController::class, 'store'])->name('store');
+        Route::get('{id}/edit', [BagianController::class, 'edit'])->name('edit');
         Route::post('status/{id}', [BagianController::class, 'updateStatus'])->name('update-status');
         Route::post('form/{id}', [BagianController::class, 'updateForm'])->name('update-form');
+        Route::put('update/{id}', [BagianController::class, 'update'])->name('update');
         Route::delete('delete/{id}', [BagianController::class, 'delete'])->name('delete');
     });
 
@@ -145,7 +148,8 @@ Route::middleware(['checkLogin'])->group(function () {
     });
 
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('ganchart', [DashboardController::class, 'ganchart'])->name('ganchart');
+    Route::get('ganchart', [ProgressActivityController::class, 'ganchart'])->name('ganchart');
+    Route::get('progress-activity', [ProgressActivityController::class, 'index'])->name('dashboard.progress');
 
     Route::get('activities/data', [ServerSideActivityController::class, 'data'])->name('activities.data');
     Route::resource('activities', ActivityController::class);
