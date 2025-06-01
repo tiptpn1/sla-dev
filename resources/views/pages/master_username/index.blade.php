@@ -180,7 +180,7 @@
                         <div class="form-group">
                             <label for="divisi">Nama Bagian : </label>
                             <select class="form-control" id="divisi" name="divisi">
-                                <option selected>Pilih Bagian</option>
+                                <option selected>--Pilih Bagian--</option>
                                 @foreach ($all_divisi as $divisi)
                                     <option value="{{ $divisi->master_bagian_id }}" data-posisi="{{ $divisi->master_bagian_posisi }}">
                                         {{ $divisi->master_bagian_nama }}

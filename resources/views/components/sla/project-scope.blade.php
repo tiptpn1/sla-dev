@@ -32,7 +32,7 @@
                                 role="progressbar" style="width: 0%;" data-scope-id="{{ $scope->id }}"
                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
                                 0%
-                            </div>
+                            </div>  
                         </div>
                         <span class="ml-2 font-weight-bold">100%</span>
                     </div>

@@ -48,6 +48,18 @@
     @stack('css')
 </head>
 
+<style>
+    .sidebar .user-panel .info {
+        max-width: 100%;
+    }
+    .sidebar .user-panel .info a {
+        display: block;
+        white-space: normal !important;
+        word-break: break-word;
+    }
+
+</style>
+
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
         <!-- Navbar -->
@@ -97,8 +109,12 @@
                     
                         @if (session('hak_akses_id') == 6)
                             <a href="#" class="d-block"> {{ session('nama_direktorat') }}</a>
-                        @elseif (session('hak_akses_id') == 7 && session('hak_akses_id'))
-                            <a href="#" class="d-block">{{ session('nama_sub_divisi') }}</a>
+                        @elseif (session('hak_akses_id') == 7) 
+                            <a href="#" class="d-block"> {{ session('nama_sub_divisi') }}</a>
+                        @elseif (session('hak_akses_id') == 9 )
+                            <a href="#" class="d-block"> Koor {{ session('nama_sub_divisi') }}</a>
+                        @elseif (session('hak_akses_id') == 10 )
+                            <a href="#" class="d-block"> Koor {{ session('bagian_nama') }}</a>
                         @else
                             <a href="#" class="d-block"> {{ session('bagian_nama') }}</a>
                         @endif

@@ -33,7 +33,6 @@ class ProgressActivityController extends Controller
         $adminAccess = Session::get('hak_akses_id');
         $bagianId = Session::get('master_nama_bagian_id');
         $subDivisiId = Session::get('id_sub_divisi');
-        $scopeProjectId = Session::get('sub_bagian_id');
         
         $year = $request->input('year', date('Y'));
         

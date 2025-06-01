@@ -52,8 +52,8 @@ class UsernameController extends Controller
             if ($roleName === 'direktorat') {
                 $direktorat = DB::table('master_direktorat')->where('direktorat_id', $request->divisi)->first();
                 $direktoratId = $direktorat->direktorat_id;
-            } 
-            elseif ($roleName === 'subdivisi') {
+            }   
+            elseif (in_array($roleName, ['koordinator sub divisi', 'subdivisi'])) {
                 $subdivisi = DB::table('master_sub_bagian')->where('id', $request->divisi)->first();
                 $subDivisiId = $subdivisi->id;
                 $masterNamaBagianId = $subdivisi->master_bagian_id;
@@ -133,7 +133,7 @@ class UsernameController extends Controller
             if ($roleName === 'direktorat') {
                 $direktorat = DB::table('master_direktorat')->where('direktorat_id', $request->divisi)->first();
                 $direktoratId = $direktorat->direktorat_id;
-            } elseif ($roleName === 'subdivisi') {
+            } elseif (in_array($roleName, ['koordinator sub divisi', 'subdivisi'])) {
                 $subdivisi = DB::table('master_sub_bagian')->where('id', $request->divisi)->first();
                 $subBagianId = $subdivisi->id;
                 $masterNamaBagianId = $subdivisi->master_bagian_id;
@@ -173,7 +173,6 @@ class UsernameController extends Controller
             ], 500);
         }
     }
-
     public function destroy($id)
     {
         DB::beginTransaction();
