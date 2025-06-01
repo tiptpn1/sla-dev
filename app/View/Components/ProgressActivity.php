@@ -43,8 +43,11 @@ class ProgressActivity extends Component
             $query->where('direktorat_id', $direktoratId);
         } elseif (($adminAccess == 3 || $adminAccess == 10) && $bagianId) {
             $query->where('master_nama_bagian_id', $bagianId);
-        } elseif (($adminAccess == 7 || $adminAccess == 9) && $scopeProjectId) {
-            $query->where('project_id', $scopeProjectId);
+        } elseif (($adminAccess == 7 || $adminAccess == 9) && $subDivisiId) {
+            $query->whereHas('scopes', function ($q) use ($subDivisiId) {
+                $q->where('isActive', true)
+                  ->where('sub_bagian_id', $subDivisiId);
+            });
         }
 
         $projects = $query->get();
