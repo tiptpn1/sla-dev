@@ -423,7 +423,7 @@
                     idKey = 'direktorat_id';
                     nameKey = 'nama';
                     selectedValue = userData?.direktorat_id;
-                } else if (roleText.includes('subdivisi') || roleText.includes('Koordinator Sub Divisi')) {
+                } else if (roleText.includes('subdivisi') || roleText.includes('koordinator sub divisi')) {
                     url = "{{ route('master-sub-divisi.data') }}";
                     label = '-- Pilih Sub Divisi --';
                     idKey = 'id';

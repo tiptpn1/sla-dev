@@ -69,9 +69,6 @@ class DashboardController extends Controller
 
         return view('dashboard.index', compact('projects', 'progressColors'));
     }
-
-
-
     public function activity()
     {
         $adminAccess = Session::get('hak_akses_id');
@@ -105,11 +102,9 @@ class DashboardController extends Controller
         if (in_array($adminAccess, [3, 10]) && $bagianId) {
             $query->where('master_nama_bagian_id', $bagianId);
         }
-
         if ($adminAccess == 6 && $bagianId) {
             $query->where('direktorat_id', $direktoratId);
         }
-
         if (in_array($adminAccess, [7, 9]) && $subDivisiId) {
             $query->whereHas('scopes', function ($q) use ($subDivisiId) {
             $q->where('isActive', true)
