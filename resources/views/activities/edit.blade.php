@@ -42,8 +42,8 @@
                                 {{-- @dd(session()->get('hak_akses_id')) --}}
                                 <label for="project_id">Project</label>
                                 <select name="project_id" class="form-control @error('project_id') is-invalid @enderror"
-                                    id="project_id" {{ in_array(session()->get('hak_akses_id'), [2, 9, 10]) ? 'required' : '' }}>
-    <option value="{{ $activity->project_id }}" selected>
+                                    id="project_id">
+                                    <option value="{{ $activity->project_id }}" selected>
                                         {{ $activity->proyek->project_nama }}
                                     </option>
                                 </select>
@@ -58,8 +58,8 @@
                             <div class="form-group">
                                 <label for="scope_id">Scope</label>
                                 <select name="scope_id" class="form-control @error('scope_id') is-invalid @enderror"
-                                    id="scope_id" {{ in_array(session()->get('hak_akses_id'), [2, 9, 10]) ? 'required' : '' }}>
-    <option value="{{ $activity->scope_id }}" selected>
+                                    id="scope_id">
+                                    <option value="{{ $activity->scope_id }}" selected>
                                         {{ $activity->scope->nama }}
                                     </option>
                                 </select>
@@ -74,9 +74,9 @@
                             <div class="form-group">
                                 <label for="nama_activity">Nama Activity</label>
                                 <input type="text" name="nama_activity"
-    class="form-control @error('nama_activity') is-invalid @enderror" id="nama_activity"
-    value="{{ old('nama_activity', $activity->nama_activity) }}"
-    {{ in_array(session()->get('hak_akses_id'), [2, 9, 10]) ? 'required' : '' }}>
+                                    class="form-control @error('nama_activity') is-invalid @enderror" id="nama_activity"
+                                    value="{{ old('nama_activity', $activity->nama_activity) }}"
+                                    >
                                 @error('nama_activity')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -158,17 +158,16 @@
                             <!-- Select PIC (Multiple Selection with Select2) -->
                             <div class="form-group">
                                 <label for="bagian_id">Select PIC(s)</label>
-<select name="bagian_id[]"
-    class="form-control select2 @error('bagian_id') is-invalid @enderror" id="bagian_id"
-    multiple {{ in_array(session()->get('hak_akses_id'), [2, 9, 10]) ? 'required' : '' }}>
-    @foreach ($bagians as $bagian)
-        <option value="{{ $bagian->master_bagian_id }}"
-            {{ in_array($bagian->master_bagian_id, old('bagian_id', $activity->pics->pluck('bagian_id')->toArray())) ? 'selected' : '' }}>
-            {{ $bagian->master_bagian_nama }}
-        </option>
-    @endforeach
-</select>
-
+                                <select name="bagian_id[]"
+                                    class="form-control select2 @error('bagian_id') is-invalid @enderror" id="bagian_id"
+                                    multiple>
+                                    @foreach ($bagians as $bagian)
+                                        <option value="{{ $bagian->master_bagian_id }}"
+                                            {{ in_array($bagian->master_bagian_id, old('bagian_id', $activity->pics->pluck('bagian_id')->toArray())) ? 'selected' : '' }}>
+                                            {{ $bagian->master_bagian_nama }}
+                                        </option>
+                                    @endforeach
+                                </select>
                                 @error('bagian_id')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
