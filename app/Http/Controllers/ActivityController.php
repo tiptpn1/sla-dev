@@ -18,60 +18,45 @@ class ActivityController extends Controller
      */
     public function index()
     {
-
         $adminAccess = Session::get('hak_akses_id');
-        $masterBagianId = Session::get('bagian_id');
+        $bagianId = Session::get('master_nama_bagian_id');
         $direktoratId = Session::get('direktorat_id');
-        $subBagianId = Session::get('sub_bagian_id');
-      
+        $subDivisiId = Session::get('id_sub_divisi');
 
-        // Mulai query builder untuk proyek
-        $query = Proyek::where('isActive', true);
-
-        // Menerapkan filter direktorat_id di awal query jika user level direktorat (hak_akses_id = 6)
-        if ($adminAccess == 6) {
-            $query->where('direktorat_id', $direktoratId);
-        }
-
-        // Jika user adalah level divisi (hak_akses_id = 3 atau 7)
-        if (in_array($adminAccess, [3, 7, 9, 10]) && $masterBagianId) {
-            $query->where('master_nama_bagian_id', $masterBagianId);
-        }
-
-        // Filter proyek di level paling atas untuk level 7
-        if ($adminAccess == 7 && $subBagianId) {
-            $query->whereHas('scopes', function ($q) use ($subBagianId) {
-                $q->where('sub_bagian_id', $subBagianId);
-            });
-        }
-
-        // Setelah menerapkan semua filter, baru kita tambahkan eager loading
-        $query->with([
-            'scopes' => function ($query) use ($adminAccess, $subBagianId) {
+        $query = Proyek::with([
+            'scopes' => function ($query) use ($adminAccess, $subDivisiId) {
                 $query->where('isActive', 1);
 
-                // Filter scopes untuk level 7, berdasarkan sub_bagian_id dari scope
-                if ($adminAccess == 7 && $subBagianId) {
-                    $query->where('sub_bagian_id', $subBagianId);
+                // Jika akses sub divisi, filter scope berdasarkan sub_bagian_id
+                if (in_array($adminAccess, [7, 9]) && $subDivisiId) {
+                    $query->where('sub_bagian_id', $subDivisiId);
                 }
             },
-            'scopes.activities' => function ($query) use ($adminAccess, $subBagianId) {
+            'scopes.activities' => function ($query) use ($adminAccess) {
                 if ($adminAccess != 2) {
                     $query->where('isActive', 1);
                 }
             },
             'scopes.activities.pics',
             'scopes.activities.pics.bagian',
-            'scopes.activities.progress' => function ($query) {
-                $query->latest('tanggal')->get();
-            },
-            'scopes.activities.progress.evidences' => function ($query) {
-                $query->latest('created_at')->get();
-            }
-        ]);
+            'scopes.activities.progress' => fn($q) => $q->latest('tanggal'),
+            'scopes.activities.progress.evidences' => fn($q) => $q->latest('created_at'),
+        ])->where('isActive', true);
 
-        // Eksekusi query dan dapatkan hasilnya
+        // Filter berdasarkan hak akses
+        if (in_array($adminAccess, [3, 10]) && $bagianId) {
+            $query->where('master_nama_bagian_id', $bagianId);
+        } elseif ($adminAccess == 6 && $direktoratId) {
+            $query->where('direktorat_id', $direktoratId);
+        } elseif (in_array($adminAccess, [7, 9]) && $subDivisiId) {
+            $query->whereHas('scopes', function ($q) use ($subDivisiId) {
+                $q->where('isActive', 1)
+                  ->where('sub_bagian_id', $subDivisiId);
+            });
+        }
+
         $projects = $query->get();
+
         return view('activities.index', compact('projects'));
     }
     /**
