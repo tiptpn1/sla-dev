@@ -186,11 +186,11 @@ class ActivityController extends Controller
         ]);
 
         $activity->pics()->delete();
-
+        
         foreach ($request->bagian_id as $bagianId) {
             Pic::create([
                 'activity_id' => $activity->id_activity,
-                'master_bagian_id' => $bagianId,
+                'bagian_id' => $bagianId,
             ]);
         }
         session()->flash('success', 'Activity updated successfully!');
