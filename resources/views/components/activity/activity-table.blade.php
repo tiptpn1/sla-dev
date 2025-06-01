@@ -141,7 +141,7 @@
                             </a>
                         @endif
 
-                        @if (in_array(session()->get('hak_akses_id'), [1, 2]))
+                        @if (in_array(session()->get('hak_akses_id'), [1, 2, 9, 10]))
                             <a href="{{ route('activities.edit', $activity->id_activity) }}"
                                 class="btn btn-warning btn-sm">
                                 <i class="fas fa-edit"></i>
