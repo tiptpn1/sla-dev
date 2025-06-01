@@ -2,16 +2,26 @@
 
 namespace App\Http\Controllers\ServerSide;
 
-use App\Http\Controllers\Controller;
-use App\Models\Proyek;
 use App\Models\Scope;
+use App\Models\Proyek;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Session;
 
 class ProjectScopeController extends Controller
 {
     public function getProjects()
     {
-        $data = Proyek::where('isActive', true)->where('project_nama', 'like', '%' . request('q') . '%')->paginate(10);
+        $hakAkses = Session::get('hak_akses_id');
+        $bagianId = Session::get('bagian_id');
+
+        $query = Proyek::where('isActive', true)->where('project_nama', 'like', '%' . request('q') . '%');
+
+        if (in_array($hakAkses, [9, 10])) {
+            $query->where('master_nama_bagian_id', $bagianId);
+        }
+
+        $data = $query->paginate(10);
 
         return response()->json([
             'total_data' => $data->total(),
