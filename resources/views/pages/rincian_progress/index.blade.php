@@ -133,6 +133,7 @@
 
 @php
     $bagianIdUser = session()->get('bagian_id');
+    $hakaksesId = session()->get('hak_akses_id');
 @endphp
 
 @section('content')
@@ -162,7 +163,7 @@
                     </div>
                 </div>
                 <div class="card">
-                @if ($hasAccess || $bagianIdUser == 33)
+                @if ($hakaksesId == 7)
                     <div class="card-header">
                             <button type="button" class="btn btn-primary" data-toggle="modal"
                                 onclick="tambahRincianProgress()">
@@ -181,10 +182,8 @@
                                         <th scope="col">Tindak Lanjut</th>
                                         <th scope="col">Tanggal</th>
                                         {{-- <th scope="col">Evidence</th> --}}
-                                        @if ($hasAccess || $bagianIdUser == 33)
-                                            <th scope="col" width="22%" style="text-align: center">Actions</th>
-                                        @endif
-                                    </tr>
+                                        <th scope="col" width="22%" style="text-align: center">Actions</th>
+                                        </tr>
                                 </thead>
                             </table>
                         </div>
@@ -319,10 +318,12 @@
                                 <input type="file" style="display: none;" name="file_evidence"
                                     onchange="addFileEvidence(this)" accept=".pdf, .jpg, .zip, .rar, .xlsx, .xls"
                                     id="addFileEvidenceFromDetail">
+                                @if ($hakaksesId == 7)
                                 <button type="button" class="btn btn-primary mb-2" data-toggle="modal"
                                     onclick="document.getElementById('addFileEvidenceFromDetail').click()">
                                     Tambah Evidence
                                 </button>
+                                @endif
                             </form>
                         </div>
                         <div class="table-responsive">
@@ -416,7 +417,7 @@
 
 @push('scripts')
     <script>
-      let hasAccess = {{ ($hasAccess || $bagianIdUser == 33) ? 'true' : 'false' }};
+      let hasAccess = {{ ($hakaksesId != 0) ? 'true' : 'false' }};
 
         $(document).ready(function() {
             $.ajaxSetup({
@@ -448,9 +449,9 @@
                                     month: '2-digit',
                                     year: 'numeric'
                                 }),
-                                `<button class="btn btn-info btn-sm status-btn"  onclick=showEvidence(this) data-id="${item.id}" data-rincian_progress="${item.rincian_progress}">Evidence</button>
+                                `<button class="btn btn-info btn-sm status-btn"  onclick=showEvidence(this) data-id="${item.id}" data-rincian_progress="${item.rincian_progress}">Evidence</button>@if ($hakaksesId == 7)
                                 <button class="btn btn-warning btn-sm edit-btn" onclick="ubahRincianProgress(this)" data-id="${item.id}" data-rincian_progress="${item.rincian_progress}" data-kendala="${item.kendala}" data-tindak_lanjut="${item.tindak_lanjut}">Edit</button>
-                                <button class="btn btn-danger btn-sm delete-btn deleteButton" type="submit" type="button" data-toggle="modal" data-id="${item.id}">Hapus</button>`
+                                <button class="btn btn-danger btn-sm delete-btn deleteButton" type="submit" type="button" data-toggle="modal" data-id="${item.id}">Hapus</button>@endif`
                             ]).draw();
                         } else {
                             table.row.add([
@@ -599,9 +600,9 @@
                         evidenceTable.row.add([
                         index + 1,
                         item.filename,
-                        `<button class="btn btn-info btn-sm" onclick=downloadEvidence(this) data-id="${item.id_evidence}" data-filename=${item.filename}>Unduh</button>
+                        `<button class="btn btn-info btn-sm" onclick=downloadEvidence(this) data-id="${item.id_evidence}" data-filename=${item.filename}>Unduh</button>@if ($hakaksesId == 7)
                         <button class="btn btn-warning btn-sm edit-btn" onclick="ubahFileEvidence(this)" data-id="${item.id_evidence}" data-filename="${item.filename}">Edit</button>
-                        <buttontype="submit" class="btn btn-danger btn-sm" type="button" data-toggle="modal" onclick="deleteFileEvidence(this)" data-id="${item.id_evidence}" data-filename=${item.filename}>Hapus</buttontype=>`
+                        <buttontype="submit" class="btn btn-danger btn-sm" type="button" data-toggle="modal" onclick="deleteFileEvidence(this)" data-id="${item.id_evidence}" data-filename=${item.filename}>Hapus</buttontype=>@endif`
                     ]).draw();
                 });
                 },
