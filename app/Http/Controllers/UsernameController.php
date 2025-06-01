@@ -76,7 +76,7 @@ class UsernameController extends Controller
                 'master_user_password' => Hash::make($request->password),
                 'master_hak_akses_id' => $request->role,
                 'master_nama_bagian_id' => $masterNamaBagianId,
-                'direktorat_id' => $direktoratId,
+                'master_direktorat_id' => $direktoratId,
                 'id_sub_divisi' => $subDivisiId,
             ]);
 
