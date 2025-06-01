@@ -113,7 +113,7 @@ class DashboardController extends Controller
         }
 
         // Eksekusi query dan dapatkan hasilnya
-        $projects = $query->get();
+        $projects = $query->get();  
 
         return view('activities.index', compact('projects'));
     }

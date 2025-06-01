@@ -52,7 +52,7 @@ class UsernameController extends Controller
             if ($roleName === 'direktorat') {
                 $direktorat = DB::table('master_direktorat')->where('direktorat_id', $request->divisi)->first();
                 $direktoratId = $direktorat->direktorat_id;
-            } 
+            }   
             elseif (in_array($roleName, ['koordinator sub divisi', 'subdivisi'])) {
                 $subdivisi = DB::table('master_sub_bagian')->where('id', $request->divisi)->first();
                 $subDivisiId = $subdivisi->id;

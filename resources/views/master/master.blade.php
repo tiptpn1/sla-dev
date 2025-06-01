@@ -112,9 +112,9 @@
                         @elseif (session('hak_akses_id') == 7) 
                             <a href="#" class="d-block"> {{ session('nama_sub_divisi') }}</a>
                         @elseif (session('hak_akses_id') == 9 )
-                            <a href="#" class="d-block"> Koordinator {{ session('nama_sub_divisi') }}</a>
+                            <a href="#" class="d-block"> Koor {{ session('nama_sub_divisi') }}</a>
                         @elseif (session('hak_akses_id') == 10 )
-                            <a href="#" class="d-block"> Koordinator {{ session('bagian_nama') }}</a>
+                            <a href="#" class="d-block"> Koor {{ session('bagian_nama') }}</a>
                         @else
                             <a href="#" class="d-block"> {{ session('bagian_nama') }}</a>
                         @endif

@@ -9,7 +9,7 @@
                 role="progressbar" style="width: {{ $activity->percent_complete }}%;" data-activity-id="1"
                 aria-valuenow="{{ $activity->percent_complete }}" aria-valuemin="0" aria-valuemax="100">
                 {{ $activity->percent_complete }}%
-            </div>
+            </div>  
         </div>
         <span class="ml-2 font-weight-bold">100%</span>
     </div>
