@@ -65,8 +65,7 @@ class ActivityController extends Controller
     public function create()
     {
         $hakAkses = Session::get('hak_akses_id');
-        $bagianId = Session::get('bagian_id');
-
+        $bagianId = Session::get('master_nama_bagian_id');
 
         $query = Proyek::select('id_project', 'project_nama');
 
@@ -76,10 +75,14 @@ class ActivityController extends Controller
 
         $projects = $query->get();
 
-        $bagians = Bagian::select('master_bagian_id', 'master_bagian_nama')->get();
+        $bagians = Bagian::where('master_bagian_id', $bagianId)->get();
         $subBagians = SubBagian::select('id', 'sub_bagian_nama')->get();
 
-
+        //  dd([
+        //     'hak_akses' => $hakAkses,
+        //     'master_nama_bagian_id' => $bagianId,
+        // ]);
+        
         return view('activities.create', compact('projects', 'bagians', 'subBagians'));
     }
 
@@ -186,11 +189,11 @@ class ActivityController extends Controller
         ]);
 
         $activity->pics()->delete();
-
+        
         foreach ($request->bagian_id as $bagianId) {
             Pic::create([
                 'activity_id' => $activity->id_activity,
-                'master_bagian_id' => $bagianId,
+                'bagian_id' => $bagianId,
             ]);
         }
         session()->flash('success', 'Activity updated successfully!');

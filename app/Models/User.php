@@ -72,7 +72,7 @@ class User extends Authenticatable
 
     public function direktorat()
     {
-        return $this->belongsTo(Direktorat::class, 'direktorat_id', 'direktorat_id');
+        return $this->belongsTo(Direktorat::class, 'master_direktorat_id', 'direktorat_id');
     }
 
     public function sub_bagian()

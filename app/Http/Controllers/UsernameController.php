@@ -60,14 +60,14 @@ class UsernameController extends Controller
 
                 $bagian = DB::table('master_bagian')->where('master_bagian_id', $subdivisi->master_bagian_id)->first();
                 if ($bagian) {
-                    $direktoratId = $bagian->direktorat_id;
+                    $direktoratId = $bagian->master_direktorat_id;
                 }
             }
             else {
                 $bagian = DB::table('master_bagian')->where('master_bagian_id', $request->divisi)->first();
                 if ($bagian) {
                     $masterNamaBagianId = $bagian->master_bagian_id;
-                    $direktoratId = $bagian->direktorat_id;
+                    $direktoratId = $bagian->master_direktorat_id;
                 }
             }
 
@@ -76,7 +76,7 @@ class UsernameController extends Controller
                 'master_user_password' => Hash::make($request->password),
                 'master_hak_akses_id' => $request->role,
                 'master_nama_bagian_id' => $masterNamaBagianId,
-                'direktorat_id' => $direktoratId,
+                'master_direktorat_id' => $direktoratId,
                 'id_sub_divisi' => $subDivisiId,
             ]);
 
@@ -131,8 +131,8 @@ class UsernameController extends Controller
 
             // Set divisi and related IDs based on the role
             if ($roleName === 'direktorat') {
-                $direktorat = DB::table('master_direktorat')->where('direktorat_id', $request->divisi)->first();
-                $direktoratId = $direktorat->direktorat_id;
+                $direktorat = DB::table('master_direktorat')->where('master_direktorat_id', $request->divisi)->first();
+                $direktoratId = $direktorat->master_direktorat_id;
             } elseif (in_array($roleName, ['koordinator sub divisi', 'subdivisi'])) {
                 $subdivisi = DB::table('master_sub_bagian')->where('id', $request->divisi)->first();
                 $subBagianId = $subdivisi->id;
@@ -140,13 +140,13 @@ class UsernameController extends Controller
 
                 $bagian = DB::table('master_bagian')->where('master_bagian_id', $subdivisi->master_bagian_id)->first();
                 if ($bagian) {
-                    $direktoratId = $bagian->direktorat_id;
+                    $direktoratId = $bagian->master_direktorat_id;
                 }
             } else {
                 $bagian = DB::table('master_bagian')->where('master_bagian_id', $request->divisi)->first();
                 if ($bagian) {
                     $masterNamaBagianId = $bagian->master_bagian_id;
-                    $direktoratId = $bagian->direktorat_id;
+                    $direktoratId = $bagian->master_direktorat_id;
                 }            
             }
 
@@ -154,7 +154,7 @@ class UsernameController extends Controller
                 'master_user_nama' => $request->username,
                 'master_hak_akses_id' => $request->role,
                 'master_nama_bagian_id' => $masterNamaBagianId,
-                'direktorat_id' => $direktoratId,
+                'master_direktorat_id' => $direktoratId,
                 'id_sub_divisi' => $subBagianId,
             ];
 
