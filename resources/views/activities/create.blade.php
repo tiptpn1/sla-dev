@@ -52,7 +52,6 @@
                         <form action="{{ route('activities.store') }}" method="POST">
                             @csrf
 
-
                             <!-- Project Dropdown -->
                             <div class="form-group">
                                 <label for="project_id">Divisi</label>
@@ -60,7 +59,7 @@
                                     id="project_id" required>
                                     @if (old('project_id'))
                                         <option value="{{ old('project_id') }}" selected>
-                                            {{ App\Models\Proyek::find(old('project_id'))->project_nama }}
+                                            {{ App\Models\Scope::find(old('project_id'))->nama }}
                                         </option>
                                     @endif
                                 </select>
