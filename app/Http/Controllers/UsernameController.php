@@ -60,14 +60,14 @@ class UsernameController extends Controller
 
                 $bagian = DB::table('master_bagian')->where('master_bagian_id', $subdivisi->master_bagian_id)->first();
                 if ($bagian) {
-                    $direktoratId = $bagian->master_direktorat_id;
+                    $direktoratId = $bagian->direktorat_id;
                 }
             }
             else {
                 $bagian = DB::table('master_bagian')->where('master_bagian_id', $request->divisi)->first();
                 if ($bagian) {
                     $masterNamaBagianId = $bagian->master_bagian_id;
-                    $direktoratId = $bagian->master_direktorat_id;
+                    $direktoratId = $bagian->direktorat_id;
                 }
             }
 
@@ -132,7 +132,7 @@ class UsernameController extends Controller
             // Set divisi and related IDs based on the role
             if ($roleName === 'direktorat') {
                 $direktorat = DB::table('master_direktorat')->where('master_direktorat_id', $request->divisi)->first();
-                $direktoratId = $direktorat->master_direktorat_id;
+                $direktoratId = $direktorat->direktorat_id;
             } elseif (in_array($roleName, ['koordinator sub divisi', 'subdivisi'])) {
                 $subdivisi = DB::table('master_sub_bagian')->where('id', $request->divisi)->first();
                 $subBagianId = $subdivisi->id;
@@ -140,13 +140,13 @@ class UsernameController extends Controller
 
                 $bagian = DB::table('master_bagian')->where('master_bagian_id', $subdivisi->master_bagian_id)->first();
                 if ($bagian) {
-                    $direktoratId = $bagian->master_direktorat_id;
+                    $direktoratId = $bagian->direktorat_id;
                 }
             } else {
                 $bagian = DB::table('master_bagian')->where('master_bagian_id', $request->divisi)->first();
                 if ($bagian) {
                     $masterNamaBagianId = $bagian->master_bagian_id;
-                    $direktoratId = $bagian->master_direktorat_id;
+                    $direktoratId = $bagian->direktorat_id;
                 }            
             }
 
