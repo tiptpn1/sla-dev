@@ -6,6 +6,7 @@ use App\Models\Pic;
 use App\Models\Bagian;
 use App\Models\Proyek;
 use App\Models\Activity;
+use App\Models\Scope;
 use App\Models\SubBagian;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -62,27 +63,23 @@ class ActivityController extends Controller
     /**
      * Show the form for creating a new resource.
      */
+
     public function create()
     {
         $hakAkses = Session::get('hak_akses_id');
         $bagianId = Session::get('master_nama_bagian_id');
+        $subBagianId = Session::get('sub_bagian_id'); 
 
+        // Ambil daftar proyek yang sesuai bagian
         $query = Proyek::select('id_project', 'project_nama');
-
         if (in_array($hakAkses, [9, 10]) && $bagianId) {
             $query->where('master_nama_bagian_id', $bagianId);
         }
-
         $projects = $query->get();
 
-        $bagians = Bagian::where('master_bagian_id', $bagianId)->get();
-        $subBagians = SubBagian::select('id', 'sub_bagian_nama')->get();
+        $bagians = Bagian::all();
+        $subBagians = SubBagian::where('master_bagian_id', $bagianId);
 
-        //  dd([
-        //     'hak_akses' => $hakAkses,
-        //     'master_nama_bagian_id' => $bagianId,
-        // ]);
-        
         return view('activities.create', compact('projects', 'bagians', 'subBagians'));
     }
 
