@@ -36,7 +36,7 @@
                                 {{ $scope->percent_complete }}%
                             </div>  
                         </div>
-                        <span class="ml-2 font-weight-bold">{{ $scope->percent_complete }}%</span>
+                        <span class="ml-2 font-weight-bold">100%</span>
                     </div>
                 </div>
                 <div class="card-tools">
