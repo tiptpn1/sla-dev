@@ -181,6 +181,7 @@
                                         <th scope="col">Kendala</th>
                                         <th scope="col">Tindak Lanjut</th>
                                         <th scope="col">Tanggal</th>
+                                        <th scope="col">Persentase</th>
                                         {{-- <th scope="col">Evidence</th> --}}
                                         <th scope="col" width="22%" style="text-align: center">Actions</th>
                                         </tr>
@@ -233,6 +234,12 @@
                             <label for="addTindakLanjut">Tanggal : </label>
                             <div class="d-flex">
                                 <input type="date" class="form-control" name="tanggal" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="addPersentase">Persentase : </label>
+                            <div class="d-flex">
+                                <input type="number" class="form-control ml-2" id="addPersentase" name="persentase" required>
                             </div>
                         </div>
                         <div class="form-group">
@@ -290,6 +297,13 @@
                             <label for="addTindakLanjut">Tanggal : </label>
                             <div class="d-flex">
                                 <input type="date" class="form-control" name="tanggal" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="persentase">Persentase : </label>
+                            <div class="d-flex">
+                                <input type="text" class="form-control ml-2" id="ubahPersentase"
+                                    name="persentase" required>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary" id="updateBagianBtn">Update</button>
@@ -449,8 +463,9 @@
                                     month: '2-digit',
                                     year: 'numeric'
                                 }),
+                                item.persentase + '%',
                                 `<button class="btn btn-info btn-sm status-btn"  onclick=showEvidence(this) data-id="${item.id}" data-rincian_progress="${item.rincian_progress}">Evidence</button>@if ($hakaksesId == 7)
-                                <button class="btn btn-warning btn-sm edit-btn" onclick="ubahRincianProgress(this)" data-id="${item.id}" data-rincian_progress="${item.rincian_progress}" data-kendala="${item.kendala}" data-tindak_lanjut="${item.tindak_lanjut}">Edit</button>
+                                <button class="btn btn-warning btn-sm edit-btn" onclick="ubahRincianProgress(this)" data-id="${item.id}" data-rincian_progress="${item.rincian_progress}" data-kendala="${item.kendala}" data-tindak_lanjut="${item.tindak_lanjut}" data-persentase="${item.persentase}">Edit</button>
                                 <button class="btn btn-danger btn-sm delete-btn deleteButton" type="submit" type="button" data-toggle="modal" data-id="${item.id}">Hapus</button>@endif`
                             ]).draw();
                         } else {
@@ -459,6 +474,7 @@
                                 item.rincian_progress,
                                 item.kendala,
                                 item.tindak_lanjut,
+                                item.persentase,
                             ]).draw();
                         }
                         });
@@ -561,6 +577,7 @@
             $('#addRincianProgress').val('');
             $('#addKendala').val('');
             $('#addTindakLanjut').val('');
+            $('#addPersentase').val('');
             $('#addEvidence').val('');
 
             $('#createRincianProgressModal').modal('show');
@@ -571,11 +588,13 @@
             rincian_progress = $(button).data('rincian_progress');
             kendala = $(button).data('kendala');
             tindak_lanjut = $(button).data('tindak_lanjut');
+            persentase = $(button).data('persentase');
 
             $('#ubahRincianProgressId').val(id);
             $('#ubahRincianProgress').val(rincian_progress);
             $('#ubahKendala').val(kendala);
             $('#ubahTindakLanjut').val(tindak_lanjut);
+            $('#ubahPersentase').val(persentase);
 
             $('#updateRincianProgressModal').modal('show');
         }

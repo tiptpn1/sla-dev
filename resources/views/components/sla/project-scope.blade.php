@@ -29,12 +29,14 @@
                         <div class="progress" style="height: 25px; flex-grow: 1;">
                             <div id="progress-bar-{{ $scope->id }}"
                                 class="progress-bar {{ $color }} progress-bar-striped progress-bar-animated font-weight-bolder"
-                                role="progressbar" style="width: 0%;" data-scope-id="{{ $scope->id }}"
-                                aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                0%
+                                role="progressbar"
+                                style="width: {{ $scope->percent_complete }}%;"
+                                aria-valuenow="{{ $scope->percent_complete }}"
+                                aria-valuemin="0" aria-valuemax="100">
+                                {{ $scope->percent_complete }}%
                             </div>  
                         </div>
-                        <span class="ml-2 font-weight-bold">100%</span>
+                        <span class="ml-2 font-weight-bold">{{ $scope->percent_complete }}%</span>
                     </div>
                 </div>
                 <div class="card-tools">
@@ -102,27 +104,4 @@
                 .removeClass('icon-expand'); // Remove expand animation class
         });
     });
-
-    var id = {{ $scope->id }};
-
-    updateProgressBar(id);
-
-    function updateProgressBar(scopeId) {
-        $.ajax({
-            url: "{{ route('master-scope.get-process', ':id') }}".replace(':id', scopeId),
-            method: 'GET',
-            success: function(response) {
-                const percentComplete = parseFloat(response.percent_complete).toFixed(2);
-
-                // Update the corresponding progress bar width and text
-                $('#progress-bar-' + scopeId)
-                    .css('width', percentComplete + '%')
-                    .attr('aria-valuenow', percentComplete)
-                    .text(percentComplete + '%');
-            },
-            error: function(xhr, status, error) {
-                console.error('Error fetching progress:', error);
-            }
-        });
-    }
 </script>

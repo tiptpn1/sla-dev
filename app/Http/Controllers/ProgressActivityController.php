@@ -21,9 +21,18 @@ class ProgressActivityController extends Controller
             ->whereYear('created_at', $year) 
             ->get();
 
-            $progressColors = ['bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-primary'];
+        foreach ($projects as $project) {
+            foreach ($project->scopes as $scope) {
+                foreach ($scope->activities as $activity) {
+                    $average = $activity->progress->avg('persentase');
+                    $activity->percent_complete = round($average ?? 0, 2);
+                }
+            }
+        }
 
-         return view('dashboard.progress-activity', compact('projects', 'progressColors'));
+        $progressColors = ['bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-primary'];
+
+        return view('dashboard.progress-activity', compact('projects', 'progressColors'));
     }
 
     public function ganchart(Request $request)
@@ -102,6 +111,25 @@ class ProgressActivityController extends Controller
             ->where('isActive', true)
             ->whereYear('created_at', $year)
             ->get();
+        }
+
+        foreach ($projects as $project) {
+            foreach ($project->scopes as $scope) {
+
+                $activityCount = 0;
+                $totalPercent = 0;
+
+                foreach ($scope->activities as $activity) {
+                    $average = $activity->progress->avg('persentase');
+                    $activity->percent_complete = round($average ?? 0, 2);
+
+                    $totalPercent += $activity->percent_complete;
+                    $activityCount++;
+                }
+
+                // Hitung rata-rata percent_complete scope dari seluruh aktivitas di dalamnya
+                $scope->percent_complete = $activityCount > 0 ? round($totalPercent / $activityCount, 2) : 0;
+            }
         }
         
         $progressColors = ['bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-primary'];
