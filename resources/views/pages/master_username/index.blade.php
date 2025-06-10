@@ -295,7 +295,7 @@
                         success: function(response) {
                             let options = '<option value="">-- Pilih Direktorat --</option>';
                             response.forEach(function(item) {
-                                options += `<option value="${item.direktorat_id}">${item.nama}</option>`;
+                                options += `<option value="${item.master_direktorat_id}">${item.nama}</option>`;
                             });
                             $('#divisi').html(options); 
                         }
@@ -422,7 +422,7 @@
                     label = '-- Pilih Direktorat --';
                     idKey = 'direktorat_id';
                     nameKey = 'nama';
-                    selectedValue = userData?.direktorat_id;
+                    selectedValue = userData?.master_direktorat_id;
                 } else if (roleText.includes('subdivisi') || roleText.includes('koordinator sub divisi')) {
                     url = "{{ route('master-sub-divisi.data') }}";
                     label = '-- Pilih Sub Divisi --';
