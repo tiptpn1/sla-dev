@@ -44,6 +44,8 @@ class ActivityController extends Controller
             'scopes.activities.progress.evidences' => fn($q) => $q->latest('created_at'),
         ])->where('isActive', true);
 
+        // Hitung rata-rata persentase 
+        
         // Filter berdasarkan hak akses
         if (in_array($adminAccess, [3, 10]) && $bagianId) {
             $query->where('master_nama_bagian_id', $bagianId);
@@ -57,6 +59,15 @@ class ActivityController extends Controller
         }
 
         $projects = $query->get();
+        // Loop untuk hitung rata-rata
+        foreach ($projects as $project) {
+            foreach ($project->scopes as $scope) {
+                foreach ($scope->activities as $activity) {
+                    $average = $activity->progress->avg('persentase');
+                    $activity->percent_complete = round($average ?? 0, 2);
+                }
+            }
+        }
 
         return view('activities.index', compact('projects'));
     }

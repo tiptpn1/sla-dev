@@ -63,14 +63,7 @@
                             step="1" {{ $isPic ? '' : 'disabled' }}>
                     </td>
                     <td id="actual-end-{{ $activity->id_activity }}">{{ $activity->actual_end }}</td>
-
-                    <td>
-                        <input type="number" value="{{ $activity->percent_complete }}"
-                            class="edit form-control {{ $isPic ? 'bg-secondary text-white' : '' }}"
-                            data-id="{{ $activity->id_activity }}" data-field="percent_complete"
-                            data-scope-id="{{ $scopeId }}" min="0" max="100" step="0.01"
-                            {{ $isPic ? '' : 'disabled' }}>
-                    </td>
+                    <td id="actual-end-{{ $activity->id_activity }}">{{ $activity->percent_complete }}%</td>
                     <td>
                         @if ($activity->pics->isNotEmpty())
                             @foreach ($activity->pics as $pic)
@@ -184,36 +177,36 @@
                 }
             });
 
-        $(document).on('keypress', '.edit[data-field="percent_complete"]', function(event) {
-            var charCode = event.which ? event.which : event.keyCode;
-            var inputValue = $(this).val();
-            // Izinkan angka (48-57), satu titik desimal (46), dan satu koma (44)
-            if ((charCode < 48 || charCode > 57) && charCode !== 46 && charCode !== 44) {
-                event.preventDefault();
-            }
+        // $(document).on('keypress', '.edit[data-field="percent_complete"]', function(event) {
+        //     var charCode = event.which ? event.which : event.keyCode;
+        //     var inputValue = $(this).val();
+        //     // Izinkan angka (48-57), satu titik desimal (46), dan satu koma (44)
+        //     if ((charCode < 48 || charCode > 57) && charCode !== 46 && charCode !== 44) {
+        //         event.preventDefault();
+        //     }
 
-            // Hanya izinkan satu titik desimal atau satu koma
-            if ((charCode === 46 || charCode === 44) && (inputValue.indexOf('.') !== -1 || inputValue
-                    .indexOf(',') !== -1)) {
-                event.preventDefault();
-            }
-        });
+        //     // Hanya izinkan satu titik desimal atau satu koma
+        //     if ((charCode === 46 || charCode === 44) && (inputValue.indexOf('.') !== -1 || inputValue
+        //             .indexOf(',') !== -1)) {
+        //         event.preventDefault();
+        //     }
+        // });
 
-        $(document).on('input', '.edit[data-field="percent_complete"]', function() {
-            var inputValue = $(this).val();
+        // $(document).on('input', '.edit[data-field="percent_complete"]', function() {
+        //     var inputValue = $(this).val();
 
-            // Ganti koma menjadi titik untuk penanganan desimal
-            inputValue = inputValue.replace(',', '.');
+        //     // Ganti koma menjadi titik untuk penanganan desimal
+        //     inputValue = inputValue.replace(',', '.');
 
-            // Pastikan hanya bisa menginput angka 0-100
-            if (parseFloat(inputValue) > 100) {
-                $(this).val(100);
-            } else if (parseFloat(inputValue) < 0) {
-                $(this).val(0);
-            } else if (inputValue === '') {
-                $(this).val(0);
-            }
-        });
+        //     // Pastikan hanya bisa menginput angka 0-100
+        //     if (parseFloat(inputValue) > 100) {
+        //         $(this).val(100);
+        //     } else if (parseFloat(inputValue) < 0) {
+        //         $(this).val(0);
+        //     } else if (inputValue === '') {
+        //         $(this).val(0);
+        //     }
+        // });
 
         $('.edit').on('change', function() {
             var id = $(this).data('id');

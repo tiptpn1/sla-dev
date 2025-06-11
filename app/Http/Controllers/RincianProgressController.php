@@ -20,6 +20,10 @@ class RincianProgressController extends Controller
             return redirect()->back()->with('error', 'Activity not found');
         }
 
+        // Hitung rata-rata persentase 
+        $average = $activity->progress->avg('persentase');
+        $activity->percent_complete = round($average, 2);
+
         $bagianId = Session::get('bagian_id');
 
         $hasAccess = $activity->pics->contains(function ($pic) use ($bagianId) {
@@ -67,6 +71,7 @@ class RincianProgressController extends Controller
             'activity_id' => 'required|exists:activity,id_activity',
             'rincian_progress' => 'required|string',
             'tindak_lanjut' => 'required|string',
+            'persentase' => 'required|numeric',
             'file_evidence' => 'nullable|mimes:pdf,jpg,zip,rar,xlsx,xls|max:10240',
             'tanggal' => 'required|date|before_or_equal:today',
         ]);
@@ -93,6 +98,7 @@ class RincianProgressController extends Controller
             $detail_progress->rincian_progress = $request->rincian_progress;
             $detail_progress->kendala = $request->kendala;
             $detail_progress->tindak_lanjut = $request->tindak_lanjut;
+            $detail_progress->persentase = $request->persentase;
             $detail_progress->tanggal = $request->tanggal;
             $data = $detail_progress->save();
 
@@ -132,6 +138,7 @@ class RincianProgressController extends Controller
             'id' => 'required|exists:detail_progress,id',
             'rincian_progress' => 'required|string',
             'tindak_lanjut' => 'required|string',
+            'persentase' => 'required|numeric',
         ]);
 
         if ($validatedData->fails()) {
@@ -147,6 +154,7 @@ class RincianProgressController extends Controller
                 'rincian_progress' => $request->rincian_progress,
                 'kendala' => $request->kendala,
                 'tindak_lanjut' => $request->tindak_lanjut,
+                'persentase' => $request->persentase,
                 'tanggal' => $request->tanggal,
             ]);
 
@@ -304,7 +312,6 @@ class RincianProgressController extends Controller
             ], 400);
         }
     }
-
     public function deleteEvidence(Request $request)
     {
         try {
@@ -342,7 +349,6 @@ class RincianProgressController extends Controller
             ], 400);
         }
     }
-
     public function downloadEvidence(Request $request)
     {
         try {
