@@ -40,6 +40,7 @@
                                     <x-sla.project-scope :scope="$scope" :color="$randomColor" />
                                 @endforeach
                             </div>
+                            <div></div>
                         </div>
                     @endforeach
         

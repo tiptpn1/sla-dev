@@ -23,9 +23,7 @@ class RincianProgressController extends Controller
         // Hitung rata-rata persentase 
         $average = $activity->progress->avg('persentase');
         $activity->percent_complete = round($average, 2);
-
         $bagianId = Session::get('bagian_id');
-
         $hasAccess = $activity->pics->contains(function ($pic) use ($bagianId) {
             return $pic->bagian_id == $bagianId;
         });
@@ -73,7 +71,7 @@ class RincianProgressController extends Controller
             'tindak_lanjut' => 'required|string',
             'persentase' => 'required|numeric',
             'file_evidence' => 'nullable|mimes:pdf,jpg,zip,rar,xlsx,xls|max:10240',
-            'tanggal' => 'required|date|before_or_equal:today',
+            'tanggal' => 'required|date',
         ]);
 
         if ($validated->fails()) {
@@ -285,7 +283,12 @@ class RincianProgressController extends Controller
                 ], 400);
             }
 
-            unlink($evidence->file_path);
+            $oldFilePath = public_path($evidence->file_path);
+
+            if (file_exists($oldFilePath)) {
+                unlink($oldFilePath);
+            }
+
 
             $file = $request->file('file_evidence');
 

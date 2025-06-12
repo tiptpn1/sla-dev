@@ -1,6 +1,25 @@
+ @php
+    $isPic = false; // Default: bukan PIC
+    $hakAksesIdUser = session()->get('hak_akses_id');
+
+    // Periksa apakah user yang login adalah PIC dari aktivitas ini
+    foreach ($activity->pics as $pic) {
+        if ( $hakAksesIdUser == 7) {                            
+            $isPic = true;
+            break;
+        }
+    }
+@endphp
+
 <div class="row align-items-center mb-3">
-    <div class="col-md-3">
-        <h6 class="text-secondary">{{ $activity->nama_activity }}</h6>
+    <div class="col-md-3 d-flex justify-content-between align-items-center">
+        <h6 class="text-secondary mb-0">{{ $activity->nama_activity }}</h6>
+        @if ($isPic || session('hak_akses_id') == 3)
+            <a href="{{ route('rincian.show', ['id' => $activity->id_activity]) }}" class="btn btn-info btn-sm ml-2">
+                <i class="fas fa-eye"></i>
+                Show
+            </a>
+        @endif
     </div>
     <div class="col-md-9 d-flex align-items-center">
         <div class="progress" style="height: 25px; flex-grow: 1;">

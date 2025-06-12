@@ -142,7 +142,7 @@ Route::middleware(['checkLogin'])->group(function () {
     Route::prefix('evidence')->name('evidence.')->group(function () {
         Route::post('/get-evidence', [RincianProgressController::class, 'getDataEvidence'])->name('show');
         Route::post('/upload-evidence', [RincianProgressController::class, 'uploadDataEvidence'])->name('upload');
-        Route::post('/update-evidence', [RincianProgressController::class, 'updateDataEvidence'])->name('update');
+        Route::put('/update-evidence', [RincianProgressController::class, 'updateDataEvidence'])->name('update');
         Route::delete('/delete-evidence', [RincianProgressController::class, 'deleteEvidence'])->name('delete');
         Route::post('/download', [RincianProgressController::class, 'downloadEvidence'])->name('download');;
     });
