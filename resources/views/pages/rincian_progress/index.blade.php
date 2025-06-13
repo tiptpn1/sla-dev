@@ -140,8 +140,7 @@
     <section class="content">
         <div class="col-md-12">
             <div class="container">
-                <!-- Activity Detail Section -->
-                <div class="card mt-4 mb-4"> 
+                <div class="card mt-4 mb-4">
                     <div class="card-header">
                         <h4>Detail Activity</h4>
                     </div>
@@ -156,7 +155,8 @@
                                 <p><strong>Percent Complete:</strong> {{ $activity->percent_complete }}%</p>
                             </div>
                             <div class="col-md-6">
-                                <p><strong>Nama Project:</strong> {{ $activity->scope->project->project_nama }}</p>
+                                <p><strong>Nama Divisi:</strong> {{ $activity->scope->project->project_nama }}</p>
+                                <p><strong>Nama Project:</strong> {{ $activity->pic_project }}</p>
                                 <p><strong>Nama Scope:</strong> {{ $activity->scope->nama }}</p>
                             </div>
                         </div>
@@ -181,6 +181,7 @@
                                         <th scope="col">Kendala</th>
                                         <th scope="col">Tindak Lanjut</th>
                                         <th scope="col">Tanggal</th>
+                                        <th scope="col">Persentase</th>
                                         {{-- <th scope="col">Evidence</th> --}}
                                         <th scope="col" width="22%" style="text-align: center">Actions</th>
                                         </tr>
@@ -236,10 +237,23 @@
                             </div>
                         </div>
                         <div class="form-group">
+                            <label for="addPersentase">Persentase : </label>
+                            <div class="d-flex">
+                                <input type="number" class="form-control ml-2" id="addPersentase" name="persentase" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label for="addEvidence">File Evidence : </label>
                             <div class="d-flex">
                                 <input type="file" class="form-control ml-2" id="addEvidence"
                                     accept=".pdf, .jpg, .zip, .rar, .xlsx, .xls" name="file_evidence">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="addNama">Nama File : </label>
+                            <div class="d-flex">
+                                <input type="text" class="form-control ml-2" id="addNama" name="nama_file"
+                                    required>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary">Save</button>
@@ -265,7 +279,6 @@
                         @csrf
                         @method('PUT')
                         <input type="hidden" id="ubahRincianProgressId" name="id">
-                        <!-- Menyimpan ID rincian progress -->
                         <div class="form-group">
                             <label for="rincianProgress">Rincian Progress : </label>
                             <div class="d-flex">
@@ -292,6 +305,13 @@
                                 <input type="date" class="form-control" name="tanggal" required>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label for="persentase">Persentase : </label>
+                            <div class="d-flex">
+                                <input type="text" class="form-control ml-2" id="ubahPersentase"
+                                    name="persentase" required>
+                            </div>
+                        </div>
                         <button type="submit" class="btn btn-primary" id="updateBagianBtn">Update</button>
                     </form>
                 </div>
@@ -299,7 +319,7 @@
         </div>
     </div>
 
-    {{-- Evidence --}}
+    {{-- Evidence Main Modal --}}
     <div class="modal fade" id="crudEvidenceModal" tabindex="-1" role="dialog"
         aria-labelledby="crudEvidenceModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
@@ -313,24 +333,19 @@
                 <div class="modal-body">
                     <div class="container">
                         <div class="d-flex justify-content-between flex-wrap mb-2">
-                            <form method="POST" enctype="multipart/form-data">
                                 <input type="hidden" name="progress_id" id="rincianProgressIdForEvidence">
-                                <input type="file" style="display: none;" name="file_evidence"
-                                    onchange="addFileEvidence(this)" accept=".pdf, .jpg, .zip, .rar, .xlsx, .xls"
-                                    id="addFileEvidenceFromDetail">
                                 @if ($hakaksesId == 7)
-                                <button type="button" class="btn btn-primary mb-2" data-toggle="modal"
-                                    onclick="document.getElementById('addFileEvidenceFromDetail').click()">
+                                <button type="button" class="btn btn-primary mb-2" onclick="showAddEvidenceModal()">
                                     Tambah Evidence
                                 </button>
                                 @endif
-                            </form>
                         </div>
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped" id="table_evidence">
                                 <thead>
                                     <tr>
                                         <th scope="col">No</th>
+                                        <th scope="col">Nama File</th>
                                         <th scope="col">File</th>
                                         <th scope="col" width="35%" style="text-align: center">Actions</th>
                                     </tr>
@@ -343,7 +358,39 @@
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
+    {{-- Modal Tambah Evidence --}}
+    <div class="modal fade" id="addEvidenceModal" tabindex="-1" role="dialog" aria-labelledby="addEvidenceModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addEvidenceModalLabel">Tambah Evidence</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addEvidenceForm" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="progress_id" id="addEvidenceProgressId">
+                        <div class="form-group">
+                            <label for="addFileName">Nama File : </label>
+                            <div class="d-flex">
+                                <input type="text" class="form-control ml-2" id="addFileName" name="nama_file" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="addEvidenceFileInput">Pilih File:</label>
+                            <input type="file" class="form-control-file" id="addEvidenceFileInput"
+                                accept=".pdf, .jpg, .zip, .rar, .xlsx, .xls" name="file_evidence" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Unggah Evidence</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -388,26 +435,39 @@
         </div>
     </div>
 
-    {{-- Update --}}
+    {{-- Modal Update Evidence --}}
     <div class="modal fade" id="updateEvidenceModal" tabindex="-1" role="dialog"
         aria-labelledby="updateEvidenceModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="updateEvidenceModalLabel">Confirm Update</h5>
+                    <h5 class="modal-title" id="updateEvidenceModalLabel">Ubah Evidence</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body" id="updateEvidenceModalText"></div>
-                <div class="modal-footer">
-                    <form method="POST" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <form id="updateEvidenceForm" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT') {{-- Gunakan PUT untuk update --}}
                         <input type="hidden" name="id_evidence" id="updateFileEvidenceId">
-                        <input type="file" style="display: none" name="file_evidence" id="updateFileEvidence"
-                            accept=".pdf, .jpg, .zip, .rar, .xlsx, .xls" onchange="confirmUbahFileEvidence(this)">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger"
-                            onclick="document.getElementById('updateFileEvidence').click()">Yes</button>
+                        <div class="form-group">
+                            <label>File Evidence Saat Ini:</label>
+                            <p><strong id="currentEvidencePreview"></strong></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="nameFile">Nama File : </label>
+                            <div class="d-flex">
+                                <input type="text" class="form-control ml-2" id="updateFileName" 
+                                name="nama_file" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateFileEvidenceInput">Ganti File (Opsional):</label>
+                            <input type="file" class="form-control-file" id="updateFileEvidenceInput"
+                                accept=".pdf, .jpg, .zip, .rar, .xlsx, .xls" name="file_evidence">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Ubah Evidence</button>
                     </form>
                 </div>
             </div>
@@ -418,6 +478,7 @@
 @push('scripts')
     <script>
       let hasAccess = {{ ($hakaksesId != 0) ? 'true' : 'false' }};
+      let rincianProgressId = null; 
 
         $(document).ready(function() {
             $.ajaxSetup({
@@ -449,8 +510,9 @@
                                     month: '2-digit',
                                     year: 'numeric'
                                 }),
+                                item.persentase + '%',
                                 `<button class="btn btn-info btn-sm status-btn"  onclick=showEvidence(this) data-id="${item.id}" data-rincian_progress="${item.rincian_progress}">Evidence</button>@if ($hakaksesId == 7)
-                                <button class="btn btn-warning btn-sm edit-btn" onclick="ubahRincianProgress(this)" data-id="${item.id}" data-rincian_progress="${item.rincian_progress}" data-kendala="${item.kendala}" data-tindak_lanjut="${item.tindak_lanjut}">Edit</button>
+                                <button class="btn btn-warning btn-sm edit-btn" onclick="ubahRincianProgress(this)" data-id="${item.id}" data-rincian_progress="${item.rincian_progress}" data-kendala="${item.kendala}" data-tindak_lanjut="${item.tindak_lanjut}" data-persentase="${item.persentase}">Edit</button>
                                 <button class="btn btn-danger btn-sm delete-btn deleteButton" type="submit" type="button" data-toggle="modal" data-id="${item.id}">Hapus</button>@endif`
                             ]).draw();
                         } else {
@@ -459,6 +521,7 @@
                                 item.rincian_progress,
                                 item.kendala,
                                 item.tindak_lanjut,
+                                item.persentase,
                             ]).draw();
                         }
                         });
@@ -500,10 +563,10 @@
 
             $(document).on('submit', '#updateRincianProgressForm', function(e) {
                 e.preventDefault();
-                var formData = $(this).serialize(); // Mengumpulkan data form
+                var formData = $(this).serialize(); 
 
                 $.ajax({
-                    url: "{{ route('rincian.update') }}", // Update dengan route yang sesuai
+                    url: "{{ route('rincian.update') }}", 
                     method: 'PUT',
                     data: formData,
                     success: function(response) {
@@ -512,7 +575,7 @@
                         toastr.success('Rincian progress updated successfully.');
                     },
                     error: function(xhr, status, error) {
-                        if (xhr.status == 400) { // Jika ada kesalahan validasi
+                        if (xhr.status == 400) { 
                             $('#updateBagianModal #error-message').text(xhr.responseJSON
                                 .message).removeClass('d-none');
                         } else {
@@ -552,6 +615,60 @@
                     }
                 })
             });
+
+            // Handle form submission for adding new evidence
+            $(document).on('submit', '#addEvidenceForm', function(e) {
+                e.preventDefault();
+                var formData = new FormData(this);
+                formData.append('progress_id', rincianProgressId); // Tambahkan progress_id
+
+                $.ajax({
+                    url: "{{ route('evidence.upload') }}",
+                    method: 'POST',
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    success: function(response) {
+                        $('#addEvidenceModal').modal('hide');
+                        $('#crudEvidenceModal').modal('show'); // Kembali ke modal evidence utama
+                        loadDataEvidence(false);
+                        toastr.success('Evidence berhasil diunggah.');
+                        // Reset form
+                        $('#addEvidenceForm')[0].reset();
+                    },
+                    error: function(xhr, status, error) {
+                        toastr.error(xhr.responseJSON.message);
+                    }
+                });
+            });
+
+            // Handle form submission for updating evidence
+            $(document).on('submit', '#updateEvidenceForm', function(e) {
+                e.preventDefault();
+                var formData = new FormData(this);
+                var evidenceId = $('#updateFileEvidenceId').val(); 
+
+                formData.append('_method', 'PUT');
+
+                $.ajax({
+                    url: "{{ route('evidence.update') }}",
+                    method: 'POST', 
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    success: function(response) {
+                        $('#updateEvidenceModal').modal('hide');
+                        $('#crudEvidenceModal').modal('show'); 
+                        loadDataEvidence(false);
+                        toastr.success('Evidence berhasil diperbarui.');
+                        // Reset form
+                        $('#updateEvidenceForm')[0].reset();
+                    },
+                    error: function(xhr, status, error) {
+                        toastr.error(xhr.responseJSON.message);
+                    }
+                });
+            });
         });
     </script>
 
@@ -561,6 +678,7 @@
             $('#addRincianProgress').val('');
             $('#addKendala').val('');
             $('#addTindakLanjut').val('');
+            $('#addPersentase').val('');
             $('#addEvidence').val('');
 
             $('#createRincianProgressModal').modal('show');
@@ -571,11 +689,13 @@
             rincian_progress = $(button).data('rincian_progress');
             kendala = $(button).data('kendala');
             tindak_lanjut = $(button).data('tindak_lanjut');
+            persentase = $(button).data('persentase');
 
             $('#ubahRincianProgressId').val(id);
             $('#ubahRincianProgress').val(rincian_progress);
             $('#ubahKendala').val(kendala);
             $('#ubahTindakLanjut').val(tindak_lanjut);
+            $('#ubahPersentase').val(persentase);
 
             $('#updateRincianProgressModal').modal('show');
         }
@@ -595,14 +715,14 @@
                     rincian_progress_id: rincianProgressId,
                 },
                 success: function(response) {
-
                     $.each(response.data, function(index, item) {
                         evidenceTable.row.add([
                         index + 1,
+                        item.nama_file,
                         item.filename,
-                        `<button class="btn btn-info btn-sm" onclick=downloadEvidence(this) data-id="${item.id_evidence}" data-filename=${item.filename}>Unduh</button>@if ($hakaksesId == 7)
-                        <button class="btn btn-warning btn-sm edit-btn" onclick="ubahFileEvidence(this)" data-id="${item.id_evidence}" data-filename="${item.filename}">Edit</button>
-                        <buttontype="submit" class="btn btn-danger btn-sm" type="button" data-toggle="modal" onclick="deleteFileEvidence(this)" data-id="${item.id_evidence}" data-filename=${item.filename}>Hapus</buttontype=>@endif`
+                        `<button class="btn btn-info btn-sm" onclick=downloadEvidence(this) data-id="${item.id_evidence}" data-filename="${item.filename}" data-nama_file="${item.nama_file}">Unduh</button>@if ($hakaksesId == 7)
+                        <button class="btn btn-warning btn-sm edit-btn" onclick="ubahFileEvidence(this)" data-id="${item.id_evidence}" data-filename="${item.filename}" data-nama_file="${item.nama_file}">Edit</button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteFileEvidence(this)" data-id="${item.id_evidence}" data-filename=${item.filename}>Hapus</button>@endif`
                     ]).draw();
                 });
                 },
@@ -614,7 +734,7 @@
 
         function showEvidence(button) {
             rincian_progress = $(button).data('rincian_progress');
-            rincianProgressId = $(button).data('id');
+            rincianProgressId = $(button).data('id'); 
 
             $('#rincianProgressIdForEvidence').val(rincianProgressId);
 
@@ -625,57 +745,30 @@
             $('#crudEvidenceModal').modal('show');
         }
 
-        function addFileEvidence(input) {
-            if ($(input).val() != undefined && $(input).val() != null) {
-                form = $(input).closest('form');
-
-                $.ajax({
-                    url: "{{ route('evidence.upload') }}", // Update dengan route yang sesuai
-                    method: 'POST',
-                    processData: false,
-                    contentType: false,
-                    data: new FormData(form[0]),
-                    success: function(response) {
-                        $(input).val('');
-                        loadDataEvidence(false);
-                        toastr.success('Evidence upload successfully.');
-                    },
-                    error: function(xhr, status, error) {
-                        toastr.error(xhr.responseJSON.message);
-                    }
-                });
-            }
-        }
-
-        function confirmUbahFileEvidence(input) {
-            if ($(input).val() != undefined && $(input).val() != null) {
-                form = $(input).closest('form');
-
-                $.ajax({
-                    url: "{{ route('evidence.update') }}", // Update dengan route yang sesuai
-                    method: 'POST',
-                    processData: false,
-                    contentType: false,
-                    data: new FormData(form[0]),
-                    success: function(response) {
-                        $(input).val('');
-                        $('#updateEvidenceModal').modal('hide');
-                        loadDataEvidence(false);
-                        toastr.success('Evidence updated successfully.');
-                    },
-                    error: function(xhr, status, error) {
-                        toastr.error(xhr.responseJSON.message);
-                    }
-                });
-            }
+        function showAddEvidenceModal() {
+            $('#addEvidenceProgressId').val(rincianProgressId);
+            $('#addEvidenceDescription').val('');
+            $('#addEvidenceModal').modal('show');
         }
 
         function ubahFileEvidence(button) {
             id_evidence = $(button).data('id');
             filename = $(button).data('filename');
+            nama_file = $(button).data('nama_file');
 
-            $('#updateEvidenceModalText').text(`Apakah anda yakin ingin mengubah file evidence ${filename}?`);
             $('#updateFileEvidenceId').val(id_evidence);
+            $('#updateFileName').val(nama_file);
+
+            let fileExtension = filename.split('.').pop().toLowerCase();
+            let filePath = `/evidence/${filename}`;
+
+            if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension)) {
+                $('#currentEvidencePreview').html(`
+                    <img src="${filePath}" alt="Evidence Image" style="max-width: 150px; max-height: 150px; border: 1px solid #ccc; padding: 5px;">
+                `);
+            } else {
+                $('#currentEvidencePreview').html(`<strong>${filename}</strong>`);
+            }
 
             $('#updateEvidenceModal').modal('show');
         }
@@ -703,6 +796,7 @@
         function deleteFileEvidence(button) {
             id_evidence = $(button).data('id');
             filename = $(button).data('filename');
+            nama_file = $(button).data('nama_file');
 
             $('#deleteFileEvidenceText').text(`Apakah anda yakin ingin menghapus file evidence ${filename}?`);
             $('#deleteFileEvidenceId').val(id_evidence);
@@ -713,6 +807,7 @@
         function downloadEvidence(button) {
             id_evidence = $(button).data('id');
             filename = $(button).data('filename');
+            nama_file = $(button).data('nama_file');
 
             const data = {
                 id_evidence: id_evidence

@@ -44,6 +44,8 @@ class ActivityController extends Controller
             'scopes.activities.progress.evidences' => fn($q) => $q->latest('created_at'),
         ])->where('isActive', true);
 
+        // Hitung rata-rata persentase 
+        
         // Filter berdasarkan hak akses
         if (in_array($adminAccess, [3, 10]) && $bagianId) {
             $query->where('master_nama_bagian_id', $bagianId);
@@ -57,6 +59,15 @@ class ActivityController extends Controller
         }
 
         $projects = $query->get();
+        // Loop untuk hitung rata-rata
+        foreach ($projects as $project) {
+            foreach ($project->scopes as $scope) {
+                foreach ($scope->activities as $activity) {
+                    $average = $activity->progress->avg('persentase');
+                    $activity->percent_complete = round($average ?? 0, 2);
+                }
+            }
+        }
 
         return view('activities.index', compact('projects'));
     }
@@ -97,6 +108,7 @@ class ActivityController extends Controller
             'actual_duration' => 'nullable|integer',
             'percent_complete' => 'nullable|integer|min:0|max:100',
             'project_id' => 'required|exists:master_project,id_project',
+            'pic_project' => 'nullable|string|max:255',
             'scope_id' => 'required|exists:scopes,id',
             'bagian_id' => 'required|array',
             'bagian_id.*' => 'exists:master_bagian,master_bagian_id',
@@ -112,6 +124,7 @@ class ActivityController extends Controller
             'actual_start' => $request->actual_start,
             'actual_duration' => $request->actual_duration,
             'percent_complete' => $request->percent_complete,
+            'pic_project' => $request->pic_project,
             'scope_id' => $request->scope_id,
             'project_id' => $request->project_id,
             'isActive' => true,
@@ -167,6 +180,7 @@ class ActivityController extends Controller
             'actual_duration' => 'nullable|integer',
             'percent_complete' => 'nullable|integer|min:0|max:100',
             'project_id' => 'required|exists:master_project,id_project',
+            'pic_project' => 'nullable|string|max:255',
             'scope_id' => 'required|exists:scopes,id',
             'bagian_id' => 'required|array',
             'bagian_id.*' => 'exists:master_bagian,master_bagian_id',
@@ -181,6 +195,7 @@ class ActivityController extends Controller
             'actual_start' => $request->actual_start,
             'actual_duration' => $request->actual_duration,
             'percent_complete' => $request->percent_complete,
+            'pic_project' => $request->pic_project,
             'project_id' => $request->project_id,
             'scope_id' => $request->scope_id,
         ]);
@@ -227,7 +242,8 @@ class ActivityController extends Controller
             'actual_start',
             'actual_duration',
             'actual_end',
-            'percent_complete'
+            'percent_complete',
+            'pic_project'
         ])) {
 
             // Update field yang diminta

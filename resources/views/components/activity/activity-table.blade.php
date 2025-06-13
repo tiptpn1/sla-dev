@@ -1,3 +1,7 @@
+<head>
+   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+</head>
+
 <div class="container">
     <table id="table_{{ $id }}" class="table_data table table-bordered table-responsive">
         <thead>
@@ -11,6 +15,7 @@
                 <th>Actual Duration (Week)</th>
                 <th>Actual End</th>
                 <th>Percent Complete</th>
+                <th>PIC Divisi</th>
                 <th>PIC Project</th>
                 <th>Rincian Progress</th>
                 <th>Evidence</th>
@@ -30,7 +35,8 @@
 
                     // Periksa apakah user yang login adalah PIC dari aktivitas ini
                     foreach ($activity->pics as $pic) {
-                        if ( $hakAksesIdUser == 7) {                            $isPic = true;
+                        if ( $hakAksesIdUser == 7) {                            
+                            $isPic = true;
                             break;
                         }
                     }
@@ -63,14 +69,7 @@
                             step="1" {{ $isPic ? '' : 'disabled' }}>
                     </td>
                     <td id="actual-end-{{ $activity->id_activity }}">{{ $activity->actual_end }}</td>
-
-                    <td>
-                        <input type="number" value="{{ $activity->percent_complete }}"
-                            class="edit form-control {{ $isPic ? 'bg-secondary text-white' : '' }}"
-                            data-id="{{ $activity->id_activity }}" data-field="percent_complete"
-                            data-scope-id="{{ $scopeId }}" min="0" max="100" step="0.01"
-                            {{ $isPic ? '' : 'disabled' }}>
-                    </td>
+                    <td id="actual-end-{{ $activity->id_activity }}">{{ $activity->percent_complete }}%</td>
                     <td>
                         @if ($activity->pics->isNotEmpty())
                             @foreach ($activity->pics as $pic)
@@ -83,6 +82,12 @@
                         @else
                             <em>No PICs available</em>
                         @endif
+                    </td>
+                    <td>
+                        <input type="text" value="{{ $activity->pic_project }}"
+                            class="edit form-control {{ $isPic ? 'bg-secondary text-white' : '' }}"
+                            data-id="{{ $activity->id_activity }}" data-field="pic_project"
+                            {{ $isPic ? '' : 'disabled' }}>
                     </td>
                     <td>
                         @if ($activity->progress->isNotEmpty())
@@ -166,8 +171,16 @@
 </div>
 
 <script src="{{ asset('plugins/jquery/jquery.min.js') }}"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script>
     $(document).ready(function() {
+        $('#table_{{ $id }}').DataTable({
+            "searching": true,
+            "paging": true,
+            "lengthChange": true,
+            "pageLength": 10
+        });
+
         $(document).on('keypress', '.edit[data-field="plan_duration"], .edit[data-field="actual_duration"]',
             function(event) {
                 var charCode = event.which ? event.which : event.keyCode;
@@ -184,76 +197,31 @@
                 }
             });
 
-        $(document).on('keypress', '.edit[data-field="percent_complete"]', function(event) {
-            var charCode = event.which ? event.which : event.keyCode;
-            var inputValue = $(this).val();
-            // Izinkan angka (48-57), satu titik desimal (46), dan satu koma (44)
-            if ((charCode < 48 || charCode > 57) && charCode !== 46 && charCode !== 44) {
-                event.preventDefault();
-            }
-
-            // Hanya izinkan satu titik desimal atau satu koma
-            if ((charCode === 46 || charCode === 44) && (inputValue.indexOf('.') !== -1 || inputValue
-                    .indexOf(',') !== -1)) {
-                event.preventDefault();
-            }
-        });
-
-        $(document).on('input', '.edit[data-field="percent_complete"]', function() {
-            var inputValue = $(this).val();
-
-            // Ganti koma menjadi titik untuk penanganan desimal
-            inputValue = inputValue.replace(',', '.');
-
-            // Pastikan hanya bisa menginput angka 0-100
-            if (parseFloat(inputValue) > 100) {
-                $(this).val(100);
-            } else if (parseFloat(inputValue) < 0) {
-                $(this).val(0);
-            } else if (inputValue === '') {
-                $(this).val(0);
-            }
-        });
-
-        $('.edit').on('change', function() {
+        //PIC Project
+        $('.edit').on('blur', function () {
             var id = $(this).data('id');
             var field = $(this).data('field');
             var value = $(this).val().trim();
             var scopeId = null;
 
-            if (field == 'percent_complete') {
-                scopeId = $(this).data('scope-id');
-                console.log(scopeId);
-
-                if (value.startsWith('0')) {
-                    value = value.replace(/^0+/, ''); // Remove leading zeros
-                    $(this).val(value); // Update the input with the new value
-                }
-            }
-
             $.ajax({
-                url: "{{ route('activity.update') }}",
-                type: "POST",
+                url: "{{ route('activity.update') }}", 
+                method: 'POST',
                 data: {
-                    _token: "{{ csrf_token() }}",
+                    _token: '{{ csrf_token() }}',
                     id: id,
                     field: field,
                     value: value
                 },
-                success: function(response) {
-                    $('#plan-end-' + id).text(response.data.plan_end);
-                    $('#actual-end-' + id).text(response.data.actual_end);
+                success: function (response) {
                     toastr.success(response.message);
-                    if (scopeId != null) {
-                        updateProgressBar(scopeId);
-                    }
                 },
                 error: function(xhr, status, error) {
                     console.error(xhr.responseText);
                     toastr.error(response.message);
                 }
             });
-        })
+        });
 
         $('.status-btn').on('click', function() {
             var id = $(this).data('id');

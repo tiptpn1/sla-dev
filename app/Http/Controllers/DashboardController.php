@@ -65,6 +65,26 @@ class DashboardController extends Controller
         }
 
         $projects = $query->get();
+
+        foreach ($projects as $project) {
+            foreach ($project->scopes as $scope) {
+
+                $activityCount = 0;
+                $totalPercent = 0;
+
+                foreach ($scope->activities as $activity) {
+                    $average = $activity->progress->avg('persentase');
+                    $activity->percent_complete = round($average ?? 0, 2);
+
+                    $totalPercent += $activity->percent_complete;
+                    $activityCount++;
+                }
+
+                // Hitung rata-rata percent_complete scope dari seluruh aktivitas di dalamnya
+                $scope->percent_complete = $activityCount > 0 ? round($totalPercent / $activityCount, 2) : 0;
+            }
+        }
+
         $progressColors = ['bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-primary'];
 
         return view('dashboard.index', compact('projects', 'progressColors'));
@@ -114,6 +134,25 @@ class DashboardController extends Controller
 
         // Eksekusi query dan dapatkan hasilnya
         $projects = $query->get();  
+
+        foreach ($projects as $project) {
+            foreach ($project->scopes as $scope) {
+
+                $activityCount = 0;
+                $totalPercent = 0;
+
+                foreach ($scope->activities as $activity) {
+                    $average = $activity->progress->avg('persentase');
+                    $activity->percent_complete = round($average ?? 0, 2);
+
+                    $totalPercent += $activity->percent_complete;
+                    $activityCount++;
+                }
+
+                // Hitung rata-rata percent_complete scope dari seluruh aktivitas di dalamnya
+                $scope->percent_complete = $activityCount > 0 ? round($totalPercent / $activityCount, 2) : 0;
+            }
+        }
 
         return view('activities.index', compact('projects'));
     }

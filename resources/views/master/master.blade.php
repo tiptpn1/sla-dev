@@ -152,6 +152,14 @@
                                     </p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{ route('activities.index') }}" class="nav-link @yield('overdue')">
+                                    <i class="nav-icon fas fa-tachometer-alt"></i>
+                                    <p>
+                                        Project Overdue
+                                    </p>
+                                </a>
+                            </li>
                         @endif
 
                         @if (in_array(session()->get('hak_akses_id'), [1, 2]))

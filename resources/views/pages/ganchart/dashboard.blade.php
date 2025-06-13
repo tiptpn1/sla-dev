@@ -58,7 +58,6 @@
 </head>
 
 <body>
-
     <div class="mb-4">
         <label for="filter-year">Filter Tahun:</label>
         <select id="filter-year" class="form-control" style="width: 200px; display: inline-block;">
@@ -83,7 +82,6 @@
     
     <div id="gantt_here" style="width:100%; height:500px;"></div>
 
-    
 
     <script>
         var selectedYear = $('#filter-year').val() || new Date().getFullYear();
@@ -197,10 +195,10 @@
                 label: "Percent Complete",
                 width: 100,
                 align: "center",
-                template: function(item) {
-                    return item.progress + "%";
-                },
-                css: "wrap-text gantt_column_wrap"
+                css: "wrap-text gantt_column_wrap",
+                template: function (item) {
+                    return (item.percent || 0) + "%";
+                }
             },
             {
                 name: "pic",
@@ -349,7 +347,7 @@
                                     start_date_data_actual: '', // untuk kolom data
                                     end_date: '{{ now() }}', // untuk bar
                                     duration_data_actual: '',
-                                    percent: '0',
+                                    percent: '',
                                     pic: '',
                                     rincian: '',
                                     evidence: '',
@@ -371,7 +369,7 @@
                             start_date_data_actual: '', // untuk kolom data
                             end_date: '{{ now() }}', // untuk bar
                             duration_data_actual: '',
-                            percent: '0',
+                            percent: '',
                             pic: '',
                             rincian: '',
                             evidence: '',

@@ -20,8 +20,10 @@ class RincianProgressController extends Controller
             return redirect()->back()->with('error', 'Activity not found');
         }
 
+        // Hitung rata-rata persentase 
+        $average = $activity->progress->avg('persentase');
+        $activity->percent_complete = round($average, 2);
         $bagianId = Session::get('bagian_id');
-
         $hasAccess = $activity->pics->contains(function ($pic) use ($bagianId) {
             return $pic->bagian_id == $bagianId;
         });
@@ -67,8 +69,10 @@ class RincianProgressController extends Controller
             'activity_id' => 'required|exists:activity,id_activity',
             'rincian_progress' => 'required|string',
             'tindak_lanjut' => 'required|string',
+            'persentase' => 'required|numeric',
             'file_evidence' => 'nullable|mimes:pdf,jpg,zip,rar,xlsx,xls|max:10240',
-            'tanggal' => 'required|date|before_or_equal:today',
+            'nama_file' => 'required|string|max:255',
+            'tanggal' => 'required|date',
         ]);
 
         if ($validated->fails()) {
@@ -93,6 +97,7 @@ class RincianProgressController extends Controller
             $detail_progress->rincian_progress = $request->rincian_progress;
             $detail_progress->kendala = $request->kendala;
             $detail_progress->tindak_lanjut = $request->tindak_lanjut;
+            $detail_progress->persentase = $request->persentase;
             $detail_progress->tanggal = $request->tanggal;
             $data = $detail_progress->save();
 
@@ -106,6 +111,7 @@ class RincianProgressController extends Controller
                     'progress_id' => $detail_progress->id,
                     'filename' => $filename,
                     'file_path' => $file_path,
+                    'nama_file' => $request->nama_file,
                 ]);
             }
 
@@ -132,6 +138,7 @@ class RincianProgressController extends Controller
             'id' => 'required|exists:detail_progress,id',
             'rincian_progress' => 'required|string',
             'tindak_lanjut' => 'required|string',
+            'persentase' => 'required|numeric',
         ]);
 
         if ($validatedData->fails()) {
@@ -147,6 +154,7 @@ class RincianProgressController extends Controller
                 'rincian_progress' => $request->rincian_progress,
                 'kendala' => $request->kendala,
                 'tindak_lanjut' => $request->tindak_lanjut,
+                'persentase' => $request->persentase,
                 'tanggal' => $request->tanggal,
             ]);
 
@@ -220,6 +228,7 @@ class RincianProgressController extends Controller
         try {
             $validatedData = Validator::make($request->all(), [
                 'file_evidence' => 'nullable|mimes:pdf,jpg,zip,rar,xlsx,xls|max:10240',
+                'nama_file' => 'required|string|max:255', 
             ]);
 
             if ($validatedData->fails()) {
@@ -230,14 +239,20 @@ class RincianProgressController extends Controller
             }
 
             $file_evidence = $request->file('file_evidence');
-            $filename = time() . '_' . $file_evidence->getClientOriginalName();
-            $file_evidence->move(public_path() . '/evidence', $filename);
-            $file_path = 'evidence/' . $filename;
+            $filename = null;
+            $file_path = null;
+
+            if ($file_evidence) {
+                $filename = time() . '_' . $file_evidence->getClientOriginalName();
+                $file_evidence->move(public_path('evidence'), $filename);
+                $file_path = 'evidence/' . $filename;
+            }
 
             DB::table('evidence')->insert([
                 'progress_id' => $request->progress_id,
                 'filename' => $filename,
                 'file_path' => $file_path,
+                'nama_file' => $request->nama_file, 
             ]);
 
             return response()->json([
@@ -253,12 +268,14 @@ class RincianProgressController extends Controller
         }
     }
 
+
     public function updateDataEvidence(Request $request)
     {
         try {
             $validatedData = Validator::make($request->all(), [
                 'id_evidence' => 'required',
                 'file_evidence' => 'nullable|mimes:pdf,jpg,zip,rar,xlsx,xls|max:10240',
+                'nama_file' => 'required|string|max:255',
             ]);
 
             if ($validatedData->fails()) {
@@ -267,30 +284,30 @@ class RincianProgressController extends Controller
                     'message' => $validatedData->errors()->first(),
                 ], 400);
             }
+ 
+            $evidence = Evidence::find($request->id_evidence);
 
-            $evidence = Evidence::where('id_evidence', $request->id_evidence)->first();
+            // Jika ada file baru diupload
+            if ($request->hasFile('file_evidence')) {
+                $file = $request->file('file_evidence');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('/evidence'), $filename);
+                $path = 'evidence/' . $filename;
 
-            if (!$evidence) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'failed to update evidence',
-                ], 400);
+                // Hapus file lama jika ada
+                $oldFilePath = public_path($evidence->file_path);
+                if (file_exists($oldFilePath)) {
+                    unlink($oldFilePath);
+                }
+
+                // Update dengan file baru
+                $evidence->filename = $filename;
+                $evidence->file_path = $path;
             }
 
-            unlink($evidence->file_path);
-
-            $file = $request->file('file_evidence');
-
-            $filename = time() . '_' . $file->getClientOriginalName();
-
-            $file->move(public_path() . '/evidence', $filename);
-
-            $path = 'evidence/' . $filename;
-
-            $evidence->update([
-                'filename' => $filename,
-                'file_path' => $path,
-            ]);
+            // Update nama_file (wajib)
+            $evidence->nama_file = $request->nama_file;
+            $evidence->save();
 
             return response()->json([
                 'status' => 'success',
@@ -304,7 +321,6 @@ class RincianProgressController extends Controller
             ], 400);
         }
     }
-
     public function deleteEvidence(Request $request)
     {
         try {
@@ -342,7 +358,6 @@ class RincianProgressController extends Controller
             ], 400);
         }
     }
-
     public function downloadEvidence(Request $request)
     {
         try {
