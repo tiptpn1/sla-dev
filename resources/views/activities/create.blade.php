@@ -49,6 +49,17 @@
                     <div class="card-header">Create New Activity</div>
 
                     <div class="card-body">
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <strong>Terjadi kesalahan:</strong>
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
                         <form action="{{ route('activities.store') }}" method="POST">
                             @csrf
 
@@ -121,12 +132,12 @@
                         
                         <!-- Plan Duration -->
                         <div class="form-group" {{ $restrictedAccess ? 'hidden' : '' }}>
-                            <label for="plan_duration">Plan Duration (days)</label>
-                            <input type="number" name="plan_duration"
-                                class="form-control @error('plan_duration') is-invalid @enderror" id="plan_duration"
-                                value="{{ old('plan_duration') }}"
+                            <label for="pic_project">PIC Project</label>
+                            <input type="text" name="pic_project"
+                                class="form-control @error('pic_project') is-invalid @enderror" id="pic_project"
+                                value="{{ old('pic_project') }}"
                                 {{ $restrictedAccess ? 'readonly' : 'required' }}>
-                            @error('plan_duration')
+                            @error('pic_project')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
@@ -189,6 +200,20 @@
                                     @endforeach
                                 </select>
                                 @error('bagian_id')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+
+                            <!-- PIC Project -->
+                            <div class="form-group" {{ $restrictedAccess ? 'hidden' : '' }}>
+                                <label for="pic_project">PIC Project</label>
+                                <input type="text" name="pic_project"
+                                    class="form-control @error('pic_project') is-invalid @enderror" id="pic_project"
+                                    value="{{ old('pic_project') }}"
+                                    {{ $restrictedAccess ? 'readonly' : 'required' }}>
+                                @error('pic_project')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
