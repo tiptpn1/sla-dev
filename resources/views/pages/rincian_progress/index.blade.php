@@ -249,6 +249,13 @@
                                     accept=".pdf, .jpg, .zip, .rar, .xlsx, .xls" name="file_evidence">
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label for="addNama">Nama File : </label>
+                            <div class="d-flex">
+                                <input type="text" class="form-control ml-2" id="addNama" name="nama_file"
+                                    required>
+                            </div>
+                        </div>
                         <button type="submit" class="btn btn-primary">Save</button>
                     </form>
                 </div>
@@ -338,6 +345,7 @@
                                 <thead>
                                     <tr>
                                         <th scope="col">No</th>
+                                        <th scope="col">Nama File</th>
                                         <th scope="col">File</th>
                                         <th scope="col" width="35%" style="text-align: center">Actions</th>
                                     </tr>
@@ -364,6 +372,12 @@
                     <form id="addEvidenceForm" method="POST" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="progress_id" id="addEvidenceProgressId">
+                        <div class="form-group">
+                            <label for="addFileName">Nama File : </label>
+                            <div class="d-flex">
+                                <input type="text" class="form-control ml-2" id="addFileName" name="nama_file" required>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label for="addEvidenceFileInput">Pilih File:</label>
                             <input type="file" class="form-control-file" id="addEvidenceFileInput"
@@ -421,7 +435,7 @@
         </div>
     </div>
 
-    {{-- Modal Update Evidence (Pop-up untuk edit) --}}
+    {{-- Modal Update Evidence --}}
     <div class="modal fade" id="updateEvidenceModal" tabindex="-1" role="dialog"
         aria-labelledby="updateEvidenceModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -440,6 +454,13 @@
                         <div class="form-group">
                             <label>File Evidence Saat Ini:</label>
                             <p><strong id="currentEvidencePreview"></strong></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="nameFile">Nama File : </label>
+                            <div class="d-flex">
+                                <input type="text" class="form-control ml-2" id="updateFileName" 
+                                name="nama_file" required>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="updateFileEvidenceInput">Ganti File (Opsional):</label>
@@ -697,9 +718,10 @@
                     $.each(response.data, function(index, item) {
                         evidenceTable.row.add([
                         index + 1,
+                        item.nama_file,
                         item.filename,
-                        `<button class="btn btn-info btn-sm" onclick=downloadEvidence(this) data-id="${item.id_evidence}" data-filename=${item.filename}>Unduh</button>@if ($hakaksesId == 7)
-                        <button class="btn btn-warning btn-sm edit-btn" onclick="ubahFileEvidence(this)" data-id="${item.id_evidence}" data-filename="${item.filename}" data-description="${item.description}">Edit</button>
+                        `<button class="btn btn-info btn-sm" onclick=downloadEvidence(this) data-id="${item.id_evidence}" data-filename="${item.filename}" data-nama_file="${item.nama_file}">Unduh</button>@if ($hakaksesId == 7)
+                        <button class="btn btn-warning btn-sm edit-btn" onclick="ubahFileEvidence(this)" data-id="${item.id_evidence}" data-filename="${item.filename}" data-nama_file="${item.nama_file}">Edit</button>
                         <button type="button" class="btn btn-danger btn-sm" onclick="deleteFileEvidence(this)" data-id="${item.id_evidence}" data-filename=${item.filename}>Hapus</button>@endif`
                     ]).draw();
                 });
@@ -732,9 +754,10 @@
         function ubahFileEvidence(button) {
             id_evidence = $(button).data('id');
             filename = $(button).data('filename');
+            nama_file = $(button).data('nama_file');
 
             $('#updateFileEvidenceId').val(id_evidence);
-            $('#updateFileEvidenceInput').val('');
+            $('#updateFileName').val(nama_file);
 
             let fileExtension = filename.split('.').pop().toLowerCase();
             let filePath = `/evidence/${filename}`;
@@ -773,6 +796,7 @@
         function deleteFileEvidence(button) {
             id_evidence = $(button).data('id');
             filename = $(button).data('filename');
+            nama_file = $(button).data('nama_file');
 
             $('#deleteFileEvidenceText').text(`Apakah anda yakin ingin menghapus file evidence ${filename}?`);
             $('#deleteFileEvidenceId').val(id_evidence);
@@ -783,6 +807,7 @@
         function downloadEvidence(button) {
             id_evidence = $(button).data('id');
             filename = $(button).data('filename');
+            nama_file = $(button).data('nama_file');
 
             const data = {
                 id_evidence: id_evidence

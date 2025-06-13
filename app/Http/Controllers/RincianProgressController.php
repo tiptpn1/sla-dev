@@ -71,6 +71,7 @@ class RincianProgressController extends Controller
             'tindak_lanjut' => 'required|string',
             'persentase' => 'required|numeric',
             'file_evidence' => 'nullable|mimes:pdf,jpg,zip,rar,xlsx,xls|max:10240',
+            'nama_file' => 'required|string|max:255',
             'tanggal' => 'required|date',
         ]);
 
@@ -110,6 +111,7 @@ class RincianProgressController extends Controller
                     'progress_id' => $detail_progress->id,
                     'filename' => $filename,
                     'file_path' => $file_path,
+                    'nama_file' => $request->nama_file,
                 ]);
             }
 
@@ -226,6 +228,7 @@ class RincianProgressController extends Controller
         try {
             $validatedData = Validator::make($request->all(), [
                 'file_evidence' => 'nullable|mimes:pdf,jpg,zip,rar,xlsx,xls|max:10240',
+                'nama_file' => 'required|string|max:255', 
             ]);
 
             if ($validatedData->fails()) {
@@ -236,14 +239,20 @@ class RincianProgressController extends Controller
             }
 
             $file_evidence = $request->file('file_evidence');
-            $filename = time() . '_' . $file_evidence->getClientOriginalName();
-            $file_evidence->move(public_path() . '/evidence', $filename);
-            $file_path = 'evidence/' . $filename;
+            $filename = null;
+            $file_path = null;
+
+            if ($file_evidence) {
+                $filename = time() . '_' . $file_evidence->getClientOriginalName();
+                $file_evidence->move(public_path('evidence'), $filename);
+                $file_path = 'evidence/' . $filename;
+            }
 
             DB::table('evidence')->insert([
                 'progress_id' => $request->progress_id,
                 'filename' => $filename,
                 'file_path' => $file_path,
+                'nama_file' => $request->nama_file, 
             ]);
 
             return response()->json([
@@ -259,12 +268,14 @@ class RincianProgressController extends Controller
         }
     }
 
+
     public function updateDataEvidence(Request $request)
     {
         try {
             $validatedData = Validator::make($request->all(), [
                 'id_evidence' => 'required',
                 'file_evidence' => 'nullable|mimes:pdf,jpg,zip,rar,xlsx,xls|max:10240',
+                'nama_file' => 'required|string|max:255',
             ]);
 
             if ($validatedData->fails()) {
@@ -273,35 +284,30 @@ class RincianProgressController extends Controller
                     'message' => $validatedData->errors()->first(),
                 ], 400);
             }
+ 
+            $evidence = Evidence::find($request->id_evidence);
 
-            $evidence = Evidence::where('id_evidence', $request->id_evidence)->first();
+            // Jika ada file baru diupload
+            if ($request->hasFile('file_evidence')) {
+                $file = $request->file('file_evidence');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('/evidence'), $filename);
+                $path = 'evidence/' . $filename;
 
-            if (!$evidence) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'failed to update evidence',
-                ], 400);
+                // Hapus file lama jika ada
+                $oldFilePath = public_path($evidence->file_path);
+                if (file_exists($oldFilePath)) {
+                    unlink($oldFilePath);
+                }
+
+                // Update dengan file baru
+                $evidence->filename = $filename;
+                $evidence->file_path = $path;
             }
 
-            $oldFilePath = public_path($evidence->file_path);
-
-            if (file_exists($oldFilePath)) {
-                unlink($oldFilePath);
-            }
-
-
-            $file = $request->file('file_evidence');
-
-            $filename = time() . '_' . $file->getClientOriginalName();
-
-            $file->move(public_path() . '/evidence', $filename);
-
-            $path = 'evidence/' . $filename;
-
-            $evidence->update([
-                'filename' => $filename,
-                'file_path' => $path,
-            ]);
+            // Update nama_file (wajib)
+            $evidence->nama_file = $request->nama_file;
+            $evidence->save();
 
             return response()->json([
                 'status' => 'success',
