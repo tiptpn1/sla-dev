@@ -108,6 +108,7 @@ class ActivityController extends Controller
             'actual_duration' => 'nullable|integer',
             'percent_complete' => 'nullable|integer|min:0|max:100',
             'project_id' => 'required|exists:master_project,id_project',
+            'pic_project' => 'required|string|max:255',
             'scope_id' => 'required|exists:scopes,id',
             'bagian_id' => 'required|array',
             'bagian_id.*' => 'exists:master_bagian,master_bagian_id',
@@ -123,6 +124,7 @@ class ActivityController extends Controller
             'actual_start' => $request->actual_start,
             'actual_duration' => $request->actual_duration,
             'percent_complete' => $request->percent_complete,
+            'pic_project' => $request->pic_project,
             'scope_id' => $request->scope_id,
             'project_id' => $request->project_id,
             'isActive' => true,
@@ -178,6 +180,7 @@ class ActivityController extends Controller
             'actual_duration' => 'nullable|integer',
             'percent_complete' => 'nullable|integer|min:0|max:100',
             'project_id' => 'required|exists:master_project,id_project',
+            'pic_project' => 'required|string|max:255',
             'scope_id' => 'required|exists:scopes,id',
             'bagian_id' => 'required|array',
             'bagian_id.*' => 'exists:master_bagian,master_bagian_id',
@@ -192,6 +195,7 @@ class ActivityController extends Controller
             'actual_start' => $request->actual_start,
             'actual_duration' => $request->actual_duration,
             'percent_complete' => $request->percent_complete,
+            'pic_project' => $request->pic_project,
             'project_id' => $request->project_id,
             'scope_id' => $request->scope_id,
         ]);
@@ -238,7 +242,8 @@ class ActivityController extends Controller
             'actual_start',
             'actual_duration',
             'actual_end',
-            'percent_complete'
+            'percent_complete',
+            'pic_project'
         ])) {
 
             // Update field yang diminta
