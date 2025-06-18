@@ -47,7 +47,8 @@
                     <td>
                         <input type="date" value="{{ $activity->plan_start }}"
                             class="edit form-control {{ $isPic ? 'bg-secondary text-white' : '' }}"
-                            data-id="{{ $activity->id_activity }}" data-field="plan_start" {{ $isPic ? '' : 'disabled' }}>
+                            data-id="{{ $activity->id_activity }}" data-field="plan_start" 
+                            {{ $isPic ? '' : 'disabled' }}>
                     </td>
                     <td>
                         <input type="number" value="{{ $activity->plan_duration }}"
@@ -105,12 +106,9 @@
                         @if ($activity->progress->isNotEmpty() && $activity->progress->first()->evidences->isNotEmpty())
                             <div class="text-muted">
                                 <span>...,</span>
-                                <a href="{{ $activity->progress->first()->evidences->first()->file_path }}"
-                                    target="_blank" class="text-info">
-                                    {{-- Tambahkan icon file menggunakan Font Awesome --}}
-                                    <i class="fas fa-file-alt"></i>
-                                    {{ $activity->progress->first()->evidences->first()->file_path }}
-                                </a>
+                                <span class="font-weight-bold">
+                                    {{ $activity->progress->first()->rincian_progress }}
+                                </span>
                             </div>
                         @else
                             <em class="text-danger">No Evidence available</em>
@@ -215,6 +213,17 @@
                 },
                 success: function (response) {
                     toastr.success(response.message);
+                    var data = response.data;
+
+                    // Update tampilan plan_end jika tersedia
+                    if (data.plan_end) {
+                        $('#plan-end-' + id).text(data.plan_end);
+                    }
+
+                    // Update tampilan actual_end jika tersedia
+                    if (data.actual_end) {
+                        $('#actual-end-' + id).text(data.actual_end);
+                    }
                 },
                 error: function(xhr, status, error) {
                     console.error(xhr.responseText);

@@ -155,7 +155,16 @@
                                 <p><strong>Percent Complete:</strong> {{ $activity->percent_complete }}%</p>
                             </div>
                             <div class="col-md-6">
-                                <p><strong>Nama Divisi:</strong> {{ $activity->scope->project->project_nama }}</p>
+                                <p><strong>Nama Divisi PIC:</strong></p>
+                                @if ($activity->pics->isNotEmpty())
+                                    <ul>
+                                        @foreach ($activity->pics as $pic)
+                                            <li>{{ $pic->bagian->master_bagian_nama }}</li>
+                                        @endforeach
+                                    </ul>
+                                @else
+                                    <p><em>No PICs available</em></p>
+                                @endif
                                 <p><strong>Nama Project:</strong> {{ $activity->pic_project }}</p>
                                 <p><strong>Nama Scope:</strong> {{ $activity->scope->nama }}</p>
                             </div>

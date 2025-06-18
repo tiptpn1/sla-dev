@@ -291,8 +291,6 @@ class ActivityController extends Controller
     }
 
 
-
-
     public function updateStatus(Request $request, $id)
     {
         $activity = Activity::findOrFail($id);
