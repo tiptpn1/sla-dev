@@ -146,15 +146,15 @@
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('activities.index') }}" class="nav-link @yield('activity')">
-                                    <i class="nav-icon fas fa-tachometer-alt"></i>
+                                    <i class="nav-icon fas fa-chart-line"></i>
                                     <p>
                                         Activity
                                     </p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('activities.index') }}" class="nav-link @yield('overdue')">
-                                    <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <a href="{{ route('overdue') }}" class="nav-link @yield('overdue')">
+                                    <i class="nav-icon fas fa-chart-pie"></i>
                                     <p>
                                         Project Overdue
                                     </p>

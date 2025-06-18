@@ -151,7 +151,11 @@ Route::middleware(['checkLogin'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('ganchart', [ProgressActivityController::class, 'ganchart'])->name('ganchart');
     Route::get('progress-activity', [ProgressActivityController::class, 'index'])->name('dashboard.progress');
+    
+    // Overdue
     Route::get('overdue', [OverdueController::class, 'index'])->name('overdue');
+    Route::get('overdue/data', [OverdueController::class, 'getProgressData'])->name('overdue.data');
+    Route::get('/overdue/chart', [OverdueController::class, 'getChartData'])->name('overdue.chart');
 
     Route::get('activities/data', [ServerSideActivityController::class, 'data'])->name('activities.data');
     Route::resource('activities', ActivityController::class);
