@@ -63,21 +63,19 @@ class OverdueController extends Controller
         $divisiCounter = 1;
 
         foreach ($projects as $project) {
-            $isFirstRowForDivisi = true;
+            $isFirstRowForProject = true;
 
             foreach ($project->scopes->where('isActive', true) as $scope) {
+                 $isFirstRowForScope = true;
                 foreach ($scope->activities->where('isActive', true) as $activity) {
                     if ($activity->plan_start && Carbon::parse($activity->plan_start)->year == $year) {
-                        $average = $activity->progress->avg('persentase');
 
-                        //Status Project Overdue
                         $today = Carbon::today();
                         $planStart = $activity->plan_start ? Carbon::parse($activity->plan_start) : null;
                         $planEnd = $activity->plan_end ? Carbon::parse($activity->plan_end) : null;
                         $actualStart = $activity->actual_start ? Carbon::parse($activity->actual_start) : null;
 
                         $status = 'Project on Schedule';
-
                         if ($planStart && $today->gt($planStart) && !$actualStart) {
                             $status = 'Project Overdue Belum Mulai';
                         }
@@ -89,13 +87,14 @@ class OverdueController extends Controller
                         }
 
                         $rows[] = [
-                            'no' => $isFirstRowForDivisi ? $divisiCounter++ : '',
-                            'proyek' => $isFirstRowForDivisi ? $project->project_nama : '',
-                            'scope' => $isFirstRowForDivisi ? $scope->nama : '',
+                            'no' => $isFirstRowForProject ? $divisiCounter++ : '',
+                            'proyek' => $isFirstRowForProject ? $project->project_nama : '',
+                            'scope' => $isFirstRowForScope ? $scope->nama : '',
                             'activity' => $activity->nama_activity,
                             'status' => $status,
                         ];
-                        $isFirstRowForDivisi = false;
+                        $isFirstRowForProject = false;
+                        $isFirstRowForScope = false;
                     }
                 }
             }
