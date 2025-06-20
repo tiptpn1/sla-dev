@@ -328,7 +328,6 @@
                                         rincian: '{{ $rincian_progress != '' ? $rincian_progress->rincian_progress : '' }}',
                                         evidence: '{{ $evidence }}',
                                         tanggal: '{{ $tanggal != '' ? $rincian_progress->tanggal : '' }}',
-
                                     },
                                 @endforeach
                             @else
