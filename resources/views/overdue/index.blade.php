@@ -176,7 +176,7 @@
                             } else if (data.includes('Penyelesaian')) {
                                 color = '#dc3545'; // Merah
                             } else if (data.includes('Akan Overdue')) {
-                                color = '#28a745'; // Hijau
+                                color = '#007bff'; // Hijau
                             }
 
                             return `
@@ -365,7 +365,7 @@
                     backgroundColor: [
                         '#dc3545',  // Merah
                         '#ffc107',  // Kuning
-                        '#28a745',  // Hijau
+                        '#007bff',  // Hijau
                     ],
                     borderWidth: 1
                 }],
