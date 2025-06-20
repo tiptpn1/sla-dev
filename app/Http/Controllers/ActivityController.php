@@ -43,8 +43,6 @@ class ActivityController extends Controller
             'scopes.activities.progress' => fn($q) => $q->latest('tanggal'),
             'scopes.activities.progress.evidences' => fn($q) => $q->latest('created_at'),
         ])->where('isActive', true);
-
-        // Hitung rata-rata persentase 
         
         // Filter berdasarkan hak akses
         if (in_array($adminAccess, [3, 10]) && $bagianId) {
@@ -258,7 +256,7 @@ class ActivityController extends Controller
                     $planDurationWeeks = intval($activity->plan_duration);
 
                     // Hitung tanggal akhir (plan_end) berdasarkan jumlah minggu
-                    $planEnd = $planStart->copy()->addWeeks($planDurationWeeks - 1);
+                    $planEnd = $planStart->copy()->addWeeks($planDurationWeeks);
 
                     $activity->plan_end = $planEnd->format('Y-m-d');
                     $activity->save();
@@ -270,7 +268,7 @@ class ActivityController extends Controller
                     $actualDurationWeeks = intval($activity->actual_duration);
 
                     // Hitung tanggal akhir (actual_end) berdasarkan jumlah minggu
-                    $actualEnd = $actualStart->copy()->addWeeks($actualDurationWeeks - 1);
+                    $actualEnd = $actualStart->copy()->addWeeks($actualDurationWeeks);
 
                     $activity->actual_end = $actualEnd->format('Y-m-d');
                     $activity->save();

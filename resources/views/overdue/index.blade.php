@@ -119,6 +119,8 @@
                                     <th>Sub Divisi</th>
                                     <th>Nama Aktivitas</th>
                                     <th>Status Overdue</th>
+                                    <th>Keterangan</th>
+                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -131,11 +133,12 @@
         </div>       
     </section>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js"></script>
     <script>
         let progressTable;
         let pieChartInstance;
+
+        const hakAkses = {{ session('hak_akses_id') }};
+        const isSubDiv = {{ session('id_sub_divisi') != null ? 'true' : 'false' }};
 
         $(document).ready(function () {
             $.ajaxSetup({
@@ -155,16 +158,19 @@
                     }
                 },
                 columns: [
-                    { data: 'no', name: 'no', orderable: false, searchable: false },
-                    { data: 'proyek', name: 'proyek' },
-                    { data: 'scope', name: 'scope' },
-                    { data: 'activity', name: 'activity' },
+                    { 
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                    },
+                    { data: 'project' },
+                    { data: 'scope' },
+                    { data: 'activity' },
                     {
                         data: 'status',
-                        name: 'status',
                         render: function (data) {
-                            let color = '#007BFF'; // Default: On Schedule
-
+                            let color = '';
                             if (data.includes('Belum Mulai')) {
                                 color = '#ffc107'; // Kuning
                             } else if (data.includes('Penyelesaian')) {
@@ -186,6 +192,42 @@
                                 </span>
                             `;
                         }
+                    },
+                    {
+                        data: 'keterangan',
+                        render: function (data, type, row, meta) {
+                            const canEdit = hakAkses == 7 || isSubDiv === true;
+                            return `
+                                <textarea 
+                                    class="edit form-control ${!canEdit ? 'bg-secondary text-white' : ''}"
+                                    data-id="${row.id_activity}"
+                                    data-field="keterangan"
+                                    ${canEdit ? '' : 'disabled'}
+                                >${data ?? ''}</textarea>
+                            `;
+                        }
+                    },
+                    {
+                        data: 'status2',
+                        orderable: false,
+                        searchable: false,
+                        render: function (data, type, row, meta) {
+                            const canEdit = hakAkses == 7 || isSubDiv === true;
+
+                                if (canEdit && !data) {
+                                    return `
+                                        <button class="btn btn-warning btn-sm status2-btn" data-id="${row.id_activity}" style="font-weight: 700;">
+                                            Tindak Lanjuti
+                                        </button>
+                                    `;
+                                } else if (data) {
+                                    return `<strong class="text-success">Sudah ditindaklanjuti</strong>`;
+                                } else {
+                                    return `<strong class="text-danger">Belum ditindaklanjuti</strong>`;
+                                }
+
+                            return '';
+                        }
                     }
                 ]
             });
@@ -205,8 +247,7 @@
                         updatePieChart([
                             response['Project Overdue Penyelesaian'],
                             response['Project Overdue Belum Mulai'],
-                            response['Project Akan Overdue'],
-                            response['Project on Schedule']
+                            response['Project Akan Overdue']
                         ]);
                     }
                 });
@@ -214,6 +255,91 @@
             $('#filter-year').change(function () {
                 progressTable.ajax.reload(); 
                 loadPieChartData();          
+            });
+        });
+
+        //Keterangan
+        $(document).on('change', '.edit', function () {
+            const id = $(this).data('id');
+            const field = $(this).data('field');
+            const value = $(this).val();
+
+            $.ajax({
+                url: '/update-keterangan',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    id_activity: id,
+                    field: field,
+                    value: value
+                },
+                success: function (response) {
+                    toastr.success(response.message);
+                    var data = response.data;
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    toastr.error(response.message);
+                }
+            });
+        });
+
+        //Button Tindak Lanjut
+        $(document).on('click', '.status2-btn', function () {
+            const id = $(this).data('id');
+            const button = $(this);
+
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: "Yakin ingin menindaklanjuti aktivitas ini?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, tindak lanjuti!',
+                cancelButtonText: 'Tidak'           
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/overdue/status",
+                        method: "POST",
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            id: id
+                        },
+                        success: function (res) {
+                            if (res.success) {
+                                // Ubah tombol jadi teks langsung tanpa reload
+                                const row = button.closest('tr');
+                                const cell = button.closest('td');
+                                cell.html('<strong class="text-success">Sudah ditindaklanjuti</strong>');
+
+                                loadChartData();
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    text: 'Aktivitas telah ditindaklanjuti.',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal!',
+                                    text: 'Gagal menindaklanjuti aktivitas.',
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Terjadi Kesalahan',
+                                text: 'Server error atau koneksi gagal.',
+                            });
+                        }
+                    });
+                }
             });
         });
 
@@ -225,19 +351,17 @@
                 datasets: [{
                     data: dataValues,
                     backgroundColor: [
-                        '#dc3545',  
-                        '#ffc107',  
-                        '#28a745',  
-                        '#007BFF'   
+                        '#dc3545',  // Merah
+                        '#ffc107',  // Kuning
+                        '#28a745',  // Hijau
                     ],
                     borderWidth: 1
                 }],
                 labels: [
-                    'Project Overdue Penyelesaian',
-                    'Project Overdue Belum Mulai',
-                    'Project Akan Overdue',
-                    'Project On Schedule'
-                ]
+                    `Project Overdue Penyelesaian: ${dataValues[0]}`,
+                    `Project Overdue Belum Mulai: ${dataValues[1]}`,
+                    `Project Akan Overdue: ${dataValues[2]}`
+                ],
             };
 
             if (pieChartInstance) pieChartInstance.destroy();
@@ -247,21 +371,42 @@
                 data: dataPie,
                 options: {
                     responsive: true,
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                const label = data.labels[tooltipItem.index] || '';
+                                const value = data.datasets[0].data[tooltipItem.index] || 0;
+                                return `${label}`;
+                            }
+                        }
+                    },
                     plugins: {
-                        legend: { position: 'bottom' },
-                        tooltip: {
-                            callbacks: {
-                                label: function (context) {
-                                    const label = context.label || '';
-                                    const value = context.raw || 0;
-                                    return `${label}: ${value}`;
-                                }
+                        datalabels: {
+                            color: '#ffff',
+                            font: {
+                                weight: 'bold',
+                                size: 14
+                            },
+                            formatter: function (value, context) {
+                                if (value === 0) return '';
+                                return value;
                             }
                         }
                     }
                 }
             });
         }
+
+        function loadChartData() {
+            $.get('/overdue/chart', function (data) {
+                updatePieChart(dataValues);
+            });
+        }
+
     </script>
 
 

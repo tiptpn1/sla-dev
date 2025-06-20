@@ -38,102 +38,54 @@ class ProgressActivityController extends Controller
     public function ganchart(Request $request)
     {
         // dd(session()->all());
-        $direktoratId = Session::get('direktorat_id');
         $adminAccess = Session::get('hak_akses_id');
         $bagianId = Session::get('master_nama_bagian_id');
+        $direktoratId = Session::get('direktorat_id');
         $subDivisiId = Session::get('id_sub_divisi');
+
+        $query = Proyek::with([
+            'scopes' => function ($query) use ($adminAccess, $subDivisiId) {
+                $query->where('isActive', 1);
+
+                // Jika akses sub divisi, filter scope berdasarkan sub_bagian_id
+                if (in_array($adminAccess, [7, 9]) && $subDivisiId) {
+                    $query->where('sub_bagian_id', $subDivisiId);
+                }
+            },
+            'scopes.activities' => function ($query) use ($adminAccess) {
+                if ($adminAccess != 2) {
+                    $query->where('isActive', 1);
+                }
+            },
+            'scopes.activities.pics',
+            'scopes.activities.pics.bagian',
+            'scopes.activities.progress' => fn($q) => $q->latest('tanggal'),
+            'scopes.activities.progress.evidences' => fn($q) => $q->latest('created_at'),
+        ])->where('isActive', true);
         
-        $year = $request->input('year', date('Y'));
-        
-        if ($adminAccess == 6) {
-            // Untuk admin direktorat
-            $projects = Proyek::with([
-                'scopes' => function($query) {
-                    $query->where('isActive', true);
-                },
-                'scopes.activities' => function($query) {
-                    $query->where('isActive', true);
-                },
-                'scopes.activities.pics',
-                'scopes.activities.progress',
-                'scopes.activities.progress.evidences'
-            ])
-            ->where('isActive', true)
-            ->where('direktorat_id', $direktoratId)
-            ->get();
-        }
-        elseif (($adminAccess == 7 || $adminAccess == 9) && $subDivisiId) {
-            // Untuk admin sub divisi
-            $projects = Proyek::with([
-                'scopes' => function($query) use ($subDivisiId) {
-                    $query->where('isActive', true)
-                        ->where('sub_bagian_id', $subDivisiId);
-                },
-                'scopes.activities',
-                'scopes.activities.pics',
-                'scopes.activities.progress',
-                'scopes.activities.progress.evidences'
-            ])
-            ->where('isActive', true)
-            ->whereHas('scopes', function ($query) use ($subDivisiId) {
-                $query->where('isActive', true)
-                    ->where('sub_bagian_id', $subDivisiId);
-            })
-            ->whereYear('created_at', $year)
-            ->get();
-        }
-        elseif (($adminAccess == 3 || $adminAccess == 10) && $bagianId) {
-            // Untuk admin divisi dan admin dengan akses 10
-            $projects = Proyek::with([
-                'scopes' => function($query) {
-                    $query->where('isActive', true);
-                },
-                'scopes.activities',
-                'scopes.activities.pics',
-                'scopes.activities.progress',
-                'scopes.activities.progress.evidences'
-            ])
-            ->where('isActive', true)
-            ->where('master_nama_bagian_id', $bagianId)
-            ->get();
-        }
-        else {
-            // Untuk hak akses lainnya (default)
-            $projects = Proyek::with([
-                'scopes' => function($query) {
-                    $query->where('isActive', true);
-                },
-                'scopes.activities',
-                'scopes.activities.pics',
-                'scopes.activities.progress',
-                'scopes.activities.progress.evidences'
-            ])
-            ->where('isActive', true)
-            ->whereYear('created_at', $year)
-            ->get();
+        // Filter berdasarkan hak akses
+        if (in_array($adminAccess, [3, 10]) && $bagianId) {
+            $query->where('master_nama_bagian_id', $bagianId);
+        } elseif ($adminAccess == 6 && $direktoratId) {
+            $query->where('direktorat_id', $direktoratId);
+        } elseif (in_array($adminAccess, [7, 9]) && $subDivisiId) {
+            $query->whereHas('scopes', function ($q) use ($subDivisiId) {
+                $q->where('isActive', 1)
+                  ->where('sub_bagian_id', $subDivisiId);
+            });
         }
 
+        $projects = $query->get();
+        // Loop untuk hitung rata-rata
         foreach ($projects as $project) {
             foreach ($project->scopes as $scope) {
-
-                $activityCount = 0;
-                $totalPercent = 0;
-
                 foreach ($scope->activities as $activity) {
                     $average = $activity->progress->avg('persentase');
                     $activity->percent_complete = round($average ?? 0, 2);
-
-                    $totalPercent += $activity->percent_complete;
-                    $activityCount++;
                 }
-
-                // Hitung rata-rata percent_complete scope dari seluruh aktivitas di dalamnya
-                $scope->percent_complete = $activityCount > 0 ? round($totalPercent / $activityCount, 2) : 0;
             }
         }
-        
-        $progressColors = ['bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-primary'];
-        return view('pages.ganchart.dashboard', compact('projects', 'progressColors'));
+        return view('pages.ganchart.dashboard', compact('projects'));
     }
 }
 

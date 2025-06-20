@@ -102,18 +102,26 @@
                             <em class="text-danger">No Progress available</em>
                         @endif
                     </td>
-                    <td>
-                        @if ($activity->progress->isNotEmpty() && $activity->progress->first()->evidences->isNotEmpty())
+                   <td>
+                        @php
+                            $allEvidences = $activity->progress->flatMap(function ($p) {
+                                return $p->evidences;
+                            });
+
+                            // Ambil evidence terakhir
+                            $lastEvidence = $allEvidences->sortByDesc('created_at')->first();
+                        @endphp
+
+                        @if ($lastEvidence)
                             <div class="text-muted">
                                 <span>...,</span>
-                                <span class="font-weight-bold">
-                                    {{ $activity->progress->first()->rincian_progress }}
-                                </span>
+                                <span class="font-weight-bold">{{ $lastEvidence->nama_file }}</span>
                             </div>
                         @else
                             <em class="text-danger">No Evidence available</em>
                         @endif
                     </td>
+
                     <td>
                         @if ($activity->progress->isNotEmpty())
                             <div class="text-muted">
