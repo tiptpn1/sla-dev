@@ -284,17 +284,21 @@
                                             array_push($pics, $pic->bagian->master_bagian_kode);
                                         }
 
-                                    if (count($activity->progress)) {
-                                        $rincian_progress = $activity->progress->sortByDesc('tanggal')->first();
-                                        $tanggal = $rincian_progress ? $rincian_progress->tanggal : '';
-                                        $evidence = $rincian_progress && $rincian_progress->evidences
-                                            ? $rincian_progress->evidences->sortByDesc('created_at')->first()->filename ?? ''
-                                            : '';
-                                    } else {
-                                        $rincian_progress = '';
-                                        $evidence = '';
-                                        $tanggal = '';
-                                    }
+                                        if (count($activity->progress)) {
+                                            $rincian_progress = $activity->progress->sortByDesc('tanggal')->first();
+                                            $tanggal = $rincian_progress ? $rincian_progress->tanggal : '';
+                                            $allEvidences = $activity->progress->flatMap(function ($p) {
+                                                return $p->evidences;
+                                            });
+
+                                            // Ambil evidence terakhir
+                                            $lastEvidence = $allEvidences->sortByDesc('created_at')->first();
+                                            $evidence = $lastEvidence ? $lastEvidence->nama_file : '';
+                                        } else {
+                                            $rincian_progress = '';
+                                            $evidence = '';
+                                            $tanggal = '';
+                                        }
 
                                     @endphp {
                                         id: '{{ $activity->id_activity }}',

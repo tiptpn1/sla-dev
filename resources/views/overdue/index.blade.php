@@ -196,10 +196,10 @@
                     {
                         data: 'keterangan',
                         render: function (data, type, row, meta) {
-                            const canEdit = hakAkses == 7 || isSubDiv === true;
+                            const canEdit = hakAkses == 7;
                             return `
                                 <textarea 
-                                    class="edit form-control ${!canEdit ? 'bg-secondary text-white' : ''}"
+                                    class="edit form-control ${canEdit ? 'bg-secondary text-white' : 'bg-light'}"
                                     data-id="${row.id_activity}"
                                     data-field="keterangan"
                                     ${canEdit ? '' : 'disabled'}
@@ -212,8 +212,7 @@
                         orderable: false,
                         searchable: false,
                         render: function (data, type, row, meta) {
-                            const canEdit = hakAkses == 7 || isSubDiv === true;
-
+                            const canEdit = hakAkses == 7;
                                 if (canEdit && !data) {
                                     return `
                                         <button class="btn btn-warning btn-sm status2-btn" data-id="${row.id_activity}" style="font-weight: 700;">
@@ -246,7 +245,7 @@
                     success: function (response) {
                         updatePieChart([
                             response['Project Overdue Penyelesaian'],
-                            response['Project Overdue Belum Mulai'],
+                            response['Project Overdue Belum Mulai Realisasi'],
                             response['Project Akan Overdue']
                         ]);
                     }
@@ -309,13 +308,26 @@
                         },
                         success: function (res) {
                             if (res.success) {
-                                // Ubah tombol jadi teks langsung tanpa reload
-                                const row = button.closest('tr');
+                                // Ganti tampilan tombol
                                 const cell = button.closest('td');
                                 cell.html('<strong class="text-success">Sudah ditindaklanjuti</strong>');
 
-                                loadChartData();
-
+                                // Reload badge 
+                                fetch("{{ route('overdue.count') }}")
+                                    .then(response => response.json())
+                                    .then(data => {
+                                    const badge = document.getElementById('overdue-badge');
+                                    if (data.count > 0) {
+                                        badge.textContent = data.count;
+                                        badge.style.display = 'inline-block';
+                                    } else {
+                                        badge.style.display = 'none';
+                                    }
+                                });
+                                //Reload chart
+                                if (typeof loadChartData === 'function') {
+                                    loadChartData();
+                                }
                                 Swal.fire({
                                     icon: 'success',
                                     title: 'Berhasil!',
@@ -359,7 +371,7 @@
                 }],
                 labels: [
                     `Project Overdue Penyelesaian: ${dataValues[0]}`,
-                    `Project Overdue Belum Mulai: ${dataValues[1]}`,
+                    `Project Overdue Belum Mulai Realisasi: ${dataValues[1]}`,
                     `Project Akan Overdue: ${dataValues[2]}`
                 ],
             };
@@ -402,11 +414,16 @@
         }
 
         function loadChartData() {
-            $.get('/overdue/chart', function (data) {
-                updatePieChart(dataValues);
-            });
+            fetch("{{ route('overdue.chart') }}")
+                .then(res => res.json())
+                .then(data => {
+                    updatePieChart([
+                        data["Project Overdue Penyelesaian"],
+                        data["Project Overdue Belum Mulai"],
+                        data["Project Akan Overdue"]
+                    ]);
+                });
         }
-
     </script>
 
 

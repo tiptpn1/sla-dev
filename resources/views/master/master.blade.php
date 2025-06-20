@@ -160,6 +160,7 @@
                                     <i class="nav-icon fas fa-chart-pie"></i>
                                     <p>
                                         Project Overdue
+                                        <span id="overdue-badge" class="right badge badge-danger" style="display: none;">0</span>
                                     </p>
                                 </a>
                             </li>
@@ -337,8 +338,10 @@
     {{-- sweetalert2 --}}
     <script src="{{ asset('plugins/sweetalert2/sweetalert2.all.min.js') }}"></script>
 </body>
+
 <script>
     $(document).ready(function () {
+        // Inisialisasi DataTable
         $('#table_a1').DataTable({
             "paging": true,
             "lengthChange": false,
@@ -351,26 +354,35 @@
                 "targets": [3, 4, 5, 13],
                 "orderable": false,
                 "searchable": false
-            }
-                // Kolom 3 (direktorat), 4 (divisi), dan 5 (regional), 13 (total) tidak dapat diurutkan dan dicari
-            ]
+            }]
         });
-    });
-</script>
-<script>
-    $(document).ready(function () {
+
         $('[data-widget="pushmenu"]').on('click', function () {
             setTimeout(function () {
                 if ($('body').hasClass('sidebar-collapse')) {
                     $('.main-footer').css('width', '100%');
                 } else {
-                    $('.main-footer').css('width', 'calc(100% - 250px)'); // 250px adalah lebar sidebar default
+                    $('.main-footer').css('width', 'calc(100% - 250px)');
                 }
             }, 300);
         });
-    });
 
+        // Ambil count overdue dan tampilkan di badge
+        fetch("{{ route('overdue.count') }}")
+            .then(response => response.json())
+            .then(data => {
+                const badge = document.getElementById('overdue-badge');
+                if (data.count > 0) {
+                    badge.textContent = data.count;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            });
+    });
 </script>
+
 @stack('scripts')
+
 
 </html>

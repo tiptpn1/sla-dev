@@ -25,6 +25,7 @@ class OverdueController extends Controller
         $subDivisiId = Session::get('id_sub_divisi');
         $year = $request->input('year', date('Y'));
         $today = Carbon::today();
+        $sevenDays = $today->copy()->addDays(7);
 
         $query = DB::table('activity')
             ->join('scopes', 'scopes.id', '=', 'activity.scope_id')
@@ -41,7 +42,10 @@ class OverdueController extends Controller
                 'activity.actual_start',
                 'activity.percent_complete'
             )
-            ->whereYear('activity.plan_start', $year)
+            ->where(function ($q) use ($year) {
+                $q->whereYear('activity.plan_start', $year)
+                ->orWhereYear('activity.plan_end', $year);
+            })
             ->where([
                 ['activity.isActive', 1],
                 ['scopes.isActive', 1],
@@ -50,18 +54,17 @@ class OverdueController extends Controller
             ->whereNotNull('activity.plan_start')
             ->whereNotNull('activity.plan_end');
 
-        // Hak akses
+        // Filter berdasarkan hak akses
         if (in_array($adminAccess, [3, 10]) && $bagianId) {
-            $query->where('master_nama_bagian_id', $bagianId);
+            $query->where('master_project.master_nama_bagian_id', $bagianId);
         } elseif ($adminAccess == 6 && $direktoratId) {
-            $query->where('direktorat_id', $direktoratId);
+            $query->where('master_project.direktorat_id', $direktoratId);
         } elseif (in_array($adminAccess, [7, 9]) && $subDivisiId) {
-            $query->where('sub_bagian_id', $subDivisiId);
+            $query->where('scopes.sub_bagian_id', $subDivisiId);
         }
 
-        // Reusable condition filter overdue
-        $query->where(function ($q) use ($today) {
-            $sevenDays = $today->copy()->addDays(7);
+        // Logika penentuan status overdue
+        $query->where(function ($q) use ($today, $sevenDays) {
             $q->where(function ($q1) use ($today) {
                 $q1->where('activity.plan_start', '<', $today)
                 ->whereNull('activity.actual_start');
@@ -101,6 +104,7 @@ class OverdueController extends Controller
             ->addIndexColumn()
             ->make(true);
     }
+
     public function getChartData(Request $request)
     {
         $adminAccess = Session::get('hak_akses_id');
@@ -109,28 +113,27 @@ class OverdueController extends Controller
         $subDivisiId = Session::get('id_sub_divisi');
         
         $year = $request->input('year', date('Y'));
+        $today = Carbon::today();
+        $sevenDays = $today->copy()->addDays(7);
 
         $query = Proyek::with([
             'scopes' => function ($query) use ($adminAccess, $subDivisiId) {
                 $query->where('isActive', 1);
-
-                // Jika akses sub divisi, filter scope berdasarkan sub_bagian_id
                 if (in_array($adminAccess, [7, 9]) && $subDivisiId) {
                     $query->where('sub_bagian_id', $subDivisiId);
                 }
             },
-            'scopes.activities' => function ($query) use ($adminAccess) {
-                if ($adminAccess != 2) {
-                    $query->where('isActive', 1);
-                }
-            },
-            'scopes.activities.pics',
-            'scopes.activities.pics.bagian',
-            'scopes.activities.progress' => fn($q) => $q->latest('tanggal'),
-            'scopes.activities.progress.evidences' => fn($q) => $q->latest('created_at'),
-        ])->where('isActive', true);
+            'scopes.activities' => function ($query) use ($year) {
+                $query->where('isActive', 1)
+                    ->where('status2', 0)
+                    ->where(function ($q) use ($year) {
+                        $q->whereYear('plan_start', $year)
+                            ->orWhereYear('plan_end', $year);
+                    });
+            }
+        ])
+        ->where('isActive', true);
 
-        // Filter berdasarkan hak akses
         if (in_array($adminAccess, [3, 10]) && $bagianId) {
             $query->where('master_nama_bagian_id', $bagianId);
         } elseif ($adminAccess == 6 && $direktoratId) {
@@ -138,45 +141,39 @@ class OverdueController extends Controller
         } elseif (in_array($adminAccess, [7, 9]) && $subDivisiId) {
             $query->whereHas('scopes', function ($q) use ($subDivisiId) {
                 $q->where('isActive', 1)
-                  ->where('sub_bagian_id', $subDivisiId);
+                ->where('sub_bagian_id', $subDivisiId);
             });
         }
 
         $projects = $query->get();
 
         $chartCounts = [
+            'Project Overdue Belum Mulai Realisasi' => 0,
             'Project Overdue Penyelesaian' => 0,
-            'Project Overdue Belum Mulai' => 0,
             'Project Akan Overdue' => 0
         ];
 
         foreach ($projects as $project) {
             foreach ($project->scopes as $scope) {
-                foreach ($scope->activities->where('status2', false) as $activity) {
-                    if ($activity->plan_start && Carbon::parse($activity->plan_start)->year == $year) {
+                foreach ($scope->activities as $activity) {
+                    if (!$activity->plan_start || !$activity->plan_end) continue;
 
-                        $today = Carbon::today();
-                        $planStart = Carbon::parse($activity->plan_start);
-                        $planEnd = $activity->plan_end ? Carbon::parse($activity->plan_end) : null;
-                        $actualStart = $activity->actual_start ? Carbon::parse($activity->actual_start) : null;
+                    $planStart = Carbon::parse($activity->plan_start);
+                    $planEnd = Carbon::parse($activity->plan_end);
+                    $actualStart = $activity->actual_start ? Carbon::parse($activity->actual_start) : null;
+                    $percent = $activity->percent_complete ?? 0;
 
-                        $status = null;
-
-                        if ($planStart && $today->gt($planStart) && !$actualStart) {
-                            $status = 'Project Overdue Belum Mulai';
-                        } elseif ($planEnd && $today->gt($planEnd) && ($average ?? 0) < 100) {
-                            $status = 'Project Overdue Penyelesaian';
-                        } elseif ($planEnd && $today->gte($planEnd->copy()->subDays(7))) {
-                            $status = 'Project Akan Overdue';
-                        }
-
-                        if ($status) {
-                            $chartCounts[$status]++;
-                        }
+                    if ($planStart && $today->gt($planStart) && !$actualStart) {
+                        $chartCounts['Project Overdue Belum Mulai Realisasi']++;
+                    } elseif ($planEnd && $today->gt($planEnd) && $percent < 100) {
+                        $chartCounts['Project Overdue Penyelesaian']++;
+                    } elseif ($planEnd && $today->gte($planEnd->copy()->subDays(7)) && $percent < 100) {
+                        $chartCounts['Project Akan Overdue']++;
                     }
                 }
             }
         }
+
         return response()->json($chartCounts);
     }
     public function getStatus(Request $request)
@@ -187,7 +184,6 @@ class OverdueController extends Controller
 
         return response()->json(['success' => true]);
     }
-
     public function updateKeterangan(Request $request)
     {
         $userHakAkses = session('hak_akses_id');
@@ -206,5 +202,74 @@ class OverdueController extends Controller
             'message' => 'Keterangan berhasil diperbarui.'
         ]);
     }
+    public function getCount(Request $request)
+    {
+        $adminAccess = Session::get('hak_akses_id');
+        $bagianId = Session::get('master_nama_bagian_id');
+        $direktoratId = Session::get('direktorat_id');
+        $subDivisiId = Session::get('id_sub_divisi');
+
+        $year = $request->input('year', date('Y'));
+        $today = Carbon::today();
+        $sevenDays = $today->copy()->addDays(7);
+
+        $query = Proyek::with([
+            'scopes' => function ($query) use ($adminAccess, $subDivisiId) {
+                $query->where('isActive', 1);
+                if (in_array($adminAccess, [7, 9]) && $subDivisiId) {
+                    $query->where('sub_bagian_id', $subDivisiId);
+                }
+            },
+            'scopes.activities' => function ($query) use ($year) {
+                $query->where('isActive', 1)
+                    ->where('status2', 0)
+                    ->where(function ($q) use ($year) {
+                        $q->whereYear('plan_start', $year)
+                            ->orWhereYear('plan_end', $year);
+                    });
+            }
+        ])
+        ->where('isActive', true);
+
+        // Filter berdasarkan hak akses
+        if (in_array($adminAccess, [3, 10]) && $bagianId) {
+            $query->where('master_nama_bagian_id', $bagianId);
+        } elseif ($adminAccess == 6 && $direktoratId) {
+            $query->where('direktorat_id', $direktoratId);
+        } elseif (in_array($adminAccess, [7, 9]) && $subDivisiId) {
+            $query->whereHas('scopes', function ($q) use ($subDivisiId) {
+                $q->where('isActive', 1)
+                ->where('sub_bagian_id', $subDivisiId);
+            });
+        }
+
+        $projects = $query->get();
+        $count = 0;
+
+        foreach ($projects as $project) {
+            foreach ($project->scopes as $scope) {
+                foreach ($scope->activities as $activity) {
+                    if (!$activity->plan_start || !$activity->plan_end) continue;
+
+                    $planStart = Carbon::parse($activity->plan_start);
+                    $planEnd = Carbon::parse($activity->plan_end);
+                    $actualStart = $activity->actual_start ? Carbon::parse($activity->actual_start) : null;
+                    $percent = $activity->percent_complete ?? 0;
+
+                    if ($today->gt($planStart) && !$actualStart) {
+                        $count++;
+                    } elseif ($today->gt($planEnd) && $percent < 100) {
+                        $count++;
+                    } elseif ($today->gte($planEnd->copy()->subDays(7)) && $percent < 100) {
+                        $count++;
+                    }
+                }
+            }
+        }
+
+        return response()->json(['count' => $count]);
+    }
+
+
 
 } 
