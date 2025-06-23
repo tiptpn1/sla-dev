@@ -156,6 +156,9 @@ Route::middleware(['checkLogin'])->group(function () {
     Route::get('overdue', [OverdueController::class, 'index'])->name('overdue');
     Route::get('overdue/data', [OverdueController::class, 'getProgressData'])->name('overdue.data');
     Route::get('/overdue/chart', [OverdueController::class, 'getChartData'])->name('overdue.chart');
+    Route::post('/overdue/status', [OverdueController::class, 'getStatus'])->name('overdue.status');
+    Route::post('/update-keterangan', [OverdueController::class, 'updateKeterangan']);
+    Route::get('/overdue/count', [OverdueController::class, 'getCount'])->name('overdue.count');
 
     Route::get('activities/data', [ServerSideActivityController::class, 'data'])->name('activities.data');
     Route::resource('activities', ActivityController::class);
