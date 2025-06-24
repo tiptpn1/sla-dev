@@ -19,17 +19,18 @@ class OverdueController extends Controller
     }
     public function getProgressData(Request $request)
     {
-        $adminAccess = Session::get('hak_akses_id');
-        $bagianId = Session::get('master_nama_bagian_id');
-        $direktoratId = Session::get('direktorat_id');
-        $subDivisiId = Session::get('id_sub_divisi');
-        $year = $request->input('year', date('Y'));
-        $today = Carbon::today();
-        $sevenDays = $today->copy()->addDays(7);
+        $adminAccess   = Session::get('hak_akses_id');
+        $bagianId      = Session::get('master_nama_bagian_id');
+        $direktoratId  = Session::get('direktorat_id');
+        $subDivisiId   = Session::get('id_sub_divisi');
+        $year          = $request->input('year', date('Y'));
+        $statusFilter  = $request->input('status');
+        $status2Filter = $request->input('status2');
+        $today         = Carbon::today()->toDateString();
 
         $query = DB::table('activity')
-            ->join('scopes', 'scopes.id', '=', 'activity.scope_id')
-            ->join('master_project', 'master_project.id_project', '=', 'scopes.project_id')
+            ->join('scopes', 'activity.scope_id', '=', 'scopes.id')
+            ->join('master_project', 'scopes.project_id', '=', 'master_project.id_project')
             ->select(
                 'master_project.project_nama as project',
                 'scopes.nama as scope',
@@ -40,21 +41,22 @@ class OverdueController extends Controller
                 'activity.plan_start',
                 'activity.plan_end',
                 'activity.actual_start',
-                'activity.percent_complete'
+                'activity.percent_complete',
+                DB::raw("CASE 
+                    WHEN activity.plan_start < '$today' AND activity.actual_start IS NULL THEN 'Project Overdue Belum Mulai Realisasi'
+                    WHEN activity.plan_end < '$today' AND activity.percent_complete < 100 THEN 'Project Overdue Penyelesaian'
+                    WHEN activity.plan_end >= DATE_SUB('$today', INTERVAL 7 DAY) AND activity.percent_complete < 100 THEN 'Project Akan Overdue'
+                    ELSE NULL END as status")
             )
+            ->where('activity.isActive', 1)
+            ->where('scopes.isActive', 1)
+            ->where('master_project.isActive', 1)
             ->where(function ($q) use ($year) {
                 $q->whereYear('activity.plan_start', $year)
                 ->orWhereYear('activity.plan_end', $year);
-            })
-            ->where([
-                ['activity.isActive', 1],
-                ['scopes.isActive', 1],
-                ['master_project.isActive', 1],
-            ])
-            ->whereNotNull('activity.plan_start')
-            ->whereNotNull('activity.plan_end');
+            });
 
-        // Filter berdasarkan hak akses
+        // Filter berdasarkan hak akses 
         if (in_array($adminAccess, [3, 10]) && $bagianId) {
             $query->where('master_project.master_nama_bagian_id', $bagianId);
         } elseif ($adminAccess == 6 && $direktoratId) {
@@ -63,89 +65,92 @@ class OverdueController extends Controller
             $query->where('scopes.sub_bagian_id', $subDivisiId);
         }
 
-        // Logika penentuan status overdue
-        $query->where(function ($q) use ($today, $sevenDays) {
-            $q->where(function ($q1) use ($today) {
-                $q1->where('activity.plan_start', '<', $today)
-                ->whereNull('activity.actual_start');
-            })
-            ->orWhere(function ($q2) use ($today) {
-                $q2->where('activity.plan_end', '<', $today)
-                ->where(function ($q) {
-                    $q->where('activity.percent_complete', '<', 100)
-                        ->orWhereNull('activity.percent_complete');
-                });
-            })
-            ->orWhere(function ($q3) use ($today, $sevenDays) {
-                $q3->whereBetween('activity.plan_end', [$today, $sevenDays])
-                ->where(function ($q) {
-                    $q->where('activity.percent_complete', '<', 100)
-                        ->orWhereNull('activity.percent_complete');
-                });
+        // Filter status (jika diisi), jika tidak diisi maka default hanya 3 jenis status
+        if ($statusFilter) {
+            $query->having('status', '=', $statusFilter);
+        } else {
+            $query->havingRaw("status IN (?, ?, ?)", [
+                'Project Overdue Belum Mulai Realisasi',
+                'Project Overdue Penyelesaian',
+                'Project Akan Overdue'
+            ]);
+        }
+
+        // Filter status2 
+        if ($status2Filter === 'Sudah ditindaklanjuti') {
+            $query->where('activity.status2', 1);
+        } elseif ($status2Filter === 'Belum ditindaklanjuti') {
+            $query->where(function ($q) {
+                $q->whereNull('activity.status2')
+                ->orWhere('activity.status2', 0);
             });
-        });
+        }
 
-        return DataTables::query($query)
-            ->addColumn('status', function ($row) use ($today) {
-                $planStart = $row->plan_start ? Carbon::parse($row->plan_start) : null;
-                $planEnd = $row->plan_end ? Carbon::parse($row->plan_end) : null;
-                $actualStart = $row->actual_start ? Carbon::parse($row->actual_start) : null;
-                $percent = $row->percent_complete ?? 0;
-
-                if ($planStart && $today->gt($planStart) && !$actualStart) {
-                    return 'Project Overdue Belum Mulai Realisasi';
-                } elseif ($planEnd && $today->gt($planEnd) && $percent < 100) {
-                    return 'Project Overdue Penyelesaian';
-                } elseif ($planEnd && $today->gte($planEnd->copy()->subDays(7)) && $percent < 100) {
-                    return 'Project Akan Overdue';
-                }
-                return '-';
-            })
+        // Return dalam format DataTables
+        return DataTables::of($query)
             ->addIndexColumn()
             ->make(true);
     }
-
     public function getChartData(Request $request)
     {
         $adminAccess = Session::get('hak_akses_id');
         $bagianId = Session::get('master_nama_bagian_id');
         $direktoratId = Session::get('direktorat_id');
         $subDivisiId = Session::get('id_sub_divisi');
-        
+
         $year = $request->input('year', date('Y'));
-        $today = Carbon::today();
-        $sevenDays = $today->copy()->addDays(7);
+        $statusFilter = $request->input('status');
+        $status2Filter = $request->input('status2');
+        $today = Carbon::today()->toDateString();
 
-        $query = Proyek::with([
-            'scopes' => function ($query) use ($adminAccess, $subDivisiId) {
-                $query->where('isActive', 1);
-                if (in_array($adminAccess, [7, 9]) && $subDivisiId) {
-                    $query->where('sub_bagian_id', $subDivisiId);
-                }
-            },
-            'scopes.activities' => function ($query) use ($year) {
-                $query->where('isActive', 1)
-                    ->where('status2', 0)
-                    ->where(function ($q) use ($year) {
-                        $q->whereYear('plan_start', $year)
-                            ->orWhereYear('plan_end', $year);
-                    });
-            }
-        ])
-        ->where('isActive', true);
+        // CASE statement untuk menentukan status
+        $caseStatus = "CASE 
+            WHEN activity.plan_start < '$today' AND activity.actual_start IS NULL THEN 'Project Overdue Belum Mulai Realisasi'
+            WHEN activity.plan_end < '$today' AND activity.percent_complete < 100 THEN 'Project Overdue Penyelesaian'
+            WHEN activity.plan_end >= DATE_SUB('$today', INTERVAL 7 DAY) AND activity.percent_complete < 100 THEN 'Project Akan Overdue'
+            ELSE NULL END";
 
+        $query = DB::table('activity')
+            ->join('scopes', 'activity.scope_id', '=', 'scopes.id')
+            ->join('master_project', 'scopes.project_id', '=', 'master_project.id_project')
+            ->where('activity.isActive', 1)
+            ->where('scopes.isActive', 1)
+            ->where('master_project.isActive', 1)
+            ->where(function ($q) use ($year) {
+                $q->whereYear('activity.plan_start', $year)
+                ->orWhereYear('activity.plan_end', $year);
+            })
+            ->selectRaw("$caseStatus as status, COUNT(*) as total")
+            ->groupBy('status');
+
+        // Filter hak akses
         if (in_array($adminAccess, [3, 10]) && $bagianId) {
-            $query->where('master_nama_bagian_id', $bagianId);
+            $query->where('master_project.master_nama_bagian_id', $bagianId);
         } elseif ($adminAccess == 6 && $direktoratId) {
-            $query->where('direktorat_id', $direktoratId);
+            $query->where('master_project.direktorat_id', $direktoratId);
         } elseif (in_array($adminAccess, [7, 9]) && $subDivisiId) {
-            $query->whereHas('scopes', function ($q) use ($subDivisiId) {
-                $q->where('isActive', 1)
-                ->where('sub_bagian_id', $subDivisiId);
+            $query->where('scopes.sub_bagian_id', $subDivisiId);
+        }
+
+        // Filter status2 
+        if ($status2Filter === 'Sudah ditindaklanjuti') {
+            $query->where('activity.status2', 1);
+        } elseif ($status2Filter === 'Belum ditindaklanjuti') {
+            $query->where(function ($q) {
+                $q->whereNull('activity.status2')->orWhere('activity.status2', 0);
+            });
+        } else {
+            $query->where(function ($q) {
+                $q->whereNull('activity.status2')->orWhere('activity.status2', 0);
             });
         }
 
-        $projects = $query->get();
+        // Filter status jika ada
+        if ($statusFilter) {
+            $query->having('status', '=', $statusFilter);
+        }
+
+        $results = $query->get();
 
         $chartCounts = [
             'Project Overdue Belum Mulai Realisasi' => 0,
@@ -153,29 +158,15 @@ class OverdueController extends Controller
             'Project Akan Overdue' => 0
         ];
 
-        foreach ($projects as $project) {
-            foreach ($project->scopes as $scope) {
-                foreach ($scope->activities as $activity) {
-                    if (!$activity->plan_start || !$activity->plan_end) continue;
-
-                    $planStart = Carbon::parse($activity->plan_start);
-                    $planEnd = Carbon::parse($activity->plan_end);
-                    $actualStart = $activity->actual_start ? Carbon::parse($activity->actual_start) : null;
-                    $percent = $activity->percent_complete ?? 0;
-
-                    if ($planStart && $today->gt($planStart) && !$actualStart) {
-                        $chartCounts['Project Overdue Belum Mulai Realisasi']++;
-                    } elseif ($planEnd && $today->gt($planEnd) && $percent < 100) {
-                        $chartCounts['Project Overdue Penyelesaian']++;
-                    } elseif ($planEnd && $today->gte($planEnd->copy()->subDays(7)) && $percent < 100) {
-                        $chartCounts['Project Akan Overdue']++;
-                    }
-                }
+        foreach ($results as $row) {
+            if ($row->status && isset($chartCounts[$row->status])) {
+                $chartCounts[$row->status] = $row->total;
             }
         }
 
         return response()->json($chartCounts);
     }
+
     public function getStatus(Request $request)
     {
         $activity = Activity::findOrFail($request->id);
@@ -202,6 +193,7 @@ class OverdueController extends Controller
             'message' => 'Keterangan berhasil diperbarui.'
         ]);
     }
+    //notifikasi
     public function getCount(Request $request)
     {
         $adminAccess = Session::get('hak_akses_id');
@@ -269,7 +261,4 @@ class OverdueController extends Controller
 
         return response()->json(['count' => $count]);
     }
-
-
-
 } 
