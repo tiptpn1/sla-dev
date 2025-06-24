@@ -89,7 +89,7 @@
                     <!-- Card for pie chart -->
                     <div class="d-flex justify-content-center">
                         <div style="width: 330px; height: 330px;">
-                            <canvas id="pieChartProject" width="250" height="250"></canvas>
+                            <div id="pieChartProject"></div>
                         </div>
                     </div>
                 </div>
@@ -101,14 +101,34 @@
                     <h4 class="font-weight-bold">Rincian Project Overdue </h4> 
                 </div>
                 <div class="card-body">
-                    <div class="mb-4">
-                        <label for="filter-year">Filter Tahun:</label>
-                        <select id="filter-year" class="form-control" style="width: 200px; display: inline-block;">
-                            @for ($i = 2023; $i <= now()->year + 1; $i++)
-                                <option value="{{ $i }}" {{ $i == now()->year ? 'selected' : '' }}>{{ $i }}</option>
-                            @endfor
-                        </select>
+                    <div class="mb-3 d-flex align-items-center">
+                        <div class="me-4">
+                            <label for="filter-year">Filter Tahun:</label>
+                            <select id="filter-year" class="form-control" style="width: 150px;">
+                                @for ($i = 2023; $i <= now()->year + 1; $i++)
+                                    <option value="{{ $i }}" {{ $i == now()->year ? 'selected' : '' }}>{{ $i }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                        <div>
+                            <label for="filter-status">Filter Overdue:</label>
+                            <select id="filter-status" class="form-control" style="width: 300px;">
+                                <option value="">-- Pilih Status Overdue --</option>
+                                <option value="Project Overdue Penyelesaian">Project Overdue Penyelesaian</option>
+                                <option value="Project Overdue Belum Mulai Realisasi">Project Overdue Belum Mulai Realisasi</option>
+                                <option value="Project Akan Overdue">Project Akan Overdue</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="filter-status2">Filter Status:</label>
+                            <select id="filter-status2" class="form-control" style="width: 200px;">
+                                <option value="">-- Pilih Status --</option>
+                                <option value="Sudah ditindaklanjuti">Sudah ditindaklanjuti</option>
+                                <option value="Belum ditindaklanjuti">Belum ditindaklanjuti</option>
+                            </select>
+                        </div>
                     </div>
+
                     <!-- Card for table -->
                     <div class="table-responsive">
                         <table id="progress-table" class="table table-bordered" width="100%">
@@ -155,6 +175,8 @@
                     url: "{{ route('overdue.data') }}",
                     data: function (d) {
                         d.year = $('#filter-year').val();
+                        d.status = $('#filter-status').val();
+                        d.status2 = $('#filter-status2').val();
                     }
                 },
                 columns: [
@@ -164,12 +186,15 @@
                     orderable: false,
                     searchable: false
                     },
-                    { data: 'project' },
-                    { data: 'scope' },
-                    { data: 'activity' },
+                    { data: 'project', name: 'master_project.project_nama'},
+                    { data: 'scope', name: 'scopes.nama'},
+                    { data: 'activity', name: 'activity.nama_activity' },
                     {
                         data: 'status',
                         render: function (data) {
+                            // Pastikan data bukan null/undefined
+                            data = data || '';
+
                             let color = '';
                             if (data.includes('Belum Mulai')) {
                                 color = '#ffc107'; // Kuning
@@ -194,7 +219,7 @@
                         }
                     },
                     {
-                        data: 'keterangan',
+                        data: 'keterangan', name: 'activity.keterangan',
                         render: function (data, type, row, meta) {
                             const canEdit = hakAkses == 7;
                             return `
@@ -209,8 +234,7 @@
                     },
                     {
                         data: 'status2',
-                        orderable: false,
-                        searchable: false,
+                        name: 'activity.status2',
                         render: function (data, type, row, meta) {
                             const canEdit = hakAkses == 7;
                                 if (canEdit && !data) {
@@ -240,7 +264,9 @@
                     url: "{{ route('overdue.chart') }}",
                     method: 'GET',
                     data: {
-                        year: $('#filter-year').val()
+                        year: $('#filter-year').val(),
+                        status: $('#filter-status').val(),
+                        status2: $('#filter-status2').val()
                     },
                     success: function (response) {
                         updatePieChart([
@@ -253,7 +279,17 @@
             }
             $('#filter-year').change(function () {
                 progressTable.ajax.reload(); 
-                loadPieChartData();          
+                // loadChartData();
+            });
+
+            $('#filter-status').on('change', function () {
+                progressTable.ajax.reload();
+                // loadChartData();
+            });
+
+            $('#filter-status2').on('change', function () {
+                progressTable.ajax.reload();
+                // loadChartData();
             });
         });
 
@@ -357,73 +393,104 @@
 
         // Fungsi update Pie Chart
         function updatePieChart(dataValues) {
-            const ctx = document.getElementById('pieChartProject').getContext('2d');
+            if (pieChartInstance) {
+                pieChartInstance.destroy();
+                pieChartInstance = null;
+            }
 
-            const dataPie = {
-                datasets: [{
-                    data: dataValues,
-                    backgroundColor: [
-                        '#dc3545',  // Merah
-                        '#ffc107',  // Kuning
-                        '#007bff',  // Hijau
-                    ],
-                    borderWidth: 1
-                }],
+            // Bersihkan container
+            document.getElementById('pieChartProject').innerHTML = '';
+
+            const options = {
+                series: dataValues,
+                chart: {
+                    type: 'pie',
+                    width: 330,
+                    height: 330,
+                    animations: {
+                        enabled: true,
+                        easing: 'easeinout',
+                        speed: 800
+                    }
+                },
                 labels: [
-                    `Project Overdue Penyelesaian: ${dataValues[0]}`,
-                    `Project Overdue Belum Mulai Realisasi: ${dataValues[1]}`,
-                    `Project Akan Overdue: ${dataValues[2]}`
+                    'Project Overdue Penyelesaian',
+                    'Project Overdue Belum Mulai Realisasi', 
+                    'Project Akan Overdue'
                 ],
-            };
-
-            if (pieChartInstance) pieChartInstance.destroy();
-
-            pieChartInstance = new Chart(ctx, {
-                type: 'pie',
-                data: dataPie,
-                options: {
-                    responsive: true,
-                    legend: {
-                        display: true,
-                        position: 'bottom'
+                colors: ['#dc3545', '#ffc107', '#007bff'], //merah, orange, biru
+                dataLabels: {
+                    enabled: true,
+                    style: {
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        colors: ['#ffffff']
                     },
-                    tooltips: {
-                        callbacks: {
-                            label: function (tooltipItem, data) {
-                                const label = data.labels[tooltipItem.index] || '';
-                                const value = data.datasets[0].data[tooltipItem.index] || 0;
-                                return `${label}`;
-                            }
-                        }
-                    },
-                    plugins: {
-                        datalabels: {
-                            color: '#ffff',
-                            font: {
-                                weight: 'bold',
-                                size: 14
-                            },
-                            formatter: function (value, context) {
-                                if (value === 0) return '';
-                                return value;
-                            }
+                    formatter: function (val, opts) {
+                        const value = opts.w.config.series[opts.seriesIndex];
+                        return value > 0 ? value : '';
+                    }
+                },
+                legend: { 
+                    position: 'bottom',
+                    fontSize: '14px',
+                    formatter: function(seriesName) {
+                        return seriesName;
+                    }
+                },
+                tooltip: { //hover
+                    enabled: true,
+                    y: {
+                        formatter: function(value) {
+                            return value + ' project';
                         }
                     }
-                }
-            });
+                },
+                plotOptions: {
+                    pie: {
+                        expandOnClick: false,
+                        donut: {
+                            size: '0%'
+                        }
+                    }
+                },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 300,
+                            height: 300
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }]
+            };
+
+            // Buat chart baru
+            pieChartInstance = new ApexCharts(document.querySelector("#pieChartProject"), options);
+            pieChartInstance.render();
         }
 
-        function loadChartData() {
-            fetch("{{ route('overdue.chart') }}")
-                .then(res => res.json())
-                .then(data => {
+        window.loadChartData = function() {
+            $.ajax({
+                url: "{{ route('overdue.chart') }}",
+                method: 'GET',
+                data: {
+                    year: $('#filter-year').val(),
+                    status: $('#filter-status').val(),
+                    status2: $('#filter-status2').val()
+                },
+                success: function (response) {
                     updatePieChart([
-                        data["Project Overdue Penyelesaian"],
-                        data["Project Overdue Belum Mulai"],
-                        data["Project Akan Overdue"]
+                        response['Project Overdue Penyelesaian'],
+                        response['Project Overdue Belum Mulai Realisasi'],
+                        response['Project Akan Overdue']
                     ]);
-                });
-        }
+                }
+            });
+        };
     </script>
 
 

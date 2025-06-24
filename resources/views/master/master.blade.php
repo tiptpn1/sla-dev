@@ -34,8 +34,7 @@
     <link rel="stylesheet" href="{{ asset('plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
     <!-- PieChart -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
     {{-- select2 --}}
     <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
@@ -60,7 +59,6 @@
         white-space: normal !important;
         word-break: break-word;
     }
-
 </style>
 
 <body class="hold-transition sidebar-mini layout-fixed">
