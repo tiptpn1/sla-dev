@@ -113,7 +113,7 @@
                         <div>
                             <label for="filter-status">Filter Overdue:</label>
                             <select id="filter-status" class="form-control" style="width: 300px;">
-                                <option value="">-- Pilih Status Overdue --</option>
+                                <option value="">-- Semua Status Overdue --</option>
                                 <option value="Project Overdue Penyelesaian">Project Overdue Penyelesaian</option>
                                 <option value="Project Overdue Belum Mulai Realisasi">Project Overdue Belum Mulai Realisasi</option>
                                 <option value="Project Akan Overdue">Project Akan Overdue</option>
@@ -122,7 +122,7 @@
                         <div>
                             <label for="filter-status2">Filter Status:</label>
                             <select id="filter-status2" class="form-control" style="width: 200px;">
-                                <option value="">-- Pilih Status --</option>
+                                <option value="">-- Semua Status --</option>
                                 <option value="Sudah ditindaklanjuti">Sudah ditindaklanjuti</option>
                                 <option value="Belum ditindaklanjuti">Belum ditindaklanjuti</option>
                             </select>
@@ -168,6 +168,9 @@
             });
 
             // Inisialisasi DataTable
+            if ($.fn.DataTable.isDataTable('#progress-table')) {
+                $('#progress-table').DataTable().clear().destroy();
+            }
             progressTable = $('#progress-table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -222,14 +225,17 @@
                         data: 'keterangan', name: 'activity.keterangan',
                         render: function (data, type, row, meta) {
                             const canEdit = hakAkses == 7;
-                            return `
-                                <textarea 
-                                    class="edit form-control ${canEdit ? 'bg-secondary text-white' : 'bg-light'}"
-                                    data-id="${row.id_activity}"
-                                    data-field="keterangan"
-                                    ${canEdit ? '' : 'disabled'}
-                                >${data ?? ''}</textarea>
-                            `;
+                            if (canEdit && row.status === "Project Overdue Penyelesaian") {
+                                return `
+                                    <textarea 
+                                        class="edit form-control bg-secondary text-white"
+                                        data-id="${row.id_activity}"
+                                        data-field="keterangan"
+                                    >${data ?? ''}</textarea>
+                                `;
+                            } else {
+                                return data ?? '';
+                            }
                         }
                     },
                     {
@@ -237,19 +243,32 @@
                         name: 'activity.status2',
                         render: function (data, type, row, meta) {
                             const canEdit = hakAkses == 7;
-                                if (canEdit && !data) {
-                                    return `
-                                        <button class="btn btn-warning btn-sm status2-btn" data-id="${row.id_activity}" style="font-weight: 700;">
-                                            Tindak Lanjuti
-                                        </button>
-                                    `;
-                                } else if (data) {
-                                    return `<strong class="text-success">Sudah ditindaklanjuti</strong>`;
-                                } else {
-                                    return `<strong class="text-danger">Belum ditindaklanjuti</strong>`;
-                                }
+                            const currentKeterangan = row.keterangan || ''; // Pastikan tidak null
+                            const isKeteranganEmpty = currentKeterangan.trim() === '';
 
-                            return '';
+                            if (row.status === "Project Overdue Penyelesaian") {
+                                if (canEdit) {
+                                    if (!data) { 
+                                        return `
+                                            <button 
+                                                class="btn btn-warning btn-sm status2-btn" 
+                                                data-id="${row.id_activity}" 
+                                                data-keterangan="${currentKeterangan.replace(/"/g, '&quot;')}" 
+                                                style="font-weight: 700;">
+                                                Tindak Lanjuti
+                                            </button>
+                                        `;
+                                    } else { 
+                                        return `<strong class="text-success">Sudah ditindaklanjuti</strong>`;
+                                    }
+                                } else { 
+                                    return data 
+                                        ? `<strong class="text-success">Sudah ditindaklanjuti</strong>` 
+                                        : `<strong class="text-danger">Belum ditindaklanjuti</strong>`;
+                                }
+                            } else {
+                                return '';
+                            }
                         }
                     }
                 ]
@@ -310,7 +329,13 @@
                 },
                 success: function (response) {
                     toastr.success(response.message);
-                    var data = response.data;
+                    const row = $(`textarea[data-id="${id}"]`).closest('tr');
+                    const btn = row.find(`.status2-btn`);
+                    btn.data('keterangan', value); // update nilai data-keterangan
+
+                    if (value.trim() !== '') {
+                        btn.prop('disabled', false);
+                    }
                 },
                 error: function(xhr, status, error) {
                     console.error(xhr.responseText);
@@ -321,8 +346,15 @@
 
         //Button Tindak Lanjut
         $(document).on('click', '.status2-btn', function () {
-            const id = $(this).data('id');
             const button = $(this);
+            const id = button.data('id');
+            const keterangan = button.data('keterangan')?.trim() || '';
+
+            // Validasi keterangan kosong
+            if (!keterangan) {
+                toastr.error('Silakan isi "Keterangan" terlebih dahulu sebelum menindaklanjuti.');
+                return;
+            }
 
             Swal.fire({
                 title: 'Konfirmasi',

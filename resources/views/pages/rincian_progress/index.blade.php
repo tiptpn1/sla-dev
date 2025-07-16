@@ -240,9 +240,9 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="addTindakLanjut">Tanggal : </label>
+                            <label for="addTanggal">Tanggal : </label>
                             <div class="d-flex">
-                                <input type="date" class="form-control" name="tanggal" required>
+                                <input type="date" class="form-control" id="addTanggal" name="tanggal" required>
                             </div>
                         </div>
                         <div class="form-group">
@@ -309,9 +309,10 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="addTindakLanjut">Tanggal : </label>
+                            <label for="tanggal">Tanggal : </label>
                             <div class="d-flex">
-                                <input type="date" class="form-control" name="tanggal" required>
+                                <input type="date" class="form-control" id="ubahTanggal"
+                                    name="tanggal" required>
                             </div>
                         </div>
                         <div class="form-group">
@@ -496,6 +497,22 @@
                 },
             });
 
+            function updatePercentageDisplay(data) {
+                if (data && data.length > 0) {
+                    let totalPercentage = 0;
+                    data.forEach(function(item) {
+                        totalPercentage += parseFloat(item.persentase);
+                    });
+                    let averagePercentage = (totalPercentage / data.length).toFixed(2);
+                    
+                    $('p:contains("Percent Complete:")').html('<strong>Percent Complete:</strong> ' + averagePercentage + '%');
+                    
+                } else {
+                    // Jika tidak ada data, set ke 0%
+                    $('p:contains("Percent Complete:")').html('<strong>Percent Complete:</strong> 0%');
+                }
+            }
+        
             function loadData() {
                 $.ajax({
                     url: "{{ route('rincian.getData') }}",
@@ -506,6 +523,9 @@
                     success: function(response) {
                         table = $('#table_rincian_progress').DataTable();
                         table.clear();
+
+                        updatePercentageDisplay(response.data);
+
                         $.each(response.data, function(index, item) {
                             if (hasAccess)
                         {
@@ -521,7 +541,7 @@
                                 }),
                                 item.persentase + '%',
                                 `<button class="btn btn-info btn-sm status-btn"  onclick=showEvidence(this) data-id="${item.id}" data-rincian_progress="${item.rincian_progress}">Evidence</button>@if ($hakaksesId == 7)
-                                <button class="btn btn-warning btn-sm edit-btn" onclick="ubahRincianProgress(this)" data-id="${item.id}" data-rincian_progress="${item.rincian_progress}" data-kendala="${item.kendala}" data-tindak_lanjut="${item.tindak_lanjut}" data-persentase="${item.persentase}">Edit</button>
+                                <button class="btn btn-warning btn-sm edit-btn" onclick="ubahRincianProgress(this)" data-id="${item.id}" data-rincian_progress="${item.rincian_progress}" data-kendala="${item.kendala}" data-tindak_lanjut="${item.tindak_lanjut}" data-tanggal="${item.tanggal}" data-persentase="${item.persentase}">Edit</button>
                                 <button class="btn btn-danger btn-sm delete-btn deleteButton" type="submit" type="button" data-toggle="modal" data-id="${item.id}">Hapus</button>@endif`
                             ]).draw();
                         } else {
@@ -558,8 +578,6 @@
                         toastr.success('Rincian progress created successfully.');
                     },
                     error: function(xhr, status, error) {
-                        // console.log(data);
-                        // console.error(xhr.responseText);
                         if (xhr.status == 400) { // Jika ada kesalahan validasi
                             $('#error-message').text(xhr.responseJSON.message).removeClass(
                                 'd-none');
@@ -687,6 +705,7 @@
             $('#addRincianProgress').val('');
             $('#addKendala').val('');
             $('#addTindakLanjut').val('');
+            $('#addTanggal').val('');
             $('#addPersentase').val('');
             $('#addEvidence').val('');
 
@@ -698,12 +717,14 @@
             rincian_progress = $(button).data('rincian_progress');
             kendala = $(button).data('kendala');
             tindak_lanjut = $(button).data('tindak_lanjut');
+            tanggal = $(button).data('tanggal');
             persentase = $(button).data('persentase');
 
             $('#ubahRincianProgressId').val(id);
             $('#ubahRincianProgress').val(rincian_progress);
             $('#ubahKendala').val(kendala);
             $('#ubahTindakLanjut').val(tindak_lanjut);
+            $('#ubahTanggal').val(tanggal);
             $('#ubahPersentase').val(persentase);
 
             $('#updateRincianProgressModal').modal('show');
