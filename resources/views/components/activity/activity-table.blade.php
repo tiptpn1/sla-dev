@@ -77,7 +77,7 @@
                                 <span class="badge badge-primary"
                                     style="margin: 2px; padding: 5px 10px; background-color: #007bff; color: white; border-radius: 15px; cursor: pointer;"
                                     title="{{ $pic->bagian->master_bagian_nama }}">
-                                    {{ $pic->bagian->master_bagian_kode }}
+                                    {{ $pic->bagian->master_bagian_kode }} 
                                 </span>
                             @endforeach
                         @else
@@ -121,7 +121,7 @@
                             <em class="text-danger">No Evidence available</em>
                         @endif
                     </td>
-
+                    
                     <td>
                         @if ($activity->progress->isNotEmpty())
                             <div class="text-muted">
